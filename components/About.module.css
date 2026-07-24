@@ -1,0 +1,104 @@
+.section {
+  padding-block: 88px 96px;
+  border-top: 1px solid var(--color-neutral-300);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.7fr);
+  grid-template-areas:
+    "about photo1 photo2"
+    "about photo1 rhythm";
+  column-gap: 20px;
+  row-gap: 28px;
+  align-items: start;
+}
+
+.aboutText {
+  grid-area: about;
+  min-width: 0;
+}
+
+.rhythmText {
+  grid-area: rhythm;
+  min-width: 0;
+}
+
+.photoFrame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+  background: var(--color-hero-mist);
+}
+
+.photoPrimary {
+  grid-area: photo1;
+  aspect-ratio: 4 / 5;
+}
+
+.photoSecondary {
+  grid-area: photo2;
+  aspect-ratio: 1 / 1;
+}
+
+.eyebrow {
+  margin: 0 0 18px;
+  font-size: 12.5px;
+  letter-spacing: 0.12em;
+  color: var(--color-neutral-600);
+}
+
+.paragraph {
+  margin: 0;
+  font-size: 17px;
+  line-height: 2;
+  color: var(--color-text-muted);
+}
+
+.paragraph + .paragraph {
+  margin-top: 18px;
+}
+
+.paragraphSmall {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.9;
+  color: var(--color-text-muted);
+}
+
+.paragraphSmall + .paragraphSmall {
+  margin-top: 14px;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "about photo1"
+      "photo2 rhythm";
+    column-gap: 24px;
+    row-gap: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding-block: 64px 72px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "about"
+      "photo1"
+      "rhythm"
+      "photo2";
+    row-gap: 32px;
+  }
+
+  .photoPrimary,
+  .photoSecondary {
+    aspect-ratio: 4 / 3;
+  }
+}

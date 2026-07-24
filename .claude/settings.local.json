@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -m pip install --quiet --user pillow)",
+      "Bash(python3 -c \"import PIL; print\\('ok', PIL.__version__\\)\")",
+      "Bash(python3 -c \"import zlib,struct; print\\('base ok'\\)\")",
+      "Bash(sips -s format bmp /Users/fujiemasaki/project/masaki-portfolio/references/hero.png --out /private/tmp/claude-501/-Users-fujiemasaki-project-masaki-portfolio/9f5e3bdb-802f-40c8-a2d2-892ebc9e0510/scratchpad/hero_full.bmp)",
+      "Bash(python3 -)",
+      "Bash(curl -sS -m 8 -o /dev/null -w \"fonts.google.com: %{http_code}\\\\n\" https://fonts.google.com)",
+      "Bash(curl -sS -m 8 -o /dev/null -w \"fonts.gstatic.com: %{http_code}\\\\n\" https://fonts.gstatic.com)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm build *)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)",
+      "Bash(kill 2786)",
+      "Bash(kill 10874)",
+      "Bash(awk '{print $2}')",
+      "Bash(xargs -r kill)"
+    ]
+  }
+}

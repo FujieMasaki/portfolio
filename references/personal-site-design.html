@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/classical-264a0800-399d-4f92-ae24-2a639ae19126/styles.css">
+  <script src="_ds/classical-264a0800-399d-4f92-ae24-2a639ae19126/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <style>
+    body { background: var(--color-bg); }
+    a.qlink { color: var(--color-neutral-800); text-decoration: none; border-bottom: 1px solid color-mix(in oklch, var(--color-accent-500) 35%, var(--color-neutral-500)); padding-bottom: 1px; transition: border-color .2s, color .2s; }
+    a.qlink:hover { color: var(--color-accent-700); border-color: var(--color-accent-700); }
+    a.qlink.active { color: var(--color-accent-700); border-color: var(--color-accent-700); }
+    a.rowlink { color: inherit; text-decoration: none; }
+    .fade-in { animation: qeFade 1s ease both; }
+    @keyframes qeFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .qe-hero-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,0.7fr); gap: 20px; align-items: start; }
+    .qe-likes-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 24px; }
+    .qe-places-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .qe-nav { display: flex; gap: 22px; }
+    .qe-bottom { display: grid; grid-template-columns: 1.3fr 1fr; gap: 56px; align-items: start; }
+    @media (max-width: 860px) {
+      .qe-hero-grid { grid-template-columns: 1fr !important; grid-template-rows: none !important; }
+      .qe-hero-grid > * { grid-column: 1 !important; grid-row: auto !important; margin-bottom: 20px; }
+      .qe-hero-grid image-slot { height: 260px !important; }
+      .qe-likes-row { grid-template-columns: repeat(2, 1fr); row-gap: 32px; }
+      .qe-places-row { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
+      .qe-bottom { grid-template-columns: 1fr; gap: 36px; }
+      .qe-name { font-size: 44px !important; margin-bottom: 18px !important; }
+      .qe-hero-overlay { background: color-mix(in oklch, var(--color-accent-100) 85%, white) !important; }
+      .qe-hero-content { max-width: none !important; padding: 64px 0 40px !important; }
+    }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--color-text); max-width: 1160px; margin: 0 auto; padding: 0 32px;">
+
+  <!-- Hero -->
+  <section data-screen-label="Hero" style="position: relative; margin: 0 -32px 0; padding: 0 32px; overflow: hidden;">
+    <div style="position: absolute; inset: 0; z-index: 0;">
+      <image-slot id="hero-photo" shape="rect" fit="cover" placeholder="差し替え：沖縄・朝の海辺、朝日" style="width:100%; height:100%;"></image-slot>
+      <div class="qe-hero-overlay" style="position:absolute; inset:0; background: linear-gradient(100deg, color-mix(in oklch, var(--color-accent-100) 78%, white) 0%, color-mix(in oklch, var(--color-accent-100) 40%, transparent) 38%, transparent 62%);"></div>
+    </div>
+    <div class="qe-hero-content" style="position: relative; z-index: 1; padding: 96px 0 64px; max-width: 34em;">
+      <div style="font-size: 12.5px; letter-spacing: 0.14em; color: var(--color-accent-700); margin-bottom: 20px;">MASAKI FUJIE / 藤江正樹 — PRODUCT ENGINEER</div>
+      <div class="qe-name fade-in" style="font-family: var(--font-heading); font-weight: 500; font-size: 76px; line-height: 1.05; margin-bottom: 26px;">Masaki Fujie</div>
+      <div class="fade-in" style="font-size: 18.5px; line-height: 1.95; color: var(--color-neutral-800); margin-bottom: 30px;">
+        沖縄に暮らしながら、<br>
+        プロダクトをつくっています。<br><br>
+        技術と人の感情のあいだで、<br>
+        少し良い方向へ進める体験を考えています。
+      </div>
+      <div class="qe-nav" style="font-size: 14.5px; flex-wrap: wrap; row-gap: 10px;">
+        <a class="qlink" href="https://www.wantedly.com/id/masaki_fujie" target="_blank" rel="noopener">Career</a>
+        <a class="qlink" href="https://github.com/FujieMasaki" target="_blank" rel="noopener">GitHub</a>
+        <a class="qlink" href="https://note.com/fujee" target="_blank" rel="noopener">Blog</a>
+        <a class="qlink active" href="#">Focus on Dot</a>
+        <a class="qlink" href="#contact">Contact</a>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:1px; background: color-mix(in oklch, var(--color-accent-300) 25%, var(--color-neutral-300));"></div>
+
+  <!-- About me + My rhythm -->
+  <section data-screen-label="About me" style="padding: 80px 0 0;">
+    <div class="qe-hero-grid" style="grid-template-rows: auto auto;">
+      <div style="grid-column: 1; grid-row: 1 / 3; min-width: 0;">
+        <div style="font-size: 12.5px; letter-spacing: 0.12em; color: var(--color-neutral-600); margin-bottom: 18px;">ABOUT ME</div>
+        <p style="font-size: 17px; line-height: 2; color: var(--color-neutral-800);">
+          沖縄に暮らしながら、フロントエンドを軸に、バックエンドや外部サービスとの連携まで、プロダクトを形にするために必要な領域へ関わっています。
+        </p>
+        <p style="font-size: 17px; line-height: 2; color: var(--color-neutral-800); margin-top: 18px;">
+          技術だけではなく、使う人がどう感じるか、どのようなきっかけで前へ進めるかを考えながら、プロダクトをつくっています。
+        </p>
+        <a class="qlink" href="https://note.com/fujee" target="_blank" rel="noopener" style="font-size: 14.5px; display:inline-block; margin-top: 10px;">もっと読む →</a>
+      </div>
+      <image-slot id="about-photo-1" shape="rect" fit="cover" placeholder="差し替え：歩く後ろ姿" style="grid-column: 2; grid-row: 1 / 3; width:100%; height: 480px;"></image-slot>
+      <image-slot id="about-photo-2" shape="rect" fit="cover" placeholder="差し替え：デスク・植物" style="grid-column: 3; grid-row: 1; width:100%; height: 260px;"></image-slot>
+      <div style="grid-column: 3; grid-row: 2; align-self: start;">
+        <div style="font-size: 12.5px; letter-spacing: 0.12em; color: var(--color-neutral-600); margin-bottom: 16px;">MY RHYTHM ｜ 日々のリズム</div>
+        <p style="font-size: 15.5px; line-height: 1.9; color: var(--color-neutral-800);">
+          朝日を浴びながら海辺を歩き、声に出して考えを整理することがあります。サウナやお風呂など、一人になれる静かな時間を大切にしています。
+        </p>
+        <a class="qlink" href="#" style="font-size: 14px; display:inline-block; margin-top: 10px;">もっと読む →</a>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:1px; background: color-mix(in oklch, var(--color-accent-300) 25%, var(--color-neutral-300)); margin-top: 64px;"></div>
+
+  <!-- Things I like -->
+  <section data-screen-label="Things I like" style="padding: 72px 0; margin: 0 -32px; padding-left: 32px; padding-right: 32px; background: color-mix(in oklch, var(--color-accent-100) 35%, var(--color-bg));">
+    <div style="font-size: 12.5px; letter-spacing: 0.12em; color: var(--color-neutral-600); margin-bottom: 36px;">THINGS I LIKE ｜ 好きな時間、惹かれるもの</div>
+    <div class="qe-likes-row">
+      <div style="text-align:center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:14px;"><path d="M2 6c.7.6 1.4 1.2 2.8 1.2 2.8 0 2.8-2.4 5.6-2.4S13.2 7.2 16 7.2 18.8 4.8 21.6 4.8"/><path d="M2 12c.7.6 1.4 1.2 2.8 1.2 2.8 0 2.8-2.4 5.6-2.4s2.8 2.4 5.6 2.4 2.8-2.4 5.6-2.4"/><path d="M2 18c.7.6 1.4 1.2 2.8 1.2 2.8 0 2.8-2.4 5.6-2.4s2.8 2.4 5.6 2.4 2.8-2.4 5.6-2.4"/></svg>
+        <div style="font-size: 15px; font-weight: 500;">沖縄の海辺</div>
+        <div style="font-size: 12.5px; color: var(--color-neutral-600); line-height: 1.7; margin-top: 6px;">朝の光と静けさが気持ちを整えてくれる</div>
+      </div>
+      <div style="text-align:center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:14px;"><ellipse cx="9" cy="7" rx="2" ry="3" transform="rotate(-18 9 7)"/><ellipse cx="15" cy="16" rx="2" ry="3" transform="rotate(18 15 16)"/></svg>
+        <div style="font-size: 15px; font-weight: 500;">ウォーキングと<br>音声ジャーナリング</div>
+        <div style="font-size: 12.5px; color: var(--color-neutral-600); line-height: 1.7; margin-top: 6px;">声に出すことで、考えが少しずつ見えてくる</div>
+      </div>
+      <div style="text-align:center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:14px;"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>
+        <div style="font-size: 15px; font-weight: 500;">サウナ・お風呂</div>
+        <div style="font-size: 12.5px; color: var(--color-neutral-600); line-height: 1.7; margin-top: 6px;">一人になれる時間が好きです</div>
+      </div>
+      <div style="text-align:center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:14px;"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>
+        <div style="font-size: 15px; font-weight: 500;">旅とホテル</div>
+        <div style="font-size: 12.5px; color: var(--color-neutral-600); line-height: 1.7; margin-top: 6px;">非日常やおもてなしから、たくさんのヒントをもらう</div>
+      </div>
+      <div style="text-align:center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:14px;"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3v18"/><path d="M5.8 5.8c2.8 2.6 2.8 9.8 0 12.4"/><path d="M18.2 5.8c-2.8 2.6-2.8 9.8 0 12.4"/></svg>
+        <div style="font-size: 15px; font-weight: 500;">バスケットボール</div>
+        <div style="font-size: 12.5px; color: var(--color-neutral-600); line-height: 1.7; margin-top: 6px;">琉球ゴールデンキングスを応援。動きや戦術を考えるのも好き</div>
+      </div>
+      <div style="text-align:center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:14px;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="1.4" fill="var(--color-accent-700)" stroke="none"/></svg>
+        <div style="font-size: 15px; font-weight: 500;">シンプルなもの</div>
+        <div style="font-size: 12.5px; color: var(--color-neutral-600); line-height: 1.7; margin-top: 6px;">余白や美しさ、人の温度があるものに惹かれます</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Places to know me + Contact -->
+  <section style="padding: 80px 0 64px;">
+    <div class="qe-bottom">
+      <div data-screen-label="Places to know me">
+        <div style="font-size: 12.5px; letter-spacing: 0.12em; color: var(--color-neutral-600); margin-bottom: 28px;">PLACES TO KNOW ME ｜ もっと知る</div>
+        <div class="qe-places-row">
+          <a class="rowlink" href="https://www.wantedly.com/id/masaki_fujie" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/></svg>
+            <div style="font-size: 15px; font-weight: 500; color: var(--color-text);">Career</div>
+            <div style="font-size: 12.5px; color: var(--color-neutral-600); margin-top: 6px; line-height: 1.6;">これまでの経歴や担当領域</div>
+          </a>
+          <a class="rowlink" href="https://github.com/FujieMasaki" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><path d="m8 6-6 6 6 6"/><path d="m16 6 6 6-6 6"/></svg>
+            <div style="font-size: 15px; font-weight: 500; color: var(--color-text);">GitHub</div>
+            <div style="font-size: 12.5px; color: var(--color-neutral-600); margin-top: 6px; line-height: 1.6;">実装や個人開発</div>
+          </a>
+          <a class="rowlink" href="https://note.com/fujee" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            <div style="font-size: 15px; font-weight: 500; color: var(--color-text);">Blog / note</div>
+            <div style="font-size: 12.5px; color: var(--color-neutral-600); margin-top: 6px; line-height: 1.6;">日々考えていることや学び</div>
+          </a>
+          <a class="rowlink" href="#">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2" fill="var(--color-accent-700)" stroke="none"/></svg>
+            <div style="font-size: 15px; font-weight: 500; color: var(--color-text);">Focus on Dot</div>
+            <div style="font-size: 12.5px; color: var(--color-neutral-600); margin-top: 6px; line-height: 1.6;">自分の声を通して今日を整理する音声ジャーナリング</div>
+          </a>
+        </div>
+      </div>
+      <div id="contact" data-screen-label="Contact">
+        <div style="font-size: 12.5px; letter-spacing: 0.12em; color: var(--color-neutral-600); margin-bottom: 18px;">CONTACT</div>
+        <p style="font-family: var(--font-heading); font-weight: 500; font-size: 24px; line-height: 1.6; margin-bottom: 16px;">
+          一緒に、良い体験を考えられるとうれしいです。
+        </p>
+        <p style="font-size: 15.5px; line-height: 1.9; color: var(--color-neutral-800); margin-bottom: 20px;">
+          転職や仕事の相談、Focus on Dotへの感想も歓迎しています。
+        </p>
+        <a class="qlink" href="mailto:hello@masakifujie.example" style="font-size: 15px; display:inline-block; margin-bottom: 22px;">hello@masakifujie.example</a>
+        <image-slot id="contact-photo" shape="rect" fit="cover" placeholder="差し替え：空・雲" style="width:100%; aspect-ratio: 16/9;"></image-slot>
+      </div>
+    </div>
+  </section>
+
+  <footer style="padding: 32px 0 56px; display:flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-neutral-300); font-size: 13px; color: var(--color-neutral-600);">
+    <span>Masaki Fujie / 藤江正樹</span>
+    <span>© 2026</span>
+  </footer>
+
+</div>
+
+</x-dc>
+</body>
+</html>

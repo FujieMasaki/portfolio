@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  /* Base palette — warm, low-saturation tones sampled from references/hero.png */
+  --color-bg: #f4f1ec;
+  --color-text: #211f1b;
+  --color-text-muted: #47433d;
+  --color-neutral-300: #ddd7c9;
+  --color-neutral-600: #6f6a61;
+  --color-accent-100: #f8ecd7;
+  --color-accent-500: #b98a44;
+  --color-accent-700: #7c5518;
+  --color-hero-mist: #dde3e4;
+
+  --container-max-width: 1160px;
+  --container-padding: 32px;
+}
+
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --font-sans: var(--font-body);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body), "Hiragino Sans", "Yu Gothic", sans-serif;
+  /* Safety net: layout is built to avoid overflow, this guards against unexpected regressions */
+  overflow-x: hidden;
+}
+
+img,
+picture,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding);
+}
