@@ -91,6 +91,11 @@
   border-color: var(--color-accent-700);
 }
 
+.navLinkDisabled {
+  color: var(--color-neutral-600);
+  opacity: 0.5;
+}
+
 @media (max-width: 860px) {
   .content {
     padding-block: 64px 40px;

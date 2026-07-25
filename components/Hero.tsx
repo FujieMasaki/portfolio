@@ -3,15 +3,16 @@ import styles from "./Hero.module.css";
 
 type NavLink = {
   label: string;
-  href: string;
-  external: boolean;
+  href?: string;
+  external?: boolean;
+  disabled?: boolean;
 };
 
 const NAV_LINKS: NavLink[] = [
   { label: "Tech Notes", href: "https://zenn.dev/fujee", external: true },
   { label: "GitHub", href: "https://github.com/FujieMasaki", external: true },
   { label: "Blog", href: "https://note.com/fujee", external: true },
-  { label: "Focus on Dot", href: "#", external: false },
+  { label: "Focus on Dot（準備中）", disabled: true },
   { label: "Contact", href: "#contact", external: false },
 ];
 
@@ -49,18 +50,24 @@ export default function Hero() {
             </p>
           </div>
           <nav className={styles.nav} aria-label="Primary">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                className={styles.navLink}
-                href={link.href}
-                {...(link.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) =>
+              link.disabled ? (
+                <span key={link.label} className={styles.navLinkDisabled}>
+                  {link.label}
+                </span>
+              ) : (
+                <a
+                  key={link.label}
+                  className={styles.navLink}
+                  href={link.href}
+                  {...(link.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
           </nav>
         </div>
       </div>
