@@ -37,6 +37,11 @@
   );
 }
 
+.navLinkDisabled {
+  color: inherit;
+  opacity: 0.5;
+}
+
 .copyright {
   white-space: nowrap;
 }

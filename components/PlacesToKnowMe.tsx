@@ -4,8 +4,9 @@ import styles from "./PlacesToKnowMe.module.css";
 type Place = {
   title: string;
   description: string;
-  href: string;
-  external: boolean;
+  href?: string;
+  external?: boolean;
+  comingSoon?: boolean;
   icon: React.ReactNode;
 };
 
@@ -71,8 +72,7 @@ const PLACES: Place[] = [
     title: "Focus on Dot",
     description:
       "話すことで自分の考えを整理し、今日の小さな気づきを見つける音声ジャーナリングアプリ。",
-    href: "#",
-    external: false,
+    comingSoon: true,
     icon: (
       <Icon>
         <circle cx="12" cy="12" r="9" />
@@ -88,25 +88,50 @@ export default function PlacesToKnowMe() {
       <p className={styles.eyebrow}>PLACES TO KNOW ME ｜ もっと知る</p>
 
       <div className={styles.grid}>
-        {PLACES.map((place) => (
-          <a
-            key={place.title}
-            className={styles.item}
-            href={place.href}
-            {...(place.external
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-          >
-            <span className={styles.icon}>{place.icon}</span>
-            <span className={styles.itemTitle}>
-              {place.title}
-              <span className={styles.arrow} aria-hidden="true">
-                →
+        {PLACES.map((place) => {
+          const inner = (
+            <>
+              <span className={styles.icon}>{place.icon}</span>
+              <span className={styles.itemTitle}>
+                {place.title}
+                {place.comingSoon ? (
+                  <span className={styles.badge}>準備中</span>
+                ) : (
+                  <span className={styles.arrow} aria-hidden="true">
+                    →
+                  </span>
+                )}
               </span>
-            </span>
-            <span className={styles.itemDescription}>{place.description}</span>
-          </a>
-        ))}
+              <span className={styles.itemDescription}>
+                {place.description}
+              </span>
+            </>
+          );
+
+          if (place.comingSoon) {
+            return (
+              <div
+                key={place.title}
+                className={`${styles.item} ${styles.itemDisabled}`}
+              >
+                {inner}
+              </div>
+            );
+          }
+
+          return (
+            <a
+              key={place.title}
+              className={styles.item}
+              href={place.href}
+              {...(place.external
+                ? { target: "_blank", rel: "noopener noreferrer" }
+                : {})}
+            >
+              {inner}
+            </a>
+          );
+        })}
       </div>
     </section>
   );

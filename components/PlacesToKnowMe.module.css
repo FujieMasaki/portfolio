@@ -65,6 +65,26 @@
   transform: translateX(0);
 }
 
+.badge {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--color-neutral-600);
+}
+
+.itemDisabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.itemDisabled:hover {
+  background: none;
+}
+
+.itemDisabled .itemTitle {
+  color: var(--color-neutral-600);
+}
+
 .itemDescription {
   font-size: 12.5px;
   line-height: 1.7;
