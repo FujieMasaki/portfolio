@@ -5,7 +5,6 @@ type CareerItem = {
   period: string;
   keyword: string;
   body: string[];
-  areas?: string[];
 };
 
 const CAREERS: CareerItem[] = [
@@ -42,9 +41,8 @@ const CAREERS: CareerItem[] = [
     keyword: "テクノロジーで体験をつくる",
     body: [
       "Webエンジニアとして、飲食・小売、旅行、AI SaaSなどのプロダクト開発を経験。UI改善や仕様検討、分析、業務改善にも関わってきました。",
-      "開発を重ねる中で、実装そのものだけでなく、誰のどんな課題を解決し、どんな体験を届けるのかへ関心が広がっています。",
+      "開発を重ねる中で、実装だけでなく、何をつくるかや、使う人の体験について考えることが増えました。",
     ],
-    areas: ["飲食・小売向け分析サービス", "訪日外国人向け旅行サービス", "AI SaaS"],
   },
   {
     title: "Experience",
@@ -89,13 +87,6 @@ export default function Career() {
                     <p key={paragraph}>{paragraph}</p>
                   ))}
                 </div>
-                {item.areas ? (
-                  <ul className={styles.areas} aria-label="経験領域">
-                    {item.areas.map((area) => (
-                      <li key={area}>{area}</li>
-                    ))}
-                  </ul>
-                ) : null}
               </div>
             </li>
           ))}
