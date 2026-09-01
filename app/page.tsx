@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import About from "@/components/About";
+import Career from "@/components/Career";
 import ThingsILike from "@/components/ThingsILike";
 import PlacesToKnowMe from "@/components/PlacesToKnowMe";
 import Contact from "@/components/Contact";
@@ -10,6 +11,7 @@ export default function Home() {
     <div className="container">
       <Hero />
       <About />
+      <Career />
       <ThingsILike />
       <PlacesToKnowMe />
       <Contact />
