@@ -6,15 +6,11 @@ type NavLink = {
   href: string;
 };
 
-const CONTACT_HREF =
-  "mailto:ffffffzzzzzeeee@gmail.com?subject=Portfolio%20Contact";
-
 const NAV_LINKS: NavLink[] = [
   { label: "About", href: "#about" },
   { label: "Career", href: "#career" },
   { label: "Things I Like", href: "#likes" },
-  { label: "Focus on Dot", href: "#focus-on-dot" },
-  { label: "Contact", href: CONTACT_HREF },
+  { label: "Contact", href: "#contact" },
 ];
 
 export default function Hero() {
