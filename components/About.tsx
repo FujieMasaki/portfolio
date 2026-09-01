@@ -8,20 +8,18 @@ export default function About() {
         <div className={styles.aboutText}>
           <p className={styles.eyebrow}>ABOUT ME</p>
           <p className={styles.paragraph}>
-            フロントエンドを軸に、
+            Webエンジニアとして、
             <br />
-            バックエンドや外部サービスとの連携まで、
+            フロントエンドを中心に、
             <br />
-            プロダクトを形にするために必要な領域へ関わっています。
+            プロダクト開発に関わっています。
           </p>
           <p className={styles.paragraph}>
-            技術だけではなく、
+            実装だけでなく、
             <br />
-            使う人がどう感じるか、
+            使う人にとって何が必要かを考えながら、
             <br />
-            どのようなきっかけで前へ進めるかを考えながら、
-            <br />
-            プロダクトをつくっています。
+            仕様検討やUI改善にも取り組んでいます。
           </p>
         </div>
 
@@ -38,16 +36,14 @@ export default function About() {
         <div className={styles.rhythmText}>
           <p className={styles.eyebrow}>MY RHYTHM ｜ 日々のリズム</p>
           <p className={styles.paragraphSmall}>
-            朝日を浴びながら海辺を歩き、
+            歩きながら、
             <br />
-            声に出して考えを整理することがあります。
+            声に出して考えを整理するのが習慣です。
           </p>
           <p className={styles.paragraphSmall}>
-            一人で歩く時間や、
+            考えがまとまらないときは、
             <br />
-            サウナ、お風呂の静かな時間が、
-            <br />
-            日々のものづくりにもつながっています。
+            一度外に出ることが多いです。
           </p>
         </div>
 

@@ -31,7 +31,7 @@ const PLACES: Place[] = [
   {
     title: "Tech Notes",
     description:
-      "フロントエンド開発や個人開発で得た知見、設計や実装についてまとめています。",
+      "フロントエンド開発や個人開発で試したこと、設計や実装についてまとめています。",
     href: "https://zenn.dev/fujee",
     external: true,
     icon: (
@@ -57,8 +57,7 @@ const PLACES: Place[] = [
   },
   {
     title: "Blog",
-    description:
-      "プロダクトづくりや自己理解、日々考えたことについて書いています。",
+    description: "プロダクトづくりや日々考えたことについて書いています。",
     href: "https://note.com/fujee",
     external: true,
     icon: (
@@ -70,8 +69,7 @@ const PLACES: Place[] = [
   },
   {
     title: "Focus on Dot",
-    description:
-      "話すことで自分の考えを整理し、今日の小さな気づきを見つける音声ジャーナリングアプリ。",
+    description: "話しながら自分の考えを整理する音声ジャーナリングアプリ。",
     comingSoon: true,
     icon: (
       <Icon>
