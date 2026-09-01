@@ -1,7 +1,8 @@
 import Image from "next/image";
 import styles from "./Contact.module.css";
 
-const CONTACT_EMAIL = "";
+const CONTACT_EMAIL = "ffffffzzzzzeeee@gmail.com";
+const CONTACT_HREF = `mailto:${CONTACT_EMAIL}?subject=Portfolio%20Contact`;
 
 export default function Contact() {
   return (
@@ -19,7 +20,7 @@ export default function Contact() {
             <br />
             個人開発についてのメッセージも歓迎しています。
           </p>
-          <a className={styles.button} href={`mailto:${CONTACT_EMAIL}`}>
+          <a className={styles.button} href={CONTACT_HREF}>
             メールを送る
             <span className={styles.buttonArrow} aria-hidden="true">
               →

@@ -3,7 +3,7 @@ import styles from "./About.module.css";
 
 export default function About() {
   return (
-    <section className={styles.section} aria-label="About / My rhythm">
+    <section className={styles.section} aria-label="About / My rhythm" id="about">
       <div className={styles.grid}>
         <div className={styles.aboutText}>
           <p className={styles.eyebrow}>ABOUT ME</p>
