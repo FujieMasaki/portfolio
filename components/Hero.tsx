@@ -41,12 +41,12 @@ export default function Hero() {
             <p>
               沖縄に暮らしながら、
               <br />
-              プロダクトをつくっています。
+              プロダクトづくりをしています。
             </p>
             <p>
               技術を使って、
               <br />
-              人にとって使いやすい体験を考えています。
+              使いやすい体験を考えています。
             </p>
           </div>
           <nav className={styles.nav} aria-label="Primary">

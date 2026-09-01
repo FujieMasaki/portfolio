@@ -5,7 +5,6 @@ type CareerItem = {
   period: string;
   keyword: string;
   body: string[];
-  areas?: string[];
 };
 
 const CAREERS: CareerItem[] = [
@@ -32,7 +31,7 @@ const CAREERS: CareerItem[] = [
     period: "2020 - 2022",
     keyword: "人と人がつながる環境をつくる",
     body: [
-      "コミュニティマネージャーとして、コワーキングスペースやプログラミングスクールなどの運営に関わりました。",
+      "コミュニティマネージャーとして、コワーキングスペースやシェアハウス、プログラミングスクールなどの運営に関わりました。",
       "人の強みや関心を見ながら、成長やつながりが生まれる環境を考える。その経験とエンジニアとの関わりから、Webエンジニアに興味を持ちました。",
     ],
   },
@@ -42,9 +41,8 @@ const CAREERS: CareerItem[] = [
     keyword: "テクノロジーで体験をつくる",
     body: [
       "Webエンジニアとして、飲食・小売、旅行、AI SaaSなどのプロダクト開発を経験。UI改善や仕様検討、分析、業務改善にも関わってきました。",
-      "開発を重ねる中で、実装そのものだけでなく、誰のどんな課題を解決し、どんな体験を届けるのかへ関心が広がっています。",
+      "開発を重ねる中で、実装だけでなく、何をつくるかや、使う人の体験について考えることが増えました。",
     ],
-    areas: ["飲食・小売向け分析サービス", "訪日外国人向け旅行サービス", "AI SaaS"],
   },
   {
     title: "Experience",
@@ -67,9 +65,9 @@ export default function Career() {
             Career
           </h2>
           <p className={styles.lead}>
-            人と場に向き合う仕事から、
+            人や場所に関わる仕事と、
             <br />
-            リアルとデジタルを横断する体験づくりへ。
+            プロダクト開発を経験してきました。
           </p>
         </div>
 
@@ -89,13 +87,6 @@ export default function Career() {
                     <p key={paragraph}>{paragraph}</p>
                   ))}
                 </div>
-                {item.areas ? (
-                  <ul className={styles.areas} aria-label="経験領域">
-                    {item.areas.map((area) => (
-                      <li key={area}>{area}</li>
-                    ))}
-                  </ul>
-                ) : null}
               </div>
             </li>
           ))}

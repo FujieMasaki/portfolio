@@ -43,7 +43,7 @@ export default function About() {
           <p className={styles.paragraphSmall}>
             考えがまとまらないときは、
             <br />
-            一度外に出ることが多いです。
+            一度外に出て、歩きながら考えを整理します。
           </p>
         </div>
 
