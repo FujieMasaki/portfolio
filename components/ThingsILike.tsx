@@ -29,9 +29,9 @@ const ITEMS: Item[] = [
     title: "沖縄の海辺",
     description: (
       <>
-        朝日を浴びながら歩き、
+        沖縄で暮らしていることもあり、
         <br />
-        声に出して考えを整理する時間。
+        海が近い生活が好きです。
       </>
     ),
     icon: (
@@ -46,9 +46,9 @@ const ITEMS: Item[] = [
     title: "一人で過ごす時間",
     description: (
       <>
-        サウナやお風呂、ウォーキング。
+        サウナやお風呂で、
         <br />
-        静かな時間に頭の中が整っていきます。
+        ぼーっと過ごす時間が好きです。
       </>
     ),
     icon: (
@@ -58,12 +58,12 @@ const ITEMS: Item[] = [
     ),
   },
   {
-    title: "心地よい空間",
+    title: "ホテル・カフェ・レストラン",
     description: (
       <>
-        ホテルのおもてなしや、
+        空間やサービスに興味があります。
         <br />
-        カフェ、レストランで人が自然に笑顔になる空気に惹かれます。
+        利用する側として工夫を見るのも好きです。
       </>
     ),
     icon: (
@@ -97,9 +97,9 @@ const ITEMS: Item[] = [
     title: "シンプルなもの",
     description: (
       <>
-        飾りすぎず、余白があり、
+        シンプルで、使いやすく、
         <br />
-        使う人のために丁寧につくられたものが好きです。
+        丁寧につくられたものが好きです。
       </>
     ),
     icon: (
@@ -115,7 +115,7 @@ export default function ThingsILike() {
   return (
     <section className={styles.section} aria-label="Things I like">
       <div className={styles.inner}>
-        <p className={styles.eyebrow}>THINGS I LIKE ｜ 好きな時間、惹かれるもの</p>
+        <p className={styles.eyebrow}>THINGS I LIKE ｜ 好きなもの・こと</p>
 
         <div className={styles.list}>
           {ITEMS.map((item) => (

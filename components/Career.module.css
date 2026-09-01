@@ -142,25 +142,6 @@
   color: var(--color-text-muted);
 }
 
-.areas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 10px;
-  margin: 20px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.areas li {
-  padding: 5px 10px 6px;
-  border: 1px solid
-    color-mix(in srgb, var(--color-accent-500) 28%, var(--color-neutral-300));
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--color-neutral-600);
-  background: color-mix(in srgb, var(--color-bg) 68%, transparent);
-}
-
 @media (max-width: 900px) {
   .inner {
     grid-template-columns: 1fr;
