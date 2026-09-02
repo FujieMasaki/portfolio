@@ -30,6 +30,18 @@ function Icon(props: SVGProps<SVGSVGElement>) {
 
 const PLACES: Place[] = [
   {
+    title: "Blog",
+    description: "プロダクトづくりや日々考えたことについて書いています。",
+    href: "https://note.com/fujee",
+    external: true,
+    icon: (
+      <Icon>
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z" />
+      </Icon>
+    ),
+  },
+  {
     title: "Tech Notes",
     description:
       "フロントエンド開発や個人開発で試したこと、設計や実装についてまとめています。",
@@ -53,18 +65,6 @@ const PLACES: Place[] = [
       <Icon>
         <path d="m8 6-6 6 6 6" />
         <path d="m16 6 6 6-6 6" />
-      </Icon>
-    ),
-  },
-  {
-    title: "Blog",
-    description: "プロダクトづくりや日々考えたことについて書いています。",
-    href: "https://note.com/fujee",
-    external: true,
-    icon: (
-      <Icon>
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-        <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z" />
       </Icon>
     ),
   },
