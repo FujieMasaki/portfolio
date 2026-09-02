@@ -113,7 +113,7 @@ const ITEMS: Item[] = [
 
 export default function ThingsILike() {
   return (
-    <section className={styles.section} aria-label="Things I like">
+    <section className={styles.section} aria-label="Things I like" id="likes">
       <div className={styles.inner}>
         <p className={styles.eyebrow}>THINGS I LIKE ｜ 好きなもの・こと</p>
 

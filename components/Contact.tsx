@@ -19,7 +19,7 @@ export default function Contact() {
             <br />
             個人開発についてのメッセージも歓迎しています。
           </p>
-          <a className={styles.button} href={`mailto:${CONTACT_EMAIL}`}>
+          <a className={styles.button} href={CONTACT_EMAIL}>
             メールを送る
             <span className={styles.buttonArrow} aria-hidden="true">
               →

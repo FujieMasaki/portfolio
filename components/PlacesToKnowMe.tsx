@@ -4,6 +4,7 @@ import styles from "./PlacesToKnowMe.module.css";
 type Place = {
   title: string;
   description: string;
+  anchorId?: string;
   href?: string;
   external?: boolean;
   comingSoon?: boolean;
@@ -70,6 +71,7 @@ const PLACES: Place[] = [
   {
     title: "Focus on Dot",
     description: "話しながら自分の考えを整理する音声ジャーナリングアプリ。",
+    anchorId: "focus-on-dot",
     comingSoon: true,
     icon: (
       <Icon>
@@ -110,6 +112,7 @@ export default function PlacesToKnowMe() {
             return (
               <div
                 key={place.title}
+                id={place.anchorId}
                 className={`${styles.item} ${styles.itemDisabled}`}
               >
                 {inner}
@@ -120,6 +123,7 @@ export default function PlacesToKnowMe() {
           return (
             <a
               key={place.title}
+              id={place.anchorId}
               className={styles.item}
               href={place.href}
               {...(place.external
