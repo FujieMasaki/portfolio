@@ -1,8 +1,7 @@
 import Image from "next/image";
 import styles from "./Contact.module.css";
 
-const CONTACT_EMAIL = "ffffffzzzzzeeee@gmail.com";
-const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
+const CONTACT_EMAIL = "contact@masakifujie.com";
 
 export default function Contact() {
   return (
