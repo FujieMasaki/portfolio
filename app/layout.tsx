@@ -17,6 +17,10 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "Masaki Fujie",
   description: "Masaki Fujie / 藤江正樹 — Product Engineer",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
