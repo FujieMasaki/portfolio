@@ -2,13 +2,20 @@ import Image from "next/image";
 import styles from "./Contact.module.css";
 
 const CONTACT_EMAIL = "contact@masakifujie.com";
+const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
 
 export default function Contact() {
   return (
-    <section className={styles.section} aria-label="Contact" id="contact">
+    <section
+      className={styles.section}
+      aria-labelledby="contact-title"
+      id="contact"
+    >
       <div className={styles.grid}>
         <div className={styles.textBlock}>
-          <p className={styles.eyebrow}>CONTACT</p>
+          <h2 className={styles.eyebrow} id="contact-title">
+            CONTACT ｜ お問い合わせ
+          </h2>
           <p className={styles.statement}>
             一緒にプロダクトをつくることや、
             <br />
@@ -19,7 +26,7 @@ export default function Contact() {
             <br />
             個人開発についてのメッセージも歓迎しています。
           </p>
-          <a className={styles.button} href={CONTACT_EMAIL}>
+          <a className={styles.button} href={CONTACT_HREF}>
             メールを送る
             <span className={styles.buttonArrow} aria-hidden="true">
               →
