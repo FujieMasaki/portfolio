@@ -27,6 +27,11 @@ export default function About() {
             <br />
             仕様検討やUI改善にも取り組んでいます。
           </p>
+          <p className={styles.paragraph}>
+            考えがまとまらないときは、
+            <br />
+            一度外に出て、歩きながら考えを整理します。
+          </p>
         </div>
 
         <div className={`${styles.photoFrame} ${styles.photoPrimary}`}>
@@ -37,14 +42,6 @@ export default function About() {
             sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 33vw"
             style={{ objectFit: "cover", objectPosition: "center" }}
           />
-        </div>
-
-        <div className={styles.rhythmText}>
-          <p className={styles.paragraphSmall}>
-            考えがまとまらないときは、
-            <br />
-            一度外に出て、歩きながら考えを整理します。
-          </p>
         </div>
 
         <div className={`${styles.photoFrame} ${styles.photoSecondary}`}>
