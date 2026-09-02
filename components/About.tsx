@@ -3,10 +3,16 @@ import styles from "./About.module.css";
 
 export default function About() {
   return (
-    <section className={styles.section} aria-label="About / My rhythm" id="about">
+    <section
+      className={styles.section}
+      aria-labelledby="about-title"
+      id="about"
+    >
       <div className={styles.grid}>
         <div className={styles.aboutText}>
-          <p className={styles.eyebrow}>ABOUT ME</p>
+          <h2 className={styles.eyebrow} id="about-title">
+            ABOUT ME ｜ 私について
+          </h2>
           <p className={styles.paragraph}>
             Webエンジニアとして、
             <br />
@@ -34,12 +40,6 @@ export default function About() {
         </div>
 
         <div className={styles.rhythmText}>
-          <p className={styles.eyebrow}>MY RHYTHM ｜ 日々のリズム</p>
-          <p className={styles.paragraphSmall}>
-            歩きながら、
-            <br />
-            声に出して考えを整理するのが習慣です。
-          </p>
           <p className={styles.paragraphSmall}>
             考えがまとまらないときは、
             <br />

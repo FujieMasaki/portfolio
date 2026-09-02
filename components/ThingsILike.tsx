@@ -113,9 +113,15 @@ const ITEMS: Item[] = [
 
 export default function ThingsILike() {
   return (
-    <section className={styles.section} aria-label="Things I like" id="likes">
+    <section
+      className={styles.section}
+      aria-labelledby="likes-title"
+      id="likes"
+    >
       <div className={styles.inner}>
-        <p className={styles.eyebrow}>THINGS I LIKE ｜ 好きなもの・こと</p>
+        <h2 className={styles.eyebrow} id="likes-title">
+          INTERESTS ｜ 好きなもの・こと
+        </h2>
 
         <div className={styles.list}>
           {ITEMS.map((item) => (

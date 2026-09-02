@@ -22,8 +22,8 @@ const CAREERS: CareerItem[] = [
     period: "2018 - 2020",
     keyword: "人が過ごす時間を考える",
     body: [
-      "沖縄のホテル・カフェで、接客や運営に携わりました。お客様がどんな目的で訪れ、どうすればこの場所でより良い時間を過ごせるのかを考えるようになりました。",
-      "人が過ごす時間は、サービスや空間のあり方で変わる。その実感が、いまの体験づくりへの関心の土台になっています。",
+      "沖縄のホテル・カフェで、接客や運営に携わりました。",
+      "お客様がどういう目的で訪れ、どうすればより良い時間を過ごせるのかを考えながら働いていました。",
     ],
   },
   {
@@ -32,7 +32,7 @@ const CAREERS: CareerItem[] = [
     keyword: "人と人がつながる環境をつくる",
     body: [
       "コミュニティマネージャーとして、コワーキングスペースやシェアハウス、プログラミングスクールなどの運営に関わりました。",
-      "人の強みや関心を見ながら、成長やつながりが生まれる環境を考える。その経験とエンジニアとの関わりから、Webエンジニアに興味を持ちました。",
+      "利用する人の強みや関心を見ながら、イベントを企画したり、人同士をつないだりしていました。そこで現役エンジニアの方々と関わったことをきっかけに、Webエンジニアに興味を持ちました。",
     ],
   },
   {
@@ -49,8 +49,8 @@ const CAREERS: CareerItem[] = [
     period: "Next",
     keyword: "リアルとデジタルをつなぐ",
     body: [
-      "Hospitality、Community & Place、Software & Productは異なる仕事に見えますが、共通して考えてきたのは、人がどう感じ、どうすればより良い時間や環境になるのかでした。",
-      "これからは、デジタルプロダクトだけでなくリアルな場所も含めて、日々の時間が少し良くなる体験づくりに関わっていきたい。現在は個人で、音声ジャーナリングサービス Focus on Dotを企画・開発しています。",
+      "ホテルやコミュニティ運営、Webプロダクト開発を経験する中で、リアルな場所とデジタルの両方に関心を持つようになりました。",
+      "これからは、デジタルだけでなくリアルな場所も含めて、体験づくりに関わっていきたいと考えています。現在は個人で、音声ジャーナリングサービス「Focus on Dot」を企画・開発しています。",
     ],
   },
 ];
@@ -60,9 +60,8 @@ export default function Career() {
     <section className={styles.section} aria-labelledby="career-title" id="career">
       <div className={styles.inner}>
         <div className={styles.heading}>
-          <p className={styles.eyebrow}>CAREER ｜ これまでの流れ</p>
-          <h2 className={styles.title} id="career-title">
-            Career
+          <h2 className={styles.eyebrow} id="career-title">
+            CAREER ｜ これまでの流れ
           </h2>
           <p className={styles.lead}>
             人や場所に関わる仕事と、
