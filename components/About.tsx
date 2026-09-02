@@ -31,7 +31,7 @@ export default function About() {
 
         <div className={`${styles.photoFrame} ${styles.photoPrimary}`}>
           <Image
-            src="/images/about-beach-walk.png"
+            src="/images/about-me.webp"
             alt=""
             fill
             sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 33vw"
@@ -49,7 +49,7 @@ export default function About() {
 
         <div className={`${styles.photoFrame} ${styles.photoSecondary}`}>
           <Image
-            src="/images/about-workspace.png"
+            src="/images/about-workspace.webp"
             alt=""
             fill
             sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 25vw"

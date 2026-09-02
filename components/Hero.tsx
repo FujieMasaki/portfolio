@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { getImageProps } from "next/image";
 import styles from "./Hero.module.css";
 
 type NavLink = {
@@ -13,18 +13,35 @@ const NAV_LINKS: NavLink[] = [
   { label: "Contact", href: "#contact" },
 ];
 
+const HERO_IMAGE_PROPS = {
+  alt: "",
+  fill: true,
+  sizes: "100vw",
+  fetchPriority: "high" as const,
+  style: { objectFit: "cover" as const, objectPosition: "50% 40%" },
+};
+
 export default function Hero() {
+  const {
+    props: { srcSet: desktopSrcSet, ...desktopImageProps },
+  } = getImageProps({
+    ...HERO_IMAGE_PROPS,
+    src: "/images/hero.webp",
+  });
+  const {
+    props: { srcSet: mobileSrcSet },
+  } = getImageProps({
+    ...HERO_IMAGE_PROPS,
+    src: "/images/hero-sp.webp",
+  });
+
   return (
     <section className={styles.hero} aria-label="Hero">
       <div className={styles.media} aria-hidden="true">
-        <Image
-          src="/images/hero-sunrise.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          style={{ objectFit: "cover", objectPosition: "50% 40%" }}
-        />
+        <picture>
+          <source media="(max-width: 860px)" srcSet={mobileSrcSet} />
+          <img {...desktopImageProps} srcSet={desktopSrcSet} alt="" />
+        </picture>
         <div className={styles.overlay} />
       </div>
 
