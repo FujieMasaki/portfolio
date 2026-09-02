@@ -29,7 +29,7 @@ export default function Contact() {
 
         <div className={styles.photoFrame}>
           <Image
-            src="/images/contact-seascape.png"
+            src="/images/contact-seascape.webp"
             alt=""
             fill
             sizes="(max-width: 860px) 100vw, 50vw"
