@@ -120,7 +120,7 @@ export default function ThingsILike() {
     >
       <div className={styles.inner}>
         <h2 className={styles.eyebrow} id="likes-title">
-          THINGS I LIKE ｜ 好きなもの・こと
+          INTERESTS ｜ 好きなもの・こと
         </h2>
 
         <div className={styles.list}>
