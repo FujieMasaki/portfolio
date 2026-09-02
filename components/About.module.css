@@ -6,9 +6,7 @@
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.7fr);
-  grid-template-areas:
-    "about photo1 photo2"
-    "about photo1 rhythm";
+  grid-template-areas: "about photo1 photo2";
   column-gap: 20px;
   row-gap: 28px;
   align-items: start;
@@ -16,11 +14,6 @@
 
 .aboutText {
   grid-area: about;
-  min-width: 0;
-}
-
-.rhythmText {
-  grid-area: rhythm;
   min-width: 0;
 }
 
@@ -63,23 +56,12 @@
   margin-top: 18px;
 }
 
-.paragraphSmall {
-  margin: 0;
-  font-size: 15.5px;
-  line-height: 1.9;
-  color: var(--color-text-muted);
-}
-
-.paragraphSmall + .paragraphSmall {
-  margin-top: 14px;
-}
-
 @media (max-width: 860px) {
   .grid {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "about photo1"
-      "photo2 rhythm";
+      "photo2 photo1";
     column-gap: 24px;
     row-gap: 40px;
   }
@@ -95,7 +77,6 @@
     grid-template-areas:
       "about"
       "photo1"
-      "rhythm"
       "photo2";
     row-gap: 32px;
   }
