@@ -34,6 +34,7 @@
 .photoSecondary {
   grid-area: photo2;
   aspect-ratio: 1 / 1;
+  margin-top: 80px;
 }
 
 .eyebrow {
@@ -64,6 +65,10 @@
       "photo2 photo1";
     column-gap: 24px;
     row-gap: 40px;
+  }
+
+  .photoSecondary {
+    margin-top: 0;
   }
 }
 
