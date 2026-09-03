@@ -1,19 +1,6 @@
 import { getImageProps } from "next/image";
 import styles from "./Hero.module.css";
 
-type NavLink = {
-  label: string;
-  href: string;
-};
-
-const NAV_LINKS: NavLink[] = [
-  { label: "ABOUT", href: "#about" },
-  { label: "CAREER", href: "#career" },
-  { label: "INTERESTS", href: "#likes" },
-  { label: "MORE", href: "#more" },
-  { label: "CONTACT", href: "#contact" },
-];
-
 const HERO_IMAGE_PROPS = {
   alt: "",
   fill: true,
@@ -49,7 +36,7 @@ export default function Hero() {
       <div className={styles.content}>
         <div className={styles.textBlock}>
           <p className={styles.eyebrow}>
-            MASAKI FUJIE / 藤江正樹 — PRODUCT ENGINEER
+            PRODUCT ENGINEER
           </p>
           <h1 className={styles.name}>Masaki Fujie</h1>
           <div className={styles.copy}>
@@ -64,13 +51,6 @@ export default function Hero() {
               使いやすい体験を考えています。
             </p>
           </div>
-          <nav className={styles.nav} aria-label="Primary">
-            {NAV_LINKS.map((link) => (
-              <a key={link.label} className={styles.navLink} href={link.href}>
-                {link.label}
-              </a>
-            ))}
-          </nav>
         </div>
       </div>
     </section>
