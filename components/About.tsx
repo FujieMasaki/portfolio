@@ -50,7 +50,7 @@ export default function About() {
             alt=""
             fill
             sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 25vw"
-            style={{ objectFit: "cover", objectPosition: "50% 55%" }}
+            style={{ objectFit: "cover", objectPosition: "center" }}
           />
         </div>
       </div>

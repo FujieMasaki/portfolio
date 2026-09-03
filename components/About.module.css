@@ -5,7 +5,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.7fr);
+  grid-template-columns: minmax(0, 1fr) repeat(2, minmax(0, 0.7fr));
   grid-template-areas: "about photo1 photo2";
   column-gap: 20px;
   row-gap: 28px;
@@ -28,12 +28,12 @@
 
 .photoPrimary {
   grid-area: photo1;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
 }
 
 .photoSecondary {
   grid-area: photo2;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
 }
 
 .eyebrow {
@@ -61,7 +61,7 @@
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "about photo1"
-      "photo2 photo1";
+      "about photo2";
     column-gap: 24px;
     row-gap: 40px;
   }
