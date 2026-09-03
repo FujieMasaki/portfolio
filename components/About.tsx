@@ -11,7 +11,7 @@ export default function About() {
       <div className={styles.grid}>
         <div className={styles.aboutText}>
           <h2 className={styles.eyebrow} id="about-title">
-            ABOUT ME ｜ 私について
+            ABOUT
           </h2>
           <p className={styles.paragraph}>
             Webエンジニアとして、

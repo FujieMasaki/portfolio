@@ -63,7 +63,7 @@ export default function Career() {
       <div className={styles.inner}>
         <div className={styles.heading}>
           <h2 className={styles.eyebrow} id="career-title">
-            CAREER ｜ これまでの流れ
+            CAREER
           </h2>
           <p className={styles.lead}>
             人や場所に関わる仕事と、
