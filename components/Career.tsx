@@ -24,6 +24,8 @@ const CAREERS: CareerItem[] = [
     body: [
       "沖縄のホテル・カフェで、接客や運営に携わりました。",
       "お客様がどういう目的で訪れ、どうすればより良い時間を過ごせるのかを考えながら働いていました。",
+      "その中で、人が対応することの良さを大切にしながらも、無人チェックインのようにITを活用した方が、お客様にとってもスタッフにとっても良い場面があるのではないかと考えるようになりました。",
+      "そこから少しずつITにも興味を持つようになりました。",
     ],
   },
   {
@@ -79,8 +81,8 @@ export default function Career() {
               </div>
 
               <div className={styles.content}>
-                <p className={styles.keyword}>{item.keyword}</p>
                 <h3 className={styles.itemTitle}>{item.title}</h3>
+                <p className={styles.keyword}>{item.keyword}</p>
                 <div className={styles.body}>
                   {item.body.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
