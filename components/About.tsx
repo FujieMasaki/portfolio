@@ -37,10 +37,10 @@ export default function About() {
         <div className={`${styles.photoSlot} ${styles.photoPrimary}`}>
           <div className={styles.photoFrame}>
             <Image
-              src="/images/about-me.webp"
+              src="/images/about-workspace.webp"
               alt=""
               fill
-              sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 33vw"
+              sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 25vw"
               style={{ objectFit: "cover", objectPosition: "center" }}
             />
           </div>
@@ -49,10 +49,10 @@ export default function About() {
         <div className={`${styles.photoSlot} ${styles.photoSecondary}`}>
           <div className={styles.photoFrame}>
             <Image
-              src="/images/about-workspace.webp"
+              src="/images/about-me.webp"
               alt=""
               fill
-              sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 25vw"
+              sizes="(max-width: 600px) 100vw, (max-width: 860px) 50vw, 33vw"
               style={{ objectFit: "cover", objectPosition: "center" }}
             />
           </div>
