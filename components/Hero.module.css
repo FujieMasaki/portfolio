@@ -130,6 +130,8 @@
   }
 
   .nav {
+    width: 100%;
+    column-gap: 18px;
     font-size: 13.5px;
   }
 }

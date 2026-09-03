@@ -84,9 +84,9 @@ const PLACES: Place[] = [
 
 export default function PlacesToKnowMe() {
   return (
-    <section className={styles.section} aria-labelledby="more-about-title">
-      <h2 className={styles.eyebrow} id="more-about-title">
-        MORE ABOUT ME ｜ もっと知る
+    <section className={styles.section} aria-labelledby="more-title" id="more">
+      <h2 className={styles.eyebrow} id="more-title">
+        MORE
       </h2>
 
       <div className={styles.grid}>
