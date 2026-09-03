@@ -79,8 +79,8 @@ export default function Career() {
               </div>
 
               <div className={styles.content}>
-                <p className={styles.keyword}>{item.keyword}</p>
                 <h3 className={styles.itemTitle}>{item.title}</h3>
+                <p className={styles.keyword}>{item.keyword}</p>
                 <div className={styles.body}>
                   {item.body.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>

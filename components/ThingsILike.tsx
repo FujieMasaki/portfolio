@@ -78,7 +78,15 @@ const ITEMS: Item[] = [
     title: "バスケットボール",
     description: (
       <>
-        琉球ゴールデンキングスを応援しています。
+        <a
+          className={styles.textLink}
+          href="https://goldenkings.jp/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          琉球ゴールデンキングス
+        </a>
+        を応援しています。
         <br />
         試合を見るだけでなく、選手の動きや戦術を考えることも好きです。
       </>

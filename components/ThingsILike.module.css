@@ -58,6 +58,27 @@
   color: var(--color-text-muted);
 }
 
+.textLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--color-accent-700) 45%,
+    transparent
+  );
+  text-underline-offset: 3px;
+}
+
+.textLink:hover,
+.textLink:focus-visible {
+  color: var(--color-accent-700);
+}
+
+.textLink:focus-visible {
+  outline: 2px solid var(--color-accent-700);
+  outline-offset: 2px;
+}
+
 @media (max-width: 900px) {
   .list {
     columns: 1;
