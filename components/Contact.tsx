@@ -14,7 +14,7 @@ export default function Contact() {
       <div className={styles.grid}>
         <div className={styles.textBlock}>
           <h2 className={styles.eyebrow} id="contact-title">
-            CONTACT ｜ お問い合わせ
+            CONTACT
           </h2>
           <p className={styles.statement}>
             一緒にプロダクトをつくることや、

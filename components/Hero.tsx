@@ -7,10 +7,11 @@ type NavLink = {
 };
 
 const NAV_LINKS: NavLink[] = [
-  { label: "About", href: "#about" },
-  { label: "Career", href: "#career" },
-  { label: "Interests", href: "#likes" },
-  { label: "Contact", href: "#contact" },
+  { label: "ABOUT", href: "#about" },
+  { label: "CAREER", href: "#career" },
+  { label: "INTERESTS", href: "#likes" },
+  { label: "MORE", href: "#more" },
+  { label: "CONTACT", href: "#contact" },
 ];
 
 const HERO_IMAGE_PROPS = {
