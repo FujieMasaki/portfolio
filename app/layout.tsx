@@ -18,8 +18,17 @@ export const metadata: Metadata = {
   title: "Masaki Fujie",
   description: "Masaki Fujie / 藤江正樹 — Product Engineer",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    shortcut: "/favicon.svg",
+    icon: [
+      {
+        url: "/favicon.png",
+        type: "image/png",
+      },
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+    shortcut: "/favicon.png",
   },
 };
 
