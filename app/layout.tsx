@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Shippori_Mincho, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 
@@ -32,6 +33,8 @@ export const metadata: Metadata = {
   },
 };
 
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,6 +45,7 @@ export default function RootLayout({
       lang="ja"
       className={`${shipporiMincho.variable} ${notoSansJP.variable}`}
     >
+      {gtmId && <GoogleTagManager gtmId={gtmId} />}
       <body>{children}</body>
     </html>
   );
