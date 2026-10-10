@@ -13,7 +13,8 @@ type Props = {
  * タッチ端末と prefers-reduced-motion では何もしない。
  *
  * 背景・植物の大きな PNG が建物より遅れて出ると空間が崩れて見えるので、
- * 舞台内の画像がそろってから data-ready を付けて一度にフェードインさせる。
+ * 先に読み込む画像がそろってから data-ready を付けて一度にフェードインさせる。
+ * JS が動かない環境では TopHero の <noscript> が舞台をそのまま表示する。
  */
 export default function ParallaxStage({ className, children }: Props) {
   const ref = useRef<HTMLDivElement>(null);
@@ -26,7 +27,10 @@ export default function ParallaxStage({ className, children }: Props) {
     const reveal = () => {
       if (!cancelled) setReady(true);
     };
-    const images = Array.from(node.querySelectorAll("img"));
+    // 待つのは先に読み込む画像（背景・植物・建物）だけ。遅延読み込みのアーチ内の画像は待たない
+    const images = Array.from(
+      node.querySelectorAll<HTMLImageElement>('img:not([loading="lazy"])'),
+    );
     Promise.all(images.map((img) => img.decode().catch(() => undefined))).then(
       reveal,
     );

@@ -119,6 +119,11 @@ export default function TopHero({ ambient = "evening" }: Props) {
         <ArchSigns />
       </ParallaxStage>
 
+      {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}
+      <noscript>
+        <style>{`.${styles.stage}{opacity:1}`}</style>
+      </noscript>
+
       <header className={styles.plaque}>
         <h1 className={styles.name}>Masaki Fujie</h1>
         <p className={styles.role}>Product Engineer</p>
