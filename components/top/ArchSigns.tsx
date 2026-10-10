@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { ARCHES, toPercentBox } from "./scene";
 import styles from "./TopHero.module.css";
 
@@ -8,7 +9,7 @@ import styles from "./TopHero.module.css";
  * 建物・前景植物より手前に出すため、アーチのリンク（建物の奥にある）とは別の層に置く。
  * hover / focus の連動は、舞台（.stage）の :has() で ArchEntrance の状態を見て、
  * 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする。
- * hover の無い端末でも、この部屋名だけで入口だと分かるようにする。
+ * hover の無い端末でも、この部屋名だけで入口だと分かるようにし、押せばその入口へ行ける。
  */
 export default function ArchSigns() {
   return (
@@ -28,7 +29,13 @@ export default function ArchSigns() {
             } as CSSProperties
           }
         >
-          <p className={styles.archPlate}>{arch.title}</p>
+          {/*
+            見えている部屋名を押しても入口へ行けるよう、同じ行き先のリンクにする。
+            Tab と読み上げはアーチ側のリンクに任せ、こちらは重ねない。
+          */}
+          <Link href={arch.href} className={styles.archPlate} tabIndex={-1}>
+            {arch.title}
+          </Link>
         </div>
       ))}
     </div>

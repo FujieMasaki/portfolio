@@ -336,6 +336,8 @@
   text-transform: uppercase;
   color: rgb(62 53 44 / 0.92);
   border-block: 1px solid rgb(112 103 92 / 0.4);
+  /* 層全体は pointer-events: none。部屋名だけは押せるようにする */
+  pointer-events: auto;
   transition:
     color 0.5s var(--ease-calm),
     border-color 0.5s var(--ease-calm);
@@ -350,6 +352,7 @@
 }
 
 /* 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする */
+.archPlate:hover,
 .stage:has(.arch[data-arch="about"]:is(:hover, :focus-visible)) .archSign[data-arch="about"] .archPlate,
 .stage:has(.arch[data-arch="work"]:is(:hover, :focus-visible)) .archSign[data-arch="work"] .archPlate,
 .stage:has(.arch[data-arch="contact"]:is(:hover, :focus-visible)) .archSign[data-arch="contact"] .archPlate {
