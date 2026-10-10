@@ -45,8 +45,8 @@
 - `r3f-*` の例は Fiber 9 / React 19 / three r185 / drei 10.7.8 が前提。導入するときは `package.json` と lockfile のバージョンを先に確認する。
 - `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。配信するコード（preview を含む）では自前の HDR/EXR を使う。
 - skill 内の、訪問者の行動に基づくパーソナライズ、計測値の送信例（web-vitals を `/analytics` へ送る等）、外部の preconnect / dns-prefetch 先は採らない。計測・外部スクリプトは `docs/code-review/security.md` の §2 に従う。
-- skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。このリポジトリのパッケージマネージャは pnpm。
-- 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（`SKILL.md`・`scripts/README.md` に書かれたパスより優先する）。
+- skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。`package.json` に scripts を足す提案（`assets:audit` 等）も同じく人間に確認する。このリポジトリのパッケージマネージャは pnpm。
+- 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（skill 内（`SKILL.md`・`scripts/README.md`・`reference/`・`CONTRIBUTING.md` 等）に書かれたパスより優先する）。
   - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs`（`asset-audit.mjs`・`skill-audit.mjs` も同じ形）。`SKILL.md` の `node scripts/...` はこのリポジトリでは別の `scripts/` を、`scripts/README.md` の `node skills/...` は存在しないパスを指すので使わない。
   - `modern-web-design/scripts/*.py` は、引数なしだと標準入力を待って止まるので、`--file` / `--pattern` を付ける。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
 - skill のコード例は、そのまま写さず、このリポジトリ（Next.js App Router の事前描画、React 19）で動くかを確かめてから使う。次の2つは不具合が確かめられているので流用しない。
@@ -64,7 +64,7 @@
 
 | Skill | 取得元 | commit | License |
 |---|---|---|---|
-| `modern-web-design` | [freshtechbro/claudedesignskills](https://github.com/freshtechbro/claudedesignskills) `.claude/skills/modern-web-design` | `1da73fe` | MIT |
+| `modern-web-design` | [freshtechbro/claudedesignskills](https://github.com/freshtechbro/claudedesignskills) `.claude/skills/modern-web-design` | `1da73fe` | MIT（取得元の中で Apache-2.0 とも表記。下記参照） |
 | `r3f-*`（5 件） | [EnzeD/r3f-skills](https://github.com/EnzeD/r3f-skills) `skills/` | `4a11805` | MIT |
 | `developing-threejs-apps` | [kndoshn/threejs-skill-plugin](https://github.com/kndoshn/threejs-skill-plugin) `skills/developing-threejs-apps` | `0f395b6` | MIT |
 
