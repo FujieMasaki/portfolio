@@ -52,9 +52,11 @@
 - 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（skill 内（`SKILL.md`・`scripts/README.md`・`reference/`・`CONTRIBUTING.md` 等）に書かれたパスより優先する）。
   - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs`（`asset-audit.mjs`・`skill-audit.mjs` も同じ形）。`SKILL.md` の `node scripts/...` はこのリポジトリでは別の `scripts/` を、`scripts/README.md` の `node skills/...` は存在しないパスを指すので使わない。
   - `python3 .claude/skills/modern-web-design/scripts/design_audit.py --file <path>` / `python3 .claude/skills/modern-web-design/scripts/pattern_generator.py --pattern <name>`（または `--list`）。`design_audit.py` は `--file`、`pattern_generator.py` は `--pattern` か `--list` を付けないと、ほかの引数があっても対話モードに入り、標準入力を待って止まる。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
-- skill のコード例は、そのまま写さず、このリポジトリ（Next.js App Router の事前描画、React 19）で動くかを確かめてから使う。次の2つは不具合が確かめられているので流用しない。
+- skill のコード例と `pattern_generator.py` の生成物は、未検証の参考として扱う。取り込み時のレビューで、上流の例に不具合が複数見つかっている。写すときは、このリポジトリ（Next.js App Router の事前描画、React 19）で動くか、キーボード操作・`prefers-reduced-motion` を含めて確かめてから使う。次の例は不具合が確かめられているので流用しない。
   - `modern-web-design/references/accessibility_guide.md` の Accessible Modal：render 中に `useRef(document.activeElement)` を評価し、サーバー描画で `document is not defined` になる。フォーカス元は `useRef(null)` で持ち、開くときの effect の中で保存する。
   - `modern-web-design/scripts/pattern_generator.py` の `form` パターン：`blur` で `submit` を発火し、フォーカスを外しただけで成功通知と `form.reset()` が走って入力が消える。`--pattern form` は使わない。
+  - `modern-web-design/scripts/pattern_generator.py` の `navigation` パターン：閉じたモバイルメニューを `opacity: 0` と `pointer-events: none` だけで隠していて、キーボードの Tab で見えないリンクにフォーカスが入る。閉じた状態は `inert` か `visibility: hidden` で操作対象から外す。
+  - `developing-threejs-apps/examples.md` のライフサイクルの例（`createThreeApp`）：`tick()` が呼ばれず描画が始まらない。始めても前フレームの時刻を更新しないため `dt` が累積して増える。描画ループは R3F の `useFrame` の `delta` を使う。
 
 ### 今は追加しないもの
 
