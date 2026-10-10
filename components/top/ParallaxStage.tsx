@@ -27,7 +27,7 @@ export default function ParallaxStage({ className, children }: Props) {
     const reveal = () => {
       if (!cancelled) setReady(true);
     };
-    // 待つのは先に読み込む画像（背景・植物・建物）だけ。遅延読み込みのアーチ内の画像は待たない
+    // 待つのは先に読み込む画像（背景・植物・建物・アーチ内の展示室）。loading="lazy" の画像は待たない
     const images = Array.from(
       node.querySelectorAll<HTMLImageElement>('img:not([loading="lazy"])'),
     );

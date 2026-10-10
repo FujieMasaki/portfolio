@@ -57,6 +57,8 @@ export default function ArchEntrance({
               alt=""
               width={1122}
               height={1402}
+              // 最初から見える位置にあるので遅延させず、舞台のフェードインの前にそろえる
+              loading="eager"
               sizes={interiorSizes(opening.width, interior.frame.width)}
             />
           </span>
