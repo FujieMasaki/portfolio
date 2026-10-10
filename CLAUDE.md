@@ -27,7 +27,7 @@
 
 ## Skill の優先順位と使い分け
 
-Skill はすべて `.claude/skills/` にプロジェクトスコープで置いている。
+サイトの実装に使う Skill は、`.claude/skills/` にプロジェクトスコープで置いている（同じ場所の `pr-review-cycle`・`human-review-artifact` は PR・レビューの手順で、`AGENTS.md` と `pr-review-cycle` が扱う）。
 
 | 優先 | Skill | 用途 |
 |---|---|---|
@@ -43,7 +43,24 @@ Skill はすべて `.claude/skills/` にプロジェクトスコープで置い�
 
 - `modern-web-design` は一般的なトレンド集で、cursor UX、glassmorphism、scrollytelling、強い micro-interaction、AI パーソナライズなども勧めてくる。**このファイルの「避けるもの」と衝突する場合はこのファイルを優先する。** 採るのは主に余白・タイポグラフィ・アクセシビリティ・パフォーマンスの原則。
 - `r3f-*` の例は Fiber 9 / React 19 / three r185 / drei 10.7.8 が前提。導入するときは `package.json` と lockfile のバージョンを先に確認する。
-- `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。本番では自前の HDR/EXR を使う。
+- Drei には、既定のままだと外部の URL から asset を取得し、訪問者の IP と Referer を第三者に渡すものがある。drei 10.7.8 で確かめた次のものは、それぞれの方法で外部の CDN を使わない。ここにないもの（フォントを指定しない `<Text>`、`FaceLandmarker` の jsDelivr・storage.googleapis.com など）も、使う前に既定の取得先を確かめる。
+  - `Environment`：`preset` を付けると `files` と `path` が githack に置き換わる。`preset` は使わず、`public/` の HDR/EXR を `files`（と必要なら `path`）で渡す。
+  - Draco（`useGLTF`・`useGLTF.preload`・`<Gltf>`）：既定のままでは、Draco で圧縮したモデルを読むときに gstatic.com から decoder を取得する。DRACOLoader は module で1つを共有し、第2引数を省いた呼び出しは毎回 `setDecoderPath` で決めたパス（未設定なら gstatic.com）を設定し直すので、`useGLTF` や `preload` を呼ぶより前に、module の最上位で `useGLTF.setDecoderPath('/draco/')` を呼ぶ形を主にする。第2引数でパスを渡す場合は、`preload` と `<Gltf useDraco>` にも同じパスを渡す。
+  - KTX2（`useKTX2`・`useKTX2.preload`・`<Ktx2>`）：省略時は jsDelivr から transcoder を取得する。どれにも `basisPath` で `public/` のパスを渡す。`useGLTF` の第2引数と `setDecoderPath` は Draco のパスしか決めないので、glTF の中の KTX2 は第4引数 `extendLoader` で `KTX2Loader` の `setTranscoderPath` に指定する。
+  - `MatcapTexture` / `useMatcapTexture` / `NormalTexture` / `useNormalTexture`：一覧（jsDelivr）と画像（githack）の取得先が固定で、自前のパスを渡せないので使わない。自前の画像を `useTexture` で読み、`meshMatcapMaterial` の `matcap` や `normalMap` に渡す。
+  - `Cloud` / `Clouds`：`texture` の既定が githack。単体の `<Cloud>` は props なしの `<Clouds>` に包まれて差し替えられないので、必ず `<Clouds texture="/…">` の中で使う。
+- skill 内の、訪問者の行動に基づくパーソナライズ、計測値の送信例（web-vitals を `/analytics` へ送る等）、外部の preconnect / dns-prefetch 先は採らない。計測・外部スクリプトは `docs/code-review/security.md` の §2 に従う。
+- skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。`package.json` に scripts を足す提案（`assets:audit` 等）も同じく人間に確認する。このリポジトリのパッケージマネージャは pnpm で、skill 内の `npm run …` は `pnpm …` に読み替える（`npm install` は、人間が依存の追加を承認したときに限り `pnpm add` に読み替える）。検査は `pnpm lint`・`pnpm type-check`・`pnpm test`・`pnpm build` で行い、終わらない dev サーバー（`npm run dev` 等）は検査のために起動しない。
+- 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（skill 内（`SKILL.md`・`scripts/README.md`・`reference/`・`CONTRIBUTING.md` 等）に書かれたパスより優先する）。
+  - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs`（`asset-audit.mjs`・`skill-audit.mjs` も同じ形）。`SKILL.md` の `node scripts/...` はこのリポジトリでは別の `scripts/` を、`scripts/README.md` の `node skills/...` は存在しないパスを指すので使わない。
+  - `python3 .claude/skills/modern-web-design/scripts/design_audit.py --file <path>` / `python3 .claude/skills/modern-web-design/scripts/pattern_generator.py --pattern <name>`（または `--list`）。`design_audit.py` は `--file`、`pattern_generator.py` は `--pattern` か `--list` を付けないと、ほかの引数があっても対話モードに入り、標準入力を待って止まる。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
+- skill のコード例と `pattern_generator.py` の生成物は、未検証の参考として扱う。取り込み時のレビューで、上流の例に不具合が複数見つかっている。写すときは、このリポジトリ（Next.js App Router の事前描画、React 19）で動くか、キーボード操作・`prefers-reduced-motion` を含めて確かめてから使う。次の例は不具合が確かめられているので流用しない。
+  - `modern-web-design/references/accessibility_guide.md` の Accessible Modal：render 中に `useRef(document.activeElement)` を評価し、サーバー描画で `document is not defined` になる。フォーカス元は `useRef(null)` で持ち、開くときの effect の中で保存する。
+  - `modern-web-design/scripts/pattern_generator.py` の `form` パターン：`blur` で `submit` を発火し、フォーカスを外しただけで成功通知と `form.reset()` が走って入力が消える。`--pattern form` は使わない。
+  - `modern-web-design/scripts/pattern_generator.py` の `navigation` パターン：閉じたモバイルメニューを `opacity: 0` と `pointer-events: none` だけで隠していて、キーボードの Tab で見えないリンクにフォーカスが入る。閉じた状態は `inert` か `visibility: hidden` で操作対象から外す。
+  - `developing-threejs-apps/examples.md` のライフサイクルの例（`createThreeApp`）：`tick()` が呼ばれず描画が始まらない。始めても前フレームの時刻を更新しないため、`dt` が上限の 0.05 秒に張りつき、速度がフレームレートに依存する。描画ループは R3F の `useFrame` の `delta` を使う。
+  - `modern-web-design/scripts/pattern_generator.py` の `hero` パターン：scroll indicator が `animation: bounce 2s infinite` で常に動き、`prefers-reduced-motion` でも duration を縮めるだけで止まりきらない。「避けるもの」の「常に何かが動いている UI」に当たる。
+- `developing-threejs-apps` の Lifecycle Contract と Target API（`createThreeApp`、自前の `requestAnimationFrame`）は vanilla の Three.js 向け。R3F では Canvas と `useFrame` が描画ループと破棄を受け持つので、監査ではこの契約を当てはめず、dispose・color space・tone mapping・性能などの観点だけを使う。
 
 ### 今は追加しないもの
 
@@ -56,8 +73,14 @@ Skill はすべて `.claude/skills/` にプロジェクトスコープで置い�
 
 | Skill | 取得元 | commit | License |
 |---|---|---|---|
-| `modern-web-design` | [freshtechbro/claudedesignskills](https://github.com/freshtechbro/claudedesignskills) `.claude/skills/modern-web-design` | `1da73fe` | MIT |
+| `modern-web-design` | [freshtechbro/claudedesignskills](https://github.com/freshtechbro/claudedesignskills) `.claude/skills/modern-web-design` | `1da73fe` | MIT（取得元の中で Apache-2.0 とも表記。下記参照） |
 | `r3f-*`（5 件） | [EnzeD/r3f-skills](https://github.com/EnzeD/r3f-skills) `skills/` | `4a11805` | MIT |
 | `developing-threejs-apps` | [kndoshn/threejs-skill-plugin](https://github.com/kndoshn/threejs-skill-plugin) `skills/developing-threejs-apps` | `0f395b6` | MIT |
 
 `developing-threejs-apps` は、通常実装で r3f-* と競合しないように、`SKILL.md` の `description` だけを監査用に書き換えている。
+
+ライセンス表示について:
+
+- `modern-web-design/LICENSE` は、取得元のリポジトリ直下の `LICENSE`（MIT、同じ commit）を同梱したもの。ただし取得元は、`plugins/individual/modern-web-design/.claude-plugin/plugin.json` で `Apache-2.0` と宣言し、同梱の `assets/README.md` にも Apache 2.0 とあり、取得元の中で表記が食い違っている。
+- `r3f-*` の取得元には `LICENSE` ファイルも著作権表示もなく、README に「MIT」とあるだけ。同梱できる表示がないため、ここに記録する。
+- `developing-threejs-apps/LICENSE` は取得元のもの。
