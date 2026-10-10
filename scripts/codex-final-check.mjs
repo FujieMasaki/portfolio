@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { closeSync, existsSync, mkdtempSync, openSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -18,6 +18,8 @@ const basePattern = /^origin\/[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 // exit code lets the caller tell a timeout (retry once) from other failures (stop).
 export const TIMEOUT_MS = 20 * 60 * 1000;
 export const EXIT_TIMEOUT = 3;
+// After SIGTERM, how long codex gets to exit before its whole process group is killed.
+export const KILL_GRACE_MS = 10 * 1000;
 
 // The user config is not loaded (its MCP servers and plugins run outside the sandbox), so the
 // model it would have chosen is pinned here.
@@ -41,7 +43,9 @@ export const DISABLED_FEATURES = [
 
 // Codex reads these from the working tree even without the user config. The check only runs on
 // branches the user wrote, so their presence is unexpected and is refused rather than trusted.
-export const UNEXPECTED_CODEX_FILES = [".codex", "AGENTS.override.md", ".agents"];
+// AGENTS.md tells agents to read a personal-conventions.md next to it, so one in the repository
+// root would also be followed.
+export const UNEXPECTED_CODEX_FILES = [".codex", "AGENTS.override.md", ".agents", "personal-conventions.md"];
 
 export function findUnexpectedCodexFiles(root, exists = existsSync) {
   return UNEXPECTED_CODEX_FILES.filter((name) => exists(path.join(root, name)));
@@ -88,7 +92,40 @@ export function buildCodexArgs(base, outputFile) {
   ];
 }
 
-function main(args) {
+// spawnSync's timeout sends the signal but then waits for the child however long it takes, and
+// never reaches the processes the child started. Codex runs in its own process group instead, so
+// the whole group gets SIGTERM at the deadline and SIGKILL after the grace period, and anything
+// still left in the group is killed once codex exits.
+export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs = KILL_GRACE_MS }) {
+  return new Promise((resolve) => {
+    const child = spawn(command, args, { cwd, stdio, detached: true });
+    let timedOut = false;
+    let killTimer;
+    const killGroup = (signal) => {
+      try {
+        process.kill(-child.pid, signal);
+      } catch {
+        // The group is already gone.
+      }
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      killGroup("SIGTERM");
+      killTimer = setTimeout(() => killGroup("SIGKILL"), graceMs);
+    }, timeoutMs);
+    const finish = (result) => {
+      clearTimeout(timer);
+      clearTimeout(killTimer);
+      if (child.pid) killGroup("SIGKILL");
+      resolve({ ...result, timedOut });
+    };
+    // A failed spawn emits both "error" and "close"; the promise keeps the first.
+    child.on("error", (error) => finish({ error }));
+    child.on("close", (status, signal) => finish({ status, signal }));
+  });
+}
+
+async function main(args) {
   const result = validateArgs(args);
   if (!result.ok) {
     console.error(result.error);
@@ -123,15 +160,14 @@ function main(args) {
   // message is printed. stdin is closed so codex neither appends it to the prompt nor
   // waits for input.
   const log = openSync(logFile, "w");
-  const codex = spawnSync("codex", buildCodexArgs(result.base, outputFile), {
+  const codex = await runWithTimeout("codex", buildCodexArgs(result.base, outputFile), {
     cwd: repoRoot,
     stdio: ["ignore", log, log],
-    timeout: TIMEOUT_MS,
-    killSignal: "SIGTERM",
+    timeoutMs: TIMEOUT_MS,
   });
   closeSync(log);
   const tail = () => readFileSync(logFile, "utf8").split("\n").slice(-20).join("\n");
-  if (codex.error?.code === "ETIMEDOUT") {
+  if (codex.timedOut) {
     console.error(`codex exec timed out after ${TIMEOUT_MS / 60000} minutes\n${tail()}`);
     return EXIT_TIMEOUT;
   }
@@ -149,5 +185,5 @@ function main(args) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
-  process.exitCode = main(process.argv.slice(2));
+  process.exitCode = await main(process.argv.slice(2));
 }

@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import test from "node:test";
 import {
   DISABLED_FEATURES,
@@ -6,6 +9,7 @@ import {
   TIMEOUT_MS,
   buildCodexArgs,
   findUnexpectedCodexFiles,
+  runWithTimeout,
   validateArgs,
 } from "./codex-final-check.mjs";
 
@@ -57,7 +61,67 @@ test("a timeout has its own exit code so the caller can retry it once", () => {
 });
 
 test("refuses to run when codex config or instructions are added to the repository root", () => {
-  const present = new Set(["/repo/AGENTS.override.md", "/repo/.agents"]);
-  assert.deepEqual(findUnexpectedCodexFiles("/repo", (file) => present.has(file)), ["AGENTS.override.md", ".agents"]);
+  const present = new Set(["/repo/AGENTS.override.md", "/repo/.agents", "/repo/personal-conventions.md"]);
+  assert.deepEqual(findUnexpectedCodexFiles("/repo", (file) => present.has(file)), [
+    "AGENTS.override.md",
+    ".agents",
+    "personal-conventions.md",
+  ]);
   assert.deepEqual(findUnexpectedCodexFiles("/repo", () => false), []);
+});
+
+const isAlive = (pid) => {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+test("passes the exit status through when codex finishes in time", async () => {
+  const result = await runWithTimeout(process.execPath, ["-e", "process.exit(4)"], {
+    stdio: "ignore",
+    timeoutMs: 5000,
+  });
+  assert.equal(result.timedOut, false);
+  assert.equal(result.status, 4);
+});
+
+test("a timeout kills the whole process group, even processes that ignore SIGTERM", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "codex-timeout-test-"));
+  const pidFile = path.join(dir, "grandchild.pid");
+  const grandchild = "process.on('SIGTERM', () => {}); setInterval(() => {}, 1000);";
+  const child = [
+    'const { spawn } = require("node:child_process");',
+    'process.on("SIGTERM", () => {});',
+    `const g = spawn(process.execPath, ["-e", ${JSON.stringify(grandchild)}], { stdio: "ignore" });`,
+    `require("node:fs").writeFileSync(${JSON.stringify(pidFile)}, String(g.pid));`,
+    "setInterval(() => {}, 1000);",
+  ].join("\n");
+  try {
+    const started = Date.now();
+    const result = await runWithTimeout(process.execPath, ["-e", child], {
+      stdio: "ignore",
+      timeoutMs: 500,
+      graceMs: 200,
+    });
+    assert.equal(result.timedOut, true);
+    assert.ok(Date.now() - started < 5000, "the grace period ends in SIGKILL instead of waiting");
+
+    const grandchildPid = Number(readFileSync(pidFile, "utf8"));
+    const deadline = Date.now() + 3000;
+    while (isAlive(grandchildPid) && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    assert.equal(isAlive(grandchildPid), false, "processes codex started are killed with it");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("a command that cannot start is reported as an error, not a timeout", async () => {
+  const result = await runWithTimeout("codex-final-check-missing-command", [], { stdio: "ignore", timeoutMs: 5000 });
+  assert.equal(result.timedOut, false);
+  assert.equal(result.error?.code, "ENOENT");
 });
