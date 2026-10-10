@@ -27,7 +27,7 @@ type Props = {
  */
 function interiorSizes(openingWidth: number, frameWidth: string) {
   const ratio = (openingWidth / CANVAS.width) * (parseFloat(frameWidth) / 100);
-  return `(max-aspect-ratio: 4/5) ${Math.ceil(ratio * 200)}vw, ${Math.ceil(ratio * 135)}vw`;
+  return `(max-aspect-ratio: 6/7) ${Math.ceil(ratio * 200)}vw, ${Math.ceil(ratio * 135)}vw`;
 }
 
 export default function ArchEntrance({
