@@ -212,8 +212,14 @@
   outline-offset: -2px;
 }
 
-.arch:is(:hover, :focus-visible) .archSmoke,
-.arch:is(:hover, :focus-visible) .archLabel::before {
+/*
+ * 選ばれた入口の見せ方は、キーボード（:focus-visible）ではどの端末でも、
+ * マウスの hover は hover できる端末だけで出す（下の @media (hover: hover)）。
+ * タッチ端末で :hover に反応させると、iOS Safari で1回目のタップが hover 表示だけで止まったり、
+ * 戻ったときに hover の見た目が残ったりするため。
+ */
+.arch:focus-visible .archSmoke,
+.arch:focus-visible .archLabel::before {
   opacity: 1;
 }
 
@@ -289,24 +295,50 @@
 }
 
 /* 小さな GO TO → カテゴリ名 → 説明 の順に、少しずつ現れる */
-.arch:is(:hover, :focus-visible) .archGoTo {
+.arch:focus-visible .archGoTo {
   opacity: 0.78;
   transition-delay: 0.1s;
 }
 
-.arch:is(:hover, :focus-visible) .archTitle {
+.arch:focus-visible .archTitle {
   opacity: 1;
   transition-delay: 0.18s;
 }
 
-.arch:is(:hover, :focus-visible) .archCaption {
+.arch:focus-visible .archCaption {
   opacity: 1;
   transition-delay: 0.3s;
 }
 
 /* ほかの入口は暗くせず、コントラストを数%落とすだけにする */
-.arches:has(.arch:is(:hover, :focus-visible)) .arch:not(:hover, :focus-visible) .archScene {
+.arches:has(.arch:focus-visible) .arch:not(:focus-visible) .archScene {
   filter: contrast(0.96);
+}
+
+@media (hover: hover) {
+  .arch:hover .archSmoke,
+  .arch:hover .archLabel::before {
+    opacity: 1;
+  }
+
+  .arch:hover .archGoTo {
+    opacity: 0.78;
+    transition-delay: 0.1s;
+  }
+
+  .arch:hover .archTitle {
+    opacity: 1;
+    transition-delay: 0.18s;
+  }
+
+  .arch:hover .archCaption {
+    opacity: 1;
+    transition-delay: 0.3s;
+  }
+
+  .arches:has(.arch:hover) .arch:not(:hover, :focus-visible) .archScene {
+    filter: contrast(0.96);
+  }
 }
 
 /* 7. 部屋名のプレート（ArchSigns） */
@@ -358,13 +390,22 @@
   }
 }
 
-/* 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする */
-.archPlate:hover,
-.stage:has(.arch[data-arch="about"]:is(:hover, :focus-visible)) .archSign[data-arch="about"] .archPlate,
-.stage:has(.arch[data-arch="work"]:is(:hover, :focus-visible)) .archSign[data-arch="work"] .archPlate,
-.stage:has(.arch[data-arch="contact"]:is(:hover, :focus-visible)) .archSign[data-arch="contact"] .archPlate {
+/* 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする（hover は hover できる端末だけ） */
+.stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
+.stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
+.stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
   color: rgb(44 37 30 / 0.98);
   border-color: rgb(96 88 78 / 0.58);
+}
+
+@media (hover: hover) {
+  .archPlate:hover,
+  .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
+  .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
+  .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
+    color: rgb(44 37 30 / 0.98);
+    border-color: rgb(96 88 78 / 0.58);
+  }
 }
 
 /*
