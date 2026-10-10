@@ -43,7 +43,6 @@
 
 - `modern-web-design` は一般的なトレンド集で、cursor UX、glassmorphism、scrollytelling、強い micro-interaction、AI パーソナライズなども勧めてくる。**このファイルの「避けるもの」と衝突する場合はこのファイルを優先する。** 採るのは主に余白・タイポグラフィ・アクセシビリティ・パフォーマンスの原則。
 - `r3f-*` の例は Fiber 9 / React 19 / three r185 / drei 10.7.8 が前提。導入するときは `package.json` と lockfile のバージョンを先に確認する。
-- `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。配信するコード（preview を含む）では自前の HDR/EXR を使う。
 - Drei には、既定のままだと外部の URL から asset を取得し、訪問者の IP と Referer を第三者に渡すものがある。drei 10.7.8 で確かめた次のものは、それぞれの方法で外部の CDN を使わない。ここにないもの（フォントを指定しない `<Text>`、`FaceLandmarker` の jsDelivr・storage.googleapis.com など）も、使う前に既定の取得先を確かめる。
   - `Environment`：`preset` を付けると `files` と `path` が githack に置き換わる。`preset` は使わず、`public/` の HDR/EXR を `files`（と必要なら `path`）で渡す。
   - Draco（`useGLTF`・`useGLTF.preload`・`<Gltf>`）：既定のままでは、Draco で圧縮したモデルを読むときに gstatic.com から decoder を取得する。DRACOLoader は module で1つを共有し、どの呼び出しも省略時は既定のパスを設定し直すので、`useGLTF` や `preload` を呼ぶより前に、module の最上位で `useGLTF.setDecoderPath('/draco/')` を呼ぶ形を主にする。第2引数でパスを渡す場合は、`preload` と `<Gltf useDraco>` にも同じパスを渡す。
@@ -59,7 +58,9 @@
   - `modern-web-design/references/accessibility_guide.md` の Accessible Modal：render 中に `useRef(document.activeElement)` を評価し、サーバー描画で `document is not defined` になる。フォーカス元は `useRef(null)` で持ち、開くときの effect の中で保存する。
   - `modern-web-design/scripts/pattern_generator.py` の `form` パターン：`blur` で `submit` を発火し、フォーカスを外しただけで成功通知と `form.reset()` が走って入力が消える。`--pattern form` は使わない。
   - `modern-web-design/scripts/pattern_generator.py` の `navigation` パターン：閉じたモバイルメニューを `opacity: 0` と `pointer-events: none` だけで隠していて、キーボードの Tab で見えないリンクにフォーカスが入る。閉じた状態は `inert` か `visibility: hidden` で操作対象から外す。
-  - `developing-threejs-apps/examples.md` のライフサイクルの例（`createThreeApp`）：`tick()` が呼ばれず描画が始まらない。始めても前フレームの時刻を更新しないため `dt` が累積して増える。描画ループは R3F の `useFrame` の `delta` を使う。
+  - `developing-threejs-apps/examples.md` のライフサイクルの例（`createThreeApp`）：`tick()` が呼ばれず描画が始まらない。始めても前フレームの時刻を更新しないため、`dt` が上限の 0.05 秒に張りつき、速度がフレームレートに依存する。描画ループは R3F の `useFrame` の `delta` を使う。
+  - `modern-web-design/scripts/pattern_generator.py` の `hero` パターン：scroll indicator が `animation: bounce 2s infinite` で常に動き、`prefers-reduced-motion` でも duration を縮めるだけで止まりきらない。「避けるもの」の「常に何かが動いている UI」に当たる。
+- `developing-threejs-apps` の Lifecycle Contract と Target API（`createThreeApp`、自前の `requestAnimationFrame`）は vanilla の Three.js 向け。R3F では Canvas と `useFrame` が描画ループと破棄を受け持つので、監査ではこの契約を当てはめず、dispose・color space・tone mapping・性能などの観点だけを使う。
 
 ### 今は追加しないもの
 
