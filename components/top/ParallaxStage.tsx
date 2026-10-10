@@ -28,8 +28,13 @@ export default function ParallaxStage({ className, children }: Props) {
     const node = ref.current;
     if (!node) return;
     let cancelled = false;
+    let revealed = false;
+    // 画像がそろったときと保険のタイマーの、先に来た方で1回だけ表示する
+    // （2回目で "late" に付け替わると、進行中のフェードインが打ち切られるため）
     const reveal = () => {
-      if (cancelled) return;
+      if (cancelled || revealed) return;
+      revealed = true;
+      window.clearTimeout(fallback);
       // CSS の保険ですでに舞台が見え始めていれば、フェードインをやり直すと一度暗転するので、
       // "late" としてそのまま表示する。ページ内の移動で戻ってきたときは新しく透明から始まるので "true"
       const alreadyShown = Number.parseFloat(getComputedStyle(node).opacity) > 0.01;
