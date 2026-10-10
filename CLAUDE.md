@@ -49,6 +49,9 @@
 - 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（`SKILL.md`・`scripts/README.md` に書かれたパスより優先する）。
   - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs`（`asset-audit.mjs`・`skill-audit.mjs` も同じ形）。`SKILL.md` の `node scripts/...` はこのリポジトリでは別の `scripts/` を、`scripts/README.md` の `node skills/...` は存在しないパスを指すので使わない。
   - `modern-web-design/scripts/*.py` は、引数なしだと標準入力を待って止まるので、`--file` / `--pattern` を付ける。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
+- skill のコード例は、そのまま写さず、このリポジトリ（Next.js App Router の事前描画、React 19）で動くかを確かめてから使う。次の2つは不具合が確かめられているので流用しない。
+  - `modern-web-design/references/accessibility_guide.md` の Accessible Modal：render 中に `useRef(document.activeElement)` を評価し、サーバー描画で `document is not defined` になる。フォーカス元は `useRef(null)` で持ち、開くときの effect の中で保存する。
+  - `modern-web-design/scripts/pattern_generator.py` の `form` パターン：`blur` で `submit` を発火し、フォーカスを外しただけで成功通知と `form.reset()` が走って入力が消える。`--pattern form` は使わない。
 
 ### 今は追加しないもの
 
