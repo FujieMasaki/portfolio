@@ -527,6 +527,12 @@
   .stage {
     --stage-h: calc(200vw * 941 / 1672);
     --above: calc(max(100svh, 560px) - var(--stage-h));
+    /*
+     * 空を伸ばす高さは 0 で止める。横向きのスマホなど高さの低い画面では --above が負になり、
+     * そのままだと空の箱が舞台の下まで届かず、背景の暗色が見えていた。
+     * 0 で止めても水平線の位置合わせは成り立ち、届かないのは舞台の下端 6% ほど（手前の植物と岩が覆う）。
+     */
+    --sky-above: max(var(--above), 0px);
 
     top: auto;
     bottom: 0;
@@ -538,9 +544,9 @@
   .sky {
     --horizon: 44.9%;
 
-    top: calc(-1 * var(--above));
+    top: calc(-1 * var(--sky-above));
     bottom: auto;
-    height: calc((var(--above) + 0.423 * var(--stage-h)) / 0.449);
+    height: calc((var(--sky-above) + 0.423 * var(--stage-h)) / 0.449);
   }
 
   .sky img {
@@ -548,7 +554,7 @@
   }
 
   .atmosphere {
-    top: calc(-1 * var(--above));
+    top: calc(-1 * var(--sky-above));
     background: linear-gradient(
       to bottom,
       rgb(40 36 52 / 0.16),
