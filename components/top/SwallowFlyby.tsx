@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import styles from "./TopHero.module.css";
 
 type Flight = {
@@ -68,17 +68,31 @@ function buildFlightPath(flight: Flight, width: number, height: number, birdWidt
  * Contact のアーチ越しに、遠くの海の上をリュウキュウツバメが横切る。
  * アイコンではなく環境の気配なので、数秒眺めていると「鳥が飛んでいる」と気づく程度に留める。
  * 同じ軌道の繰り返しに見えないよう、飛ぶたびに高さ・うねり・速さ・向きを変えて1羽だけ通す。
- * prefers-reduced-motion では飛ばさない。
+ * prefers-reduced-motion では飛ばさない（閲覧の途中で有効にしたときも、飛んでいる燕を止める）。
  */
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+/** 「動きを減らす」の設定を購読する（閲覧の途中で変わっても追従する） */
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(REDUCED_MOTION);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
 export default function SwallowFlyby() {
   const [flight, setFlight] = useState<Flight | null>(null);
+  // サーバーでは燕を描かないので、動きを減らす側（true）として扱う
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => true,
+  );
   const flightCount = useRef(0);
   const birdRef = useRef<HTMLSpanElement>(null);
 
   // 次の1羽を出すまでの間を空ける
   useEffect(() => {
-    if (flight) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (flight || reducedMotion) return;
 
     const delay =
       flightCount.current === 0 ? randomBetween(3000, 6000) : randomBetween(10000, 22000);
@@ -100,13 +114,13 @@ export default function SwallowFlyby() {
       });
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [flight]);
+  }, [flight, reducedMotion]);
 
   // 1羽分の軌道を作って飛ばし、抜けたら片付ける
   useEffect(() => {
     const bird = birdRef.current;
     const scene = bird?.parentElement;
-    if (!flight || !bird || !scene) return;
+    if (!flight || reducedMotion || !bird || !scene) return;
 
     const { width, height } = scene.getBoundingClientRect();
     const animation = bird.animate(
@@ -115,9 +129,10 @@ export default function SwallowFlyby() {
     );
     animation.onfinish = () => setFlight(null);
     return () => animation.cancel();
-  }, [flight]);
+  }, [flight, reducedMotion]);
 
-  if (!flight) return null;
+  // 動きを減らす設定の間は、飛んでいる途中の燕も描かない（次の燕も予約しない）
+  if (!flight || reducedMotion) return null;
 
   return (
     <span

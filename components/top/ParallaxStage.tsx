@@ -10,7 +10,7 @@ type Props = {
 /**
  * ポインタ位置を -1〜1 の CSS 変数（--px / --py）として流すだけのラッパー。
  * 動かす量は各レイヤーの CSS 側で決める（背景はごく弱く）。
- * タッチ端末と prefers-reduced-motion では何もしない。
+ * タッチ端末と prefers-reduced-motion では何もしない（閲覧の途中で設定が変わっても追従する）。
  *
  * 背景・植物の大きな PNG が建物より遅れて出ると空間が崩れて見えるので、
  * 空・植物・建物の画像がそろってから data-ready を付けて一度にフェードインさせる。
@@ -62,9 +62,9 @@ export default function ParallaxStage({ className, children }: Props) {
     if (!node) return;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!finePointer.matches || reducedMotion.matches) return;
 
     let frame = 0;
+    let listening = false;
     const onMove = (event: PointerEvent) => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
@@ -75,8 +75,28 @@ export default function ParallaxStage({ className, children }: Props) {
       });
     };
 
-    window.addEventListener("pointermove", onMove, { passive: true });
+    // 閲覧の途中で「動きを減らす」やポインタの種類が変わっても、そのたびに付け外しする。
+    // 外すときは、ずらした背景を元の位置に戻す
+    const sync = () => {
+      const shouldListen = finePointer.matches && !reducedMotion.matches;
+      if (shouldListen && !listening) {
+        window.addEventListener("pointermove", onMove, { passive: true });
+        listening = true;
+      } else if (!shouldListen && listening) {
+        window.removeEventListener("pointermove", onMove);
+        cancelAnimationFrame(frame);
+        node.style.setProperty("--px", "0");
+        node.style.setProperty("--py", "0");
+        listening = false;
+      }
+    };
+
+    sync();
+    finePointer.addEventListener("change", sync);
+    reducedMotion.addEventListener("change", sync);
     return () => {
+      finePointer.removeEventListener("change", sync);
+      reducedMotion.removeEventListener("change", sync);
       cancelAnimationFrame(frame);
       window.removeEventListener("pointermove", onMove);
     };
