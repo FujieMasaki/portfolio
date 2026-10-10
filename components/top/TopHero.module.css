@@ -1,0 +1,360 @@
+/*
+ * TOP ヒーロー
+ * 舞台（.stage）は完成イメージと同じ 1672:941 の箱で、中の各レイヤーは scene.ts の座標を % で置く。
+ * 画面に対しては object-fit: cover と同じ考え方で舞台を拡大・中央寄せする。
+ */
+
+.hero {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --hero-ink: #f4f1ec;
+
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1c211b;
+}
+
+.stage {
+  --px: 0;
+  --py: 0;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
+  aspect-ratio: 1672 / 941;
+  translate: -50% -50%;
+  container-type: inline-size;
+  opacity: 0;
+}
+
+.stage[data-ready] {
+  animation: stage-arrive 2.4s var(--ease-calm) both;
+}
+
+.stage > * {
+  position: absolute;
+}
+
+/* 1. 海と空：ごく弱いパララックス。動いても端が見えないよう少し大きく敷く */
+.sky {
+  inset: -2%;
+  transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
+  transition: transform 1.6s var(--ease-calm);
+}
+
+.sky img {
+  object-fit: cover;
+  /* 水平線を完成イメージと同じ高さ（上から約 42%）に合わせる */
+  object-position: 50% 53%;
+}
+
+/* 2 / 5. 前景植物。手前側は建物の範囲を抜いたマスクで切り出す */
+.plantsBack,
+.plantsFront,
+.building {
+  pointer-events: none;
+}
+
+.plantsFront {
+  mask-image: url("/images/top/top-foreground-front-mask.svg");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* 3. アーチ */
+.arches {
+  inset: 0;
+}
+
+.arch {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.archScene {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform 1.4s var(--ease-calm),
+    filter 1.4s var(--ease-calm);
+}
+
+.archImage {
+  position: absolute;
+}
+
+.archImage img {
+  width: 100%;
+  height: auto;
+}
+
+.archView {
+  object-fit: cover;
+  /* アーチ越しの景色は少し明るく、建物の中から外を覗いた抜け感にする */
+  scale: 1.02;
+}
+
+/* 開口部の縁にかかる陰影で、アーチの奥行きを出す */
+.archScene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 18px 24px -12px rgb(30 22 14 / 0.45);
+  pointer-events: none;
+}
+
+.archVeil {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.34);
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-calm);
+}
+
+.archLabel {
+  position: absolute;
+  top: 30%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55cqw;
+  padding-inline: 0.6cqw;
+  color: var(--hero-ink);
+  text-align: center;
+  opacity: 0;
+  translate: 0 0.5cqw;
+  transition:
+    opacity 0.9s var(--ease-calm),
+    translate 0.9s var(--ease-calm);
+}
+
+.archTitle {
+  font-family: var(--font-heading), serif;
+  font-size: max(1.15cqw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+}
+
+/* 案内板のような細い罫 */
+.archTitle::after {
+  content: "";
+  display: block;
+  width: 1.4em;
+  height: 1px;
+  margin: 0.6em auto 0;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.archCaption {
+  font-size: max(0.6cqw, 10px);
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  color: rgb(244 241 236 / 0.8);
+}
+
+.arch:hover .archScene,
+.arch:focus-visible .archScene {
+  transform: scale(1.04);
+  filter: brightness(1.08);
+}
+
+.arch:hover .archVeil,
+.arch:focus-visible .archVeil {
+  opacity: 1;
+}
+
+.arch:hover .archLabel,
+.arch:focus-visible .archLabel {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.arch:focus-visible .archVeil {
+  box-shadow: inset 0 0 0 1px rgb(244 241 236 / 0.6);
+}
+
+/* Contact：アーチの向こうを横切るツバメ */
+.swallow {
+  position: absolute;
+  top: 24%;
+  left: 18%;
+  width: 13%;
+  color: #2a2420;
+  opacity: 0.85;
+  animation: swallow-drift 16s ease-in-out infinite;
+}
+
+/* 6. 周辺減光と夕方の光 */
+.atmosphere {
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 52%,
+      transparent 55%,
+      rgb(16 18 14 / 0.38) 100%
+    ),
+    linear-gradient(to bottom, rgb(40 36 52 / 0.12), transparent 30%);
+}
+
+/* 館名のプレート */
+.plaque {
+  position: absolute;
+  left: clamp(20px, 3vw, 48px);
+  bottom: clamp(20px, 4svh, 44px);
+  z-index: 1;
+  color: var(--hero-ink);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+  animation: plaque-arrive 1.6s var(--ease-calm) 1.2s both;
+  pointer-events: none;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-heading), serif;
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.role {
+  margin: 0.4em 0 0;
+  font-size: clamp(10px, 0.7vw, 11px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+@keyframes stage-arrive {
+  from {
+    opacity: 0;
+    scale: 1.025;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes plaque-arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@keyframes swallow-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-4deg);
+  }
+  50% {
+    transform: translate(120%, -40%) rotate(3deg);
+  }
+}
+
+/* タッチ端末：hover が無いので案内は常に控えめに出しておく */
+@media (hover: none) {
+  .archVeil {
+    opacity: 0.6;
+  }
+
+  .archLabel {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/*
+ * 縦長画面：舞台を画面下に置き、3つのアーチが画面幅に収まる大きさにする。
+ * 舞台の上に余る空は、空レイヤーだけを上へ伸ばして埋める（水平線の高さは舞台と揃えたまま）。
+ */
+@media (max-aspect-ratio: 4/5) {
+  .stage {
+    --stage-h: calc(200vw * 941 / 1672);
+    --above: calc(max(100svh, 560px) - var(--stage-h));
+
+    top: auto;
+    bottom: 0;
+    width: 200vw;
+    translate: -50% 0;
+  }
+
+  /* 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ */
+  .sky {
+    top: calc(-1 * var(--above));
+    bottom: auto;
+    height: calc((var(--above) + 0.423 * var(--stage-h)) / 0.449);
+  }
+
+  .sky img {
+    object-position: 50% 0%;
+  }
+
+  .atmosphere {
+    top: calc(-1 * var(--above));
+    background: linear-gradient(
+      to bottom,
+      rgb(40 36 52 / 0.16),
+      transparent 40%,
+      transparent 75%,
+      rgb(16 18 14 / 0.35)
+    );
+  }
+
+  /* 舞台の上端で切れる木々の梢を空へ溶かす */
+  .plantsBack {
+    mask-image: linear-gradient(to bottom, transparent, #000 16%);
+  }
+
+  .plantsFront {
+    mask-image:
+      url("/images/top/top-foreground-front-mask.svg"),
+      linear-gradient(to bottom, transparent, #000 16%);
+    mask-composite: intersect;
+  }
+
+  .archLabel {
+    top: 26%;
+  }
+
+  .archCaption {
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .plaque {
+    top: clamp(28px, 8svh, 64px);
+    bottom: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage[data-ready] {
+    opacity: 1;
+  }
+
+  .stage[data-ready],
+  .plaque,
+  .swallow {
+    animation: none;
+  }
+
+  .sky,
+  .archScene,
+  .archVeil,
+  .archLabel {
+    transition: none;
+  }
+}
