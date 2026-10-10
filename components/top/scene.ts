@@ -57,6 +57,8 @@ export type Arch = {
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
   interior?: ImageInterior | ViewInterior;
+  /** アーチの奥を、時折リュウキュウツバメが横切る */
+  flyby?: boolean;
 };
 
 export const ARCHES: Arch[] = [
@@ -90,8 +92,9 @@ export const ARCHES: Arch[] = [
     title: "Contact",
     caption: "Email / SNS",
     opening: { x: 1077, y: 422, width: 144, height: 394 },
-    // 海の切り取りとツバメは一旦外している。戻すときは次を指定する:
+    // 海の切り取りは一旦外している。戻すときは次を指定する:
     // interior: { kind: "view", objectPosition: "60% 30%" },
+    flyby: true,
   },
 ];
 

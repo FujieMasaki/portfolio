@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CANVAS, toPercentBox, type Arch } from "./scene";
-import Swallow from "./Swallow";
+import SwallowFlyby from "./SwallowFlyby";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -50,21 +50,19 @@ export default function ArchEntrance({
           </span>
         )}
         {interior?.kind === "view" && (
-          <>
-            <Image
-              src={background}
-              alt=""
-              fill
-              sizes={`${Math.round((opening.width / CANVAS.width) * 300)}vw`}
-              className={styles.archView}
-              style={{
-                objectPosition: interior.objectPosition,
-                filter: backgroundFilter,
-              }}
-            />
-            <Swallow />
-          </>
+          <Image
+            src={background}
+            alt=""
+            fill
+            sizes={`${Math.round((opening.width / CANVAS.width) * 300)}vw`}
+            className={styles.archView}
+            style={{
+              objectPosition: interior.objectPosition,
+              filter: backgroundFilter,
+            }}
+          />
         )}
+        {arch.flyby && <SwallowFlyby />}
       </span>
 
       <span className={styles.archVeil} aria-hidden="true" />

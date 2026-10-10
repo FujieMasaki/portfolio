@@ -245,15 +245,27 @@
   box-shadow: inset 0 0 0 1px rgb(244 241 236 / 0.6);
 }
 
-/* Contact：アーチの向こうを横切るツバメ */
+/*
+ * Contact：アーチの奥、遠くの海の上を時折横切るリュウキュウツバメ。
+ * 軌道（位置・向き）は SwallowFlyby.tsx が飛ぶたびに作る。ここでは見え方と羽ばたきだけ。
+ * アイコンに見えないよう、真っ黒にせず夕方の海に馴染む濃さにし、輪郭をわずかに霞ませる。
+ */
 .swallow {
   position: absolute;
-  top: 24%;
-  left: 18%;
-  width: 13%;
-  color: #2a2420;
-  opacity: 0.85;
-  animation: swallow-drift 16s ease-in-out infinite;
+  top: 0;
+  left: 0;
+  width: 16.5%;
+  color: rgb(40 34 36);
+  opacity: 0.74;
+  filter: blur(0.35px);
+  will-change: transform;
+}
+
+.swallow svg {
+  display: block;
+  width: 100%;
+  transform-origin: 50% 45%;
+  animation: swallow-flap var(--flap-duration, 1.15s) ease-in-out infinite;
 }
 
 /* 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される） */
@@ -348,13 +360,18 @@
   }
 }
 
-@keyframes swallow-drift {
+/* 羽ばたいては滑空する。遠景なので、羽の形ではなくシルエットがわずかに変わる程度 */
+@keyframes swallow-flap {
   0%,
+  50%,
   100% {
-    transform: translate(0, 0) rotate(-4deg);
+    scale: 1 1;
   }
-  50% {
-    transform: translate(120%, -40%) rotate(3deg);
+  16% {
+    scale: 1 0.6;
+  }
+  32% {
+    scale: 1 1.04;
   }
 }
 
@@ -452,7 +469,6 @@
 
   .stage[data-ready],
   .plaque,
-  .swallow,
   .clouds,
   .sea,
   .haze,
