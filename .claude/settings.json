@@ -16,9 +16,6 @@
       "Bash(git fetch origin main)",
       "Bash(git merge-base *)",
       "Bash(git rev-parse *)",
-      "Bash(gh pr view * --json number,title,body,baseRefName,headRefOid,url)",
-      "Bash(gh pr view * --json headRefOid)",
-      "Bash(gh pr view * --json headRefOid --jq .headRefOid)",
       "Bash(gh pr checks *)",
       "Bash(node scripts/codex-final-check.mjs *)"
     ],

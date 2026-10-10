@@ -30,9 +30,10 @@ description: 「PR作成して」と依頼されたら、PR作成→セルフレ
   会話に明記する（PRコメントは書かない）。
 - `--no-verify`、force push、mainへの直接push、PRのマージをしない。
 - pushは`git push origin HEAD:<type>/<slug>`（初回は`-u`付き）の形だけを使う。
-- `.claude/settings.json`が確認なしで通すのは、読むだけのコマンド（`git diff`は`origin/`から始まる形、
-  `git fetch`は`git fetch origin main`だけ）と検査・Codexのスクリプトだけ。それ以外の`git fetch`・`git add`・
-  `git commit`・`git push`・`git switch`・`gh pr create`・`gh pr edit`は毎回人間の確認を求める。
+- `.claude/settings.json`が確認なしで通すのは、読むだけのgit（`git diff`は`origin/<base>...HEAD`の形、
+  `git fetch`は`git fetch origin main`だけ）、検査、`gh pr checks`、Codexのスクリプトだけ。それ以外の`git fetch`・
+  `git add`・`git commit`・`git push`・`git switch`・`gh pr view`・`gh pr create`・`gh pr edit`は毎回人間の確認を求める
+  （`gh pr view`は、ほかのアカウントが書いたコメント・レビューの本文を出せる形を許可ルールで塞ぎきれないため）。
   取り返しのつかない操作の主な形（force push、mainへのpush、`--no-verify`、`git reset --hard`、`git branch -D`等）は
   deny に置き、確認しても実行できない。
   許可ルールは事故を防ぐ柵であって安全の境界ではないため、確認を避ける目的で別の書き方に言い換えない。
@@ -147,7 +148,8 @@ browser等の機能を無効にし、承認も`never`に固定する（ユーザ
 - Codexの出力はそのままPRや会話へ転記せず、指摘の要点を自分の言葉でまとめる。秘密情報らしき値が
   含まれていたら転記せず、「止まる条件」に従う。
 - 終了コードで判断する。`0`は結果を読む。`3`はtimeoutで、1回だけ再実行する（Codexのループ回数には
-  数えない）。再実行も`3`なら、または`1`・`2`なら「止まる条件」に従う。
+  数えない）。再実行も`3`なら、または`1`・`2`、signalで止められたときの`128`+signal番号（`130`・`143`等）なら
+  「止まる条件」に従う。
 - このPRで`scripts/codex-final-check.mjs`を変更した場合は、許可ルールにより変更後の中身が確認なしで
   実行される。実行前にセルフレビューで、`--sandbox read-only`の固定と引数の検査が保たれているかを確認する。
   `pnpm install`・`lint`・`test`・`build`も同じく、`package.json`のscripts・`eslint.config.mjs`・`next.config.ts`・
