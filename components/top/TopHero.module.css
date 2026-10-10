@@ -141,6 +141,8 @@
    */
   outline: 2px solid transparent;
   outline-offset: -2px;
+  /* Safari で、合成レイヤーになった燕が角丸の外へはみ出さないようにする */
+  isolation: isolate;
   -webkit-tap-highlight-color: transparent;
 }
 

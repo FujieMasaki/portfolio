@@ -21,6 +21,15 @@ type Props = {
  * アーチの中央付近に「GO TO・カテゴリ名・説明」を浮かび上がらせる。
  * スモークはリンク自体の切り抜き（アーチ形）の内側にあるので、コンクリートや植物にはかからない。
  */
+/**
+ * アーチ内の画像の sizes。表示幅は「開口部の幅 × 画像の拡大率 × 舞台の幅」で、
+ * 舞台の幅は縦長画面で 200vw、横長では画面の比率により 100〜約135vw になる。
+ */
+function interiorSizes(openingWidth: number, frameWidth: string) {
+  const ratio = (openingWidth / CANVAS.width) * (parseFloat(frameWidth) / 100);
+  return `(max-aspect-ratio: 4/5) ${Math.ceil(ratio * 200)}vw, ${Math.ceil(ratio * 135)}vw`;
+}
+
 export default function ArchEntrance({
   arch,
   background,
@@ -48,7 +57,7 @@ export default function ArchEntrance({
               alt=""
               width={1122}
               height={1402}
-              sizes={`${Math.round((opening.width / CANVAS.width) * 220)}vw`}
+              sizes={interiorSizes(opening.width, interior.frame.width)}
             />
           </span>
         )}
