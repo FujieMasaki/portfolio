@@ -38,7 +38,15 @@ export default function TopHero({ ambient = "evening" }: Props) {
     AMBIENTS[ambient];
 
   return (
-    <section className={styles.hero} aria-label="Masaki Fujie">
+    <section className={styles.hero} aria-labelledby="top-title">
+      {/* 読み上げ・Tab の順で、館名がメニューより先に来るよう舞台より前に置く（見た目は absolute で左下） */}
+      <header className={styles.plaque}>
+        <h1 className={styles.name} id="top-title">
+          Masaki Fujie
+        </h1>
+        <p className={styles.role}>Product Engineer</p>
+      </header>
+
       <ParallaxStage className={styles.stage}>
         <Sky background={background} backgroundFilter={backgroundFilter} />
 
@@ -126,11 +134,6 @@ export default function TopHero({ ambient = "evening" }: Props) {
       <noscript>
         <style>{`.${styles.stage}{opacity:1}`}</style>
       </noscript>
-
-      <header className={styles.plaque}>
-        <h1 className={styles.name}>Masaki Fujie</h1>
-        <p className={styles.role}>Product Engineer</p>
-      </header>
     </section>
   );
 }
