@@ -16,16 +16,25 @@ type Props = {
  * 先に読み込む画像がそろってから data-ready を付けて一度にフェードインさせる。
  * JS が動かない環境では TopHero の <noscript> が舞台をそのまま表示する。
  */
+/** TopHero.module.css の .stage:not([data-ready]) の保険が始まるまでの時間（animation-delay と合わせる） */
+const CSS_FALLBACK_MS = 6000;
+/** JS 側の保険。CSS の保険より先に表示する */
+const JS_FALLBACK_MS = 5000;
+
 export default function ParallaxStage({ className, children }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(false);
+  /** "true" は通常どおりフェードイン、"late" は CSS の保険ですでに表示されているのでそのまま見せる */
+  const [ready, setReady] = useState<"true" | "late" | null>(null);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
     let cancelled = false;
     const reveal = () => {
-      if (!cancelled) setReady(true);
+      if (cancelled) return;
+      // ページの読み込み開始から CSS の保険（6 秒）を過ぎていれば、舞台はもう見えている。
+      // そこでフェードインをやり直すと一度暗転するので、"late" としてそのまま表示する
+      setReady(performance.now() >= CSS_FALLBACK_MS ? "late" : "true");
     };
     // 待つのは先に読み込む画像（背景・植物・建物・アーチ内の展示室）。loading="lazy" の画像は待たない
     const images = Array.from(
@@ -36,7 +45,7 @@ export default function ParallaxStage({ className, children }: Props) {
     );
     // 画像が極端に遅い回線でも、いつまでも真っ暗にはしない。
     // CSS 側の保険（6 秒）より先に表示し、保険で出た後に暗転し直すちらつきを避ける
-    const fallback = window.setTimeout(reveal, 5000);
+    const fallback = window.setTimeout(reveal, JS_FALLBACK_MS);
     return () => {
       cancelled = true;
       window.clearTimeout(fallback);
@@ -69,7 +78,7 @@ export default function ParallaxStage({ className, children }: Props) {
   }, []);
 
   return (
-    <div ref={ref} className={className} data-ready={ready || undefined}>
+    <div ref={ref} className={className} data-ready={ready ?? undefined}>
       {children}
     </div>
   );

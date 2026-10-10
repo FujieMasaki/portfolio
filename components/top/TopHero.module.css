@@ -34,6 +34,12 @@
   animation: stage-arrive 2.4s var(--ease-calm) both;
 }
 
+/* CSS の保険で表示された後に ready になった場合は、フェードインをやり直さない（一度暗転させない） */
+.stage[data-ready="late"] {
+  opacity: 1;
+  animation: none;
+}
+
 /*
  * 保険：JS の読み込みや hydration に失敗して data-ready が付かなくても、
  * 6 秒たったら CSS だけで舞台を表示する（見えないリンクだけが残らないように）。
@@ -41,6 +47,7 @@
 .stage:not([data-ready]) {
   /* 表示されるまでは、見えないアーチのリンクに Tab でフォーカスが入らないようにする */
   visibility: hidden;
+  /* 6s は ParallaxStage.tsx の CSS_FALLBACK_MS と合わせる */
   animation: stage-fallback 0.8s var(--ease-calm) 6s forwards;
 }
 
