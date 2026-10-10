@@ -44,7 +44,9 @@
 - `modern-web-design` は一般的なトレンド集で、cursor UX、glassmorphism、scrollytelling、強い micro-interaction、AI パーソナライズなども勧めてくる。**このファイルの「避けるもの」と衝突する場合はこのファイルを優先する。** 採るのは主に余白・タイポグラフィ・アクセシビリティ・パフォーマンスの原則。
 - `r3f-*` の例は Fiber 9 / React 19 / three r185 / drei 10.7.8 が前提。導入するときは `package.json` と lockfile のバージョンを先に確認する。
 - `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。配信するコード（preview を含む）では自前の HDR/EXR を使う。
-- Drei の `useGLTF` は既定で Draco decoder を外部の CDN（drei 10.7.8 では `https://www.gstatic.com/draco/versioned/decoders/1.5.5/`）から取得し、訪問者の IP と Referer が第三者に渡る。Draco / KTX2 / meshopt を使うときは、decoder・transcoder を `public/` に置いて自前で配信し（`useGLTF` の第2引数や `useGLTF.setDecoderPath` でパスを指定する）、外部の CDN を使わない。
+- Drei には、既定のままだと外部の URL（gstatic.com・jsDelivr・githack）から asset を取得し、訪問者の IP と Referer を第三者に渡すものがある。drei 10.7.8 で確かめたのは `Environment` の preset、`useGLTF` の Draco decoder、`useKTX2` の transcoder、`Cloud` / `Clouds` の texture、`MatcapTexture`、`NormalTexture`。これらは `public/` に置いた自前の asset のパスを明示して使い、外部の CDN を使わない。フォントを指定しない `<Text>` など、ここにないものも、使う前に既定の取得先を確かめる。
+  - Draco：既定のままでは、Draco で圧縮したモデルを読むときに decoder を取得する。`useGLTF` の第2引数に文字列のパスを渡すか、`useGLTF.setDecoderPath` で指定する。
+  - KTX2：`useGLTF` の第2引数と `setDecoderPath` は Draco のパスしか決めない。`useKTX2` の第2引数か、`useGLTF` の第4引数 `extendLoader` で `KTX2Loader` の `setTranscoderPath` に指定する。
 - skill 内の、訪問者の行動に基づくパーソナライズ、計測値の送信例（web-vitals を `/analytics` へ送る等）、外部の preconnect / dns-prefetch 先は採らない。計測・外部スクリプトは `docs/code-review/security.md` の §2 に従う。
 - skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。`package.json` に scripts を足す提案（`assets:audit` 等）も同じく人間に確認する。このリポジトリのパッケージマネージャは pnpm で、skill 内の `npm run …` / `npm install` は pnpm に読み替える。検査は `pnpm lint`・`pnpm type-check`・`pnpm test`・`pnpm build` で行い、終わらない dev サーバー（`npm run dev` 等）は検査のために起動しない。
 - 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（skill 内（`SKILL.md`・`scripts/README.md`・`reference/`・`CONTRIBUTING.md` 等）に書かれたパスより優先する）。
