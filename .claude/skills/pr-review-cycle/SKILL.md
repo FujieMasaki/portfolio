@@ -150,6 +150,9 @@ browser等の機能を無効にし、承認も`never`に固定する（ユーザ
   数えない）。再実行も`3`なら、または`1`・`2`なら「止まる条件」に従う。
 - このPRで`scripts/codex-final-check.mjs`を変更した場合は、許可ルールにより変更後の中身が確認なしで
   実行される。実行前にセルフレビューで、`--sandbox read-only`の固定と引数の検査が保たれているかを確認する。
+  `pnpm install`・`lint`・`test`・`build`も同じく、`package.json`のscripts・`eslint.config.mjs`・`next.config.ts`・
+  `scripts/`のtest・`.pnpmfile.cjs`の中身を確認なしで実行する。これらを変更したPRでは、検査を実行する前に
+  セルフレビューで意図しない処理が入っていないかを確かめる。
 
 Codexが報告したdiffの範囲（baseとHEAD）が、スクリプトが最初に出したSHAと一致し、HEADがpush済みの
 最新コミットと一致しているか確認する。baseはbaseの先端とmerge-baseのどちらで報告されていてもよい。
@@ -210,8 +213,10 @@ Codexの指摘を修正したら、修正の大小にかかわらず、手順2�
 
 次の2点を確認してから報告する。
 
-- `git rev-parse HEAD` と `git rev-parse @{u}` が一致すること（レビュー中に他者や別の自動化が同じ
-  PRブランチへ直接pushしていた場合、その分の変更がレビューを経ずにPRへ残ってしまうため）。
+- `gh pr view <番号> --json headRefOid --jq .headRefOid` で取ったPRの今の先端が、`git rev-parse HEAD`
+  （最後にレビューしたコミット）と一致すること。`@{u}`はfetchしない限り更新されないローカルの記録なので、
+  比較に使わない。一致しなければ、レビュー中に他者や別の自動化が同じPRブランチへpushしているので、
+  その変更がレビューを経ずにPRへ残らないよう、取り込んで手順2からやり直す。
 - `git status` がclean であること（コミットし忘れた変更・未追跡ファイルが残っていないこと）。
 
 確認できたら、PRのURL、手順9で作ったガイドページのURL（作らなかった場合はその理由）、レビュー→修正の
