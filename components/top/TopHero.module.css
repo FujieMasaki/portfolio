@@ -145,12 +145,7 @@
   display: block;
   overflow: hidden;
   cursor: pointer;
-  /*
-   * 通常はスモークと GO TO でフォーカスを示し、線は出さない。
-   * 透明な outline にしておくと、強制カラーモードではシステムの色に置き換わってフォーカスが見える。
-   */
-  outline: 2px solid transparent;
-  outline-offset: -2px;
+  outline: none;
   /* Safari で、合成レイヤーになった燕が角丸の外へはみ出さないようにする */
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
@@ -198,6 +193,16 @@
   opacity: 0;
   transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+}
+
+/*
+ * 通常はスモークと GO TO でフォーカスを示し、線は出さない。
+ * フォーカス中のアーチにだけ透明な outline を付けると、強制カラーモードでは
+ * システムの色に置き換わり、どのアーチを選んでいるかが分かる。
+ */
+.arch:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
 }
 
 .arch:is(:hover, :focus-visible) .archSmoke,
