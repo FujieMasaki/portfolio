@@ -16,9 +16,7 @@ type Props = {
  * 先に読み込む画像がそろってから data-ready を付けて一度にフェードインさせる。
  * JS が動かない環境では TopHero の <noscript> が舞台をそのまま表示する。
  */
-/** TopHero.module.css の .stage:not([data-ready]) の保険が始まるまでの時間（animation-delay と合わせる） */
-const CSS_FALLBACK_MS = 6000;
-/** JS 側の保険。CSS の保険より先に表示する */
+/** JS 側の保険。TopHero.module.css の .stage:not([data-ready]) の保険（6 秒）より先に表示する */
 const JS_FALLBACK_MS = 5000;
 
 export default function ParallaxStage({ className, children }: Props) {
@@ -32,9 +30,10 @@ export default function ParallaxStage({ className, children }: Props) {
     let cancelled = false;
     const reveal = () => {
       if (cancelled) return;
-      // ページの読み込み開始から CSS の保険（6 秒）を過ぎていれば、舞台はもう見えている。
-      // そこでフェードインをやり直すと一度暗転するので、"late" としてそのまま表示する
-      setReady(performance.now() >= CSS_FALLBACK_MS ? "late" : "true");
+      // CSS の保険ですでに舞台が見え始めていれば、フェードインをやり直すと一度暗転するので、
+      // "late" としてそのまま表示する。ページ内の移動で戻ってきたときは新しく透明から始まるので "true"
+      const alreadyShown = Number.parseFloat(getComputedStyle(node).opacity) > 0.01;
+      setReady(alreadyShown ? "late" : "true");
     };
     // 待つのは先に読み込む画像（背景・植物・建物・アーチ内の展示室）。loading="lazy" の画像は待たない
     const images = Array.from(

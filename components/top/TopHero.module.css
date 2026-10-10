@@ -47,7 +47,7 @@
 .stage:not([data-ready]) {
   /* 表示されるまでは、見えないアーチのリンクに Tab でフォーカスが入らないようにする */
   visibility: hidden;
-  /* 6s は ParallaxStage.tsx の CSS_FALLBACK_MS と合わせる */
+  /* 6s は ParallaxStage.tsx の JS_FALLBACK_MS（5 秒）より長くしておく */
   animation: stage-fallback 0.8s var(--ease-calm) 6s forwards;
 }
 
