@@ -28,9 +28,10 @@ description: 「PR作成して」と依頼されたら、PR作成→セルフレ
 - サブエージェント・codexの指摘を握りつぶさない。妥当性を自分で判断し、対応しない場合は理由をPR本文か
   会話に明記する（PRコメントは書かない）。
 - `--no-verify`、force push、mainへの直接push、PRのマージをしない。
-- pushは`git push origin HEAD:<type>/<slug>`（初回は`-u`付き）の形だけを使う。`.claude/settings.json`は
-  この形だけを確認なしで通す。許可ルールは事故を防ぐ柵であって安全の境界ではないため、確認を避ける目的で
-  別の書き方に言い換えない。
+- pushは`git push origin HEAD:<type>/<slug>`（初回は`-u`付き）の形だけを使う。
+- `.claude/settings.json`が確認なしで通すのは、読むだけのコマンドと検査・Codexのスクリプトだけ。
+  `git add`・`git commit`・`git push`・`git switch`・`gh pr create`・`gh pr edit`は毎回人間の確認を求める。
+  許可ルールは事故を防ぐ柵であって安全の境界ではないため、確認を避ける目的で別の書き方に言い換えない。
 - 秘密情報（`.env*`等）を読まない・出力しない。
 - レビュー→修正ループの反復回数を数え、Codexとのループは5回、1回のサブエージェント段階は3回で必ず止まる
   （無限ループにしない）。
@@ -124,8 +125,8 @@ diff全体を読み直す（修正が別の箇所と矛盾していないかは�
 node scripts/codex-final-check.mjs origin/<ベースブランチ>
 ```
 
-Codexは必ずこのスクリプト経由で実行し、`codex exec`を直接実行しない。Claude Codeの許可ルールは
-前方一致のため、`codex exec -s read-only *`を許可すると、後ろにsandboxを外すオプション
+Codexは必ずこのスクリプト経由で実行し、`codex exec`を直接実行しない。Claude Codeの許可ルールの
+`*`は後ろに続く任意の引数に一致するため、`codex exec -s read-only *`を許可すると、後ろにsandboxを外すオプション
 （`--dangerously-bypass-approvals-and-sandbox`等）を足しても確認なしで通ってしまう。スクリプトは
 baseだけを受け取り（形式を検査し、余分な引数は拒否する）、`codex exec --sandbox read-only`の引数を
 すべて自分で組み立てる。ユーザー設定（MCPサーバ・plugin）とexecpolicyのrulesを読み込まず、

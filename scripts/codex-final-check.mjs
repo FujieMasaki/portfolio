@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Runs the pr-review-cycle final check with Codex in a read-only sandbox.
-// Claude Code's permission rules match by prefix, so allowing `codex exec -s read-only *`
+// A Claude Code permission rule's `*` matches any trailing arguments, so allowing `codex exec -s read-only *`
 // would also allow appended flags that lift the sandbox. Only this script is allowed:
 // it accepts the base branch alone and builds every codex argument itself.
 // Usage: node scripts/codex-final-check.mjs origin/<base>
