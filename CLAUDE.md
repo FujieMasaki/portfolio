@@ -27,7 +27,7 @@
 
 ## Skill の優先順位と使い分け
 
-サイトの実装に使う Skill は、`.claude/skills/` にプロジェクトスコープで置いている（同じ場所の `pr-review-cycle`・`human-review-artifact` は PR・レビューの手順で、`AGENTS.md` が扱う）。
+サイトの実装に使う Skill は、`.claude/skills/` にプロジェクトスコープで置いている（同じ場所の `pr-review-cycle`・`human-review-artifact` は PR・レビューの手順で、`AGENTS.md` と `pr-review-cycle` が扱う）。
 
 | 優先 | Skill | 用途 |
 |---|---|---|
@@ -43,11 +43,11 @@
 
 - `modern-web-design` は一般的なトレンド集で、cursor UX、glassmorphism、scrollytelling、強い micro-interaction、AI パーソナライズなども勧めてくる。**このファイルの「避けるもの」と衝突する場合はこのファイルを優先する。** 採るのは主に余白・タイポグラフィ・アクセシビリティ・パフォーマンスの原則。
 - `r3f-*` の例は Fiber 9 / React 19 / three r185 / drei 10.7.8 が前提。導入するときは `package.json` と lockfile のバージョンを先に確認する。
-- `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。本番では自前の HDR/EXR を使う。
+- `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。配信するコード（preview を含む）では自前の HDR/EXR を使う。
 - skill 内の、訪問者の行動に基づくパーソナライズ、計測値の送信例（web-vitals を `/analytics` へ送る等）、外部の preconnect / dns-prefetch 先は採らない。計測・外部スクリプトは `docs/code-review/security.md` の §2 に従う。
 - skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。このリポジトリのパッケージマネージャは pnpm。
-- 同梱スクリプトは、読み取りと標準出力だけと確認済み（外部への通信・コマンドの実行はない）。実行するときは repo root から次の形で行う。
-  - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs` / `asset-audit.mjs`。`SKILL.md` の `node scripts/three-doctor.mjs` は、このリポジトリでは別の `scripts/` を指すので使わない。
+- 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（`SKILL.md`・`scripts/README.md` に書かれたパスより優先する）。
+  - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs`（`asset-audit.mjs`・`skill-audit.mjs` も同じ形）。`SKILL.md` の `node scripts/...` はこのリポジトリでは別の `scripts/` を、`scripts/README.md` の `node skills/...` は存在しないパスを指すので使わない。
   - `modern-web-design/scripts/*.py` は、引数なしだと標準入力を待って止まるので、`--file` / `--pattern` を付ける。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
 
 ### 今は追加しないもの
