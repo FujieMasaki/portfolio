@@ -34,11 +34,11 @@
 | 変更内容 | 最低限確認する観点 |
 | --- | --- |
 | すべての変更 | `security.md` |
-| 動き（CSS animation・transition、`useFrame`、scroll連動） | `prefers-reduced-motion`で止まる・弱まるか。常に何かが動いていないか。動きの量が`CLAUDE.md`の「避けるもの」（大きなカメラ移動、激しいscroll連動、強いBloom等）に当たらないか |
+| 動き（CSS animation・transition、`useFrame`、scroll連動） | `prefers-reduced-motion`で止まる・弱まるか。JSで止める動きは、表示した時点の1回だけでなく、閲覧中に設定が変わっても追従するか（`matchMedia`の`change`を購読しているか）。常に何かが動いていないか。動きの量が`CLAUDE.md`の「避けるもの」（大きなカメラ移動、激しいscroll連動、強いBloom等）に当たらないか |
 | Three.js / React Three Fiber | geometry・material・textureを作った側が破棄しているか（unmount・再生成でGPUメモリが増え続けないか）。描画ループが不要なときに止まるか（`frameloop`、画面外・タブ非表示）。color space・tone mappingの設定。WebGLが使えない・context lossのときにDOMの表示だけで成り立つか。詳しい監査は`developing-threejs-apps` skill |
 | 画像・動画・フォントの追加 | 表示サイズに対して大きすぎないか（`next/image`のサイズ指定、形式）。LCPに当たる画像の読み込み優先度。`alt`。不要になった素材が残っていないか |
 | レイアウト・タイポグラフィ | スマホ幅（360px前後）で横スクロールや重なりが出ないか。文字の大きさ・行間・コントラスト |
-| 操作できる要素（リンク・ボタン・メニュー） | キーボードで操作でき、フォーカスが見えるか。`button`と`a`の使い分け。外部リンクの`rel` |
+| 操作できる要素（リンク・ボタン・メニュー） | キーボードで操作でき、フォーカスが見えるか（`outline: none`にするなら、強制カラーモードでも見える代わりがあるか）。`:hover`で内容を出す演出は`@media (hover: hover)`に限っているか（タッチ端末で1回目のタップがhover表示で止まったり、戻ったときにhoverの見た目が残ったりしないか）。`button`と`a`の使い分け。外部リンクの`rel` |
 | client componentの追加（`"use client"`） | serverで足りるものをclientにしていないか。bundleに重いライブラリ（three等）を読み込む範囲が広がっていないか（`dynamic` importで必要な画面だけに限るか） |
 | 計測・外部スクリプト（GTM等） | `security.md` §2 |
 | `.env*`、`next.config.ts`、依存、CI、`.claude/`・`scripts/`の変更 | 秘密情報、公開設定、サプライチェーン、権限。人が見ていない間に動く自動化（`scripts/`・`.claude/`のskill）は、失敗・ハング時の後始末と、誰でも決められる値（fork PRのbranch名等）を信頼していないか |
@@ -63,3 +63,7 @@
 
 - 2026-10-11: 初版作成。fod-appのレビュー指針（`docs/code-review/frontend/`）を基に、静的なポートフォリオサイト
   （Next.js、Three.js / R3Fの導入予定）向けに観点を置き換えた。
+- 2026-10-11: TOPヒーローのPR（#20）のレビューで、次の3点が段階を越えて繰り返し指摘されたため、§3に追記した。
+  - JSで止める動きが、閲覧中の`prefers-reduced-motion`の変更に追従していなかった（Codexが再現）。
+  - `:hover`による演出がタッチ端末にも効き、iOS Safariで1回目のタップが止まるおそれがあった。
+  - フォーカスの線を消した状態で、強制カラーモードではフォーカスがまったく見えなかった。
