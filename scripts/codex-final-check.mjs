@@ -1,6 +1,6 @@
 import { spawn, spawnSync } from "node:child_process";
 import { closeSync, existsSync, mkdtempSync, openSync, readFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { constants, tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -95,8 +95,12 @@ export function buildCodexArgs(base, outputFile) {
 // spawnSync's timeout sends the signal but then waits for the child however long it takes, and
 // never reaches the processes the child started. Codex runs in its own process group instead, so
 // the whole group gets SIGTERM at the deadline and SIGKILL after the grace period, and anything
-// still left in the group is killed once codex exits.
-export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs = KILL_GRACE_MS }) {
+// still left in the group is killed once codex exits. Its own group is out of reach of signals
+// sent to this script's group, so with exitOnSignal the group is killed before this script
+// exits on SIGTERM / SIGINT / SIGHUP (otherwise codex would keep running with no deadline).
+export const FORWARDED_SIGNALS = ["SIGTERM", "SIGINT", "SIGHUP"];
+
+export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs = KILL_GRACE_MS, exitOnSignal = false }) {
   return new Promise((resolve) => {
     const child = spawn(command, args, { cwd, stdio, detached: true });
     let timedOut = false;
@@ -108,6 +112,11 @@ export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs =
         // The group is already gone.
       }
     };
+    const onSignal = (signal) => {
+      killGroup("SIGKILL");
+      process.exit(128 + constants.signals[signal]);
+    };
+    if (exitOnSignal) for (const signal of FORWARDED_SIGNALS) process.once(signal, onSignal);
     const timer = setTimeout(() => {
       timedOut = true;
       killGroup("SIGTERM");
@@ -116,6 +125,7 @@ export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs =
     const finish = (result) => {
       clearTimeout(timer);
       clearTimeout(killTimer);
+      for (const signal of FORWARDED_SIGNALS) process.off(signal, onSignal);
       if (child.pid) killGroup("SIGKILL");
       resolve({ ...result, timedOut });
     };
@@ -164,6 +174,7 @@ async function main(args) {
     cwd: repoRoot,
     stdio: ["ignore", log, log],
     timeoutMs: TIMEOUT_MS,
+    exitOnSignal: true,
   });
   closeSync(log);
   const tail = () => readFileSync(logFile, "utf8").split("\n").slice(-20).join("\n");

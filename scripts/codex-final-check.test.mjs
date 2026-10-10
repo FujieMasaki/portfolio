@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -103,7 +104,7 @@ test("a timeout kills the whole process group, even processes that ignore SIGTER
     const started = Date.now();
     const result = await runWithTimeout(process.execPath, ["-e", child], {
       stdio: "ignore",
-      timeoutMs: 500,
+      timeoutMs: 2000,
       graceMs: 200,
     });
     assert.equal(result.timedOut, true);
@@ -115,6 +116,40 @@ test("a timeout kills the whole process group, even processes that ignore SIGTER
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
     assert.equal(isAlive(grandchildPid), false, "processes codex started are killed with it");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+const waitFor = async (condition, ms = 5000) => {
+  const deadline = Date.now() + ms;
+  while (!condition() && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return condition();
+};
+
+test("stopping the script also kills codex's process group instead of leaving it without a deadline", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "codex-signal-test-"));
+  const pidFile = path.join(dir, "child.pid");
+  const runner = path.join(dir, "runner.mjs");
+  const moduleUrl = new URL("./codex-final-check.mjs", import.meta.url).href;
+  const child = `require("node:fs").writeFileSync(${JSON.stringify(pidFile)}, String(process.pid)); setInterval(() => {}, 1000);`;
+  writeFileSync(
+    runner,
+    `import { runWithTimeout } from ${JSON.stringify(moduleUrl)};\n` +
+      `await runWithTimeout(process.execPath, ["-e", ${JSON.stringify(child)}], ` +
+      `{ stdio: "ignore", timeoutMs: 60000, exitOnSignal: true });\n`,
+  );
+  try {
+    const script = spawn(process.execPath, [runner], { stdio: "ignore" });
+    const exited = new Promise((resolve) => script.on("close", (status) => resolve(status)));
+    assert.ok(await waitFor(() => existsSync(pidFile)), "the child started");
+    const childPid = Number(readFileSync(pidFile, "utf8"));
+
+    script.kill("SIGTERM");
+    assert.equal(await exited, 128 + 15);
+    assert.equal(await waitFor(() => !isAlive(childPid), 3000), true, "codex is killed with the script");
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

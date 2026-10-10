@@ -142,7 +142,7 @@ browser等の機能を無効にし、承認も`never`に固定する（ユーザ
 - repo rootから実行する（実行前に`git rev-parse --show-toplevel`と一致するか確かめる）。
 - **最終チェックは、自分が作成したブランチだけを対象にする。** 他人が作成したブランチでは実行しない
   （ブランチ上のスクリプトや、Codexが読む`final-check.md`・`AGENTS.md`がブランチ側で書き換えられるため）。
-- スクリプトは、Codexが読み込みうる設定・指示（`.codex`、`AGENTS.override.md`、`.agents`）がrepo rootに
+- スクリプトは、Codexが読み込みうる設定・指示（`.codex`、`AGENTS.override.md`、`.agents`、`personal-conventions.md`）がrepo rootに
   あれば、Codexを起動せず終了コード`2`で止まる。
 - Codexの出力はそのままPRや会話へ転記せず、指摘の要点を自分の言葉でまとめる。秘密情報らしき値が
   含まれていたら転記せず、「止まる条件」に従う。
