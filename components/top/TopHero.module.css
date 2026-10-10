@@ -198,7 +198,8 @@
   pointer-events: none;
 }
 
-.arch:is(:hover, :focus-visible) .archSmoke {
+.arch:is(:hover, :focus-visible) .archSmoke,
+.arch:is(:hover, :focus-visible) .archLabel::before {
   opacity: 1;
 }
 
@@ -215,10 +216,27 @@
   display: grid;
   justify-items: center;
   gap: 0.75em;
+  isolation: isolate;
   color: var(--hero-ink);
   text-align: center;
   text-shadow: 0 1px 8px rgb(0 0 0 / 0.32);
   pointer-events: none;
+}
+
+/*
+ * 文字の後ろだけに敷く、ぼかした暗い帯。明るい壁や額の上でも案内が読めるようにする。
+ * 縁は大きくぼかし、帯の形が見えないようにする（スモークは 0.24 のまま）。
+ */
+.archLabel::before {
+  content: "";
+  position: absolute;
+  inset: -1.1em -4%;
+  z-index: -1;
+  border-radius: 40%;
+  background: rgb(12 10 8 / 0.42);
+  filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .archGoTo,
