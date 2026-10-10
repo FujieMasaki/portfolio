@@ -1,10 +1,13 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import ArchEntrance from "./ArchEntrance";
 import ParallaxStage from "./ParallaxStage";
+import Sky from "./Sky";
 import {
   AMBIENTS,
   ARCHES,
   BUILDING,
+  FOLIAGE_SWAY,
   FOREGROUND,
   toPercentBox,
   type AmbientId,
@@ -20,11 +23,12 @@ type Props = {
  * TOP のヒーロー。海辺の小さな私設美術館の入口として、3つのアーチを About / Work / Contact の入口にする。
  *
  * レイヤー（奥 → 手前）:
- *   1. sky        海と空の背景
- *   2. plantsBack 前景植物の全体（建物の背後に回る岬・木立をここで見せる）
+ *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞を含む。Sky.tsx）
+ *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）
  *   3. arch       アーチ内の展示室・海への抜け（＋ hover の幕と案内文字）
  *   4. building   建物本体（開口部は透過）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
+ *      sway       風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY。初期実装では空）
  *   6. atmosphere 周辺減光と夕方の光
  */
 export default function TopHero({ ambient = "evening" }: Props) {
@@ -34,16 +38,7 @@ export default function TopHero({ ambient = "evening" }: Props) {
   return (
     <section className={styles.hero} aria-label="Masaki Fujie">
       <ParallaxStage className={styles.stage}>
-        <div className={styles.sky} aria-hidden="true">
-          <Image
-            src={background}
-            alt=""
-            fill
-            priority
-            sizes="(max-aspect-ratio: 4/5) 200vw, 110vw"
-            style={{ filter: backgroundFilter }}
-          />
-        </div>
+        <Sky background={background} backgroundFilter={backgroundFilter} />
 
         <div
           className={styles.plantsBack}
@@ -97,6 +92,25 @@ export default function TopHero({ ambient = "evening" }: Props) {
             sizes="(max-aspect-ratio: 4/5) 200vw, 100vw"
           />
         </div>
+
+        {FOLIAGE_SWAY.map((layer) => (
+          <div
+            key={layer.src}
+            className={styles.sway}
+            style={
+              {
+                ...toPercentBox(layer.rect),
+                filter: sceneFilter,
+                transformOrigin: layer.origin,
+                "--sway-angle": `${layer.angle}deg`,
+                "--sway-duration": `${layer.duration}s`,
+              } as CSSProperties
+            }
+            aria-hidden="true"
+          >
+            <Image src={layer.src} alt="" fill sizes="100vw" />
+          </div>
+        ))}
 
         <div className={styles.atmosphere} aria-hidden="true" />
       </ParallaxStage>

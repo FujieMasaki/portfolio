@@ -38,8 +38,14 @@
   position: absolute;
 }
 
-/* 1. 海と空：ごく弱いパララックス。動いても端が見えないよう少し大きく敷く */
+/*
+ * 1. 海と空：ごく弱いパララックス。動いても端が見えないよう少し大きく敷く。
+ * 雲・海・霞の動きはどれも「気づかなくてもよい」程度に留め、建築より目立たせない。
+ */
 .sky {
+  /* .sky の箱の中での水平線の高さ。雲と海の写しはここで上下に切り分ける */
+  --horizon: 42.2%;
+
   inset: -2%;
   transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
   transition: transform 1.6s var(--ease-calm);
@@ -47,8 +53,63 @@
 
 .sky img {
   object-fit: cover;
-  /* 水平線を完成イメージと同じ高さ（上から約 42%）に合わせる */
+  /* 水平線を完成イメージと同じ高さ（舞台の上から約 42%）に合わせる */
   object-position: 50% 53%;
+}
+
+.clouds,
+.sea,
+.haze {
+  position: absolute;
+  inset: 0;
+}
+
+/* 雲：水平線より上の写しを、片道 90 秒かけて横へ往復させる（往復なのでループの継ぎ目が出ない） */
+.clouds {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--horizon) - 2.5%),
+    transparent calc(var(--horizon) - 0.3%)
+  );
+  animation: cloud-drift 90s ease-in-out infinite alternate;
+}
+
+/*
+ * 海：水平線より下の写しを、水平線を支点にわずかに縦へ伸縮させる。
+ * 手前ほど大きく、遠くほど動かないので遠近が崩れない。半透明で元の画像と重ね、揺らぎだけを残す。
+ */
+.sea {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon) + 0.4%),
+    #000 calc(var(--horizon) + 5%)
+  );
+  opacity: 0.7;
+  transform-origin: 50% var(--horizon);
+  animation: sea-breathe 11s ease-in-out infinite alternate;
+}
+
+/* 霞：水平線の帯と、建物の左右奥の遠景にだけ。霧と分かるほど白くしない */
+.haze {
+  background:
+    linear-gradient(
+      to bottom,
+      transparent calc(var(--horizon) - 8%),
+      rgb(238 228 224 / 0.07) calc(var(--horizon) - 0.5%),
+      rgb(238 228 224 / 0.05) calc(var(--horizon) + 2%),
+      transparent calc(var(--horizon) + 12%)
+    ),
+    radial-gradient(
+      ellipse 16% 12% at 10% var(--horizon),
+      rgb(238 228 224 / 0.06),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 16% 12% at 90% var(--horizon),
+      rgb(238 228 224 / 0.06),
+      transparent 70%
+    );
+  animation: haze-drift 120s ease-in-out infinite alternate;
 }
 
 /* 2 / 5. 前景植物。手前側は建物の範囲を抜いたマスクで切り出す */
@@ -195,6 +256,12 @@
   animation: swallow-drift 16s ease-in-out infinite;
 }
 
+/* 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される） */
+.sway {
+  pointer-events: none;
+  animation: foliage-sway var(--sway-duration) ease-in-out infinite alternate;
+}
+
 /* 6. 周辺減光と夕方の光 */
 .atmosphere {
   inset: 0;
@@ -254,6 +321,33 @@
   }
 }
 
+@keyframes cloud-drift {
+  from {
+    transform: translate3d(-1.2%, 0, 0);
+  }
+  to {
+    transform: translate3d(1.2%, 0, 0);
+  }
+}
+
+@keyframes sea-breathe {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.003, 1.012);
+  }
+}
+
+@keyframes haze-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+  to {
+    transform: translate3d(1.5%, 0, 0);
+  }
+}
+
 @keyframes swallow-drift {
   0%,
   100% {
@@ -261,6 +355,15 @@
   }
   50% {
     transform: translate(120%, -40%) rotate(3deg);
+  }
+}
+
+@keyframes foliage-sway {
+  from {
+    rotate: calc(-1 * var(--sway-angle));
+  }
+  to {
+    rotate: var(--sway-angle);
   }
 }
 
@@ -293,6 +396,8 @@
 
   /* 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ */
   .sky {
+    --horizon: 44.9%;
+
     top: calc(-1 * var(--above));
     bottom: auto;
     height: calc((var(--above) + 0.423 * var(--stage-h)) / 0.449);
@@ -347,7 +452,11 @@
 
   .stage[data-ready],
   .plaque,
-  .swallow {
+  .swallow,
+  .clouds,
+  .sea,
+  .haze,
+  .sway {
     animation: none;
   }
 
