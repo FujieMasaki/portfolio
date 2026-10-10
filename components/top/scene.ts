@@ -78,7 +78,7 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/top-arch-about-gallery.png",
-      frame: { left: "-43%", top: "-4%", width: "186%" },
+      frame: { left: "-43%", top: "0%", width: "186%" },
     },
   },
   {
@@ -91,7 +91,7 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/top-arch-work-single-frame.png",
-      frame: { left: "-61%", top: "-18%", width: "223%" },
+      frame: { left: "-61%", top: "-10%", width: "223%" },
     },
   },
   {
