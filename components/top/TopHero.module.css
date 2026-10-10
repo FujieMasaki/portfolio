@@ -39,6 +39,8 @@
  * 6 秒たったら CSS だけで舞台を表示する（見えないリンクだけが残らないように）。
  */
 .stage:not([data-ready]) {
+  /* 表示されるまでは、見えないアーチのリンクに Tab でフォーカスが入らないようにする */
+  visibility: hidden;
   animation: stage-fallback 0.8s var(--ease-calm) 6s forwards;
 }
 
@@ -434,6 +436,7 @@
 @keyframes stage-fallback {
   to {
     opacity: 1;
+    visibility: visible;
   }
 }
 

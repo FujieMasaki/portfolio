@@ -132,7 +132,7 @@ export default function TopHero({ ambient = "evening" }: Props) {
 
       {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}
       <noscript>
-        <style>{`.${styles.stage}{opacity:1}`}</style>
+        <style>{`.${styles.stage}{opacity:1;visibility:visible}`}</style>
       </noscript>
     </section>
   );

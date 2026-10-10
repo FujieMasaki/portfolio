@@ -34,8 +34,9 @@ export default function ParallaxStage({ className, children }: Props) {
     Promise.all(images.map((img) => img.decode().catch(() => undefined))).then(
       reveal,
     );
-    // 画像が極端に遅い回線でも、いつまでも真っ暗にはしない
-    const fallback = window.setTimeout(reveal, 6000);
+    // 画像が極端に遅い回線でも、いつまでも真っ暗にはしない。
+    // CSS 側の保険（6 秒）より先に表示し、保険で出た後に暗転し直すちらつきを避ける
+    const fallback = window.setTimeout(reveal, 5000);
     return () => {
       cancelled = true;
       window.clearTimeout(fallback);
