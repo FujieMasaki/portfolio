@@ -1,6 +1,6 @@
 ---
 name: developing-threejs-apps
-description: Implements, debugs, and optimizes Three.js code in existing repositories. Covers WebGL/WebGPU rendering, glTF assets, color management, postprocessing, shaders, interaction, and performance optimization. Activate when user requests Three.js code changes.
+description: Audits Three.js / React Three Fiber code for quality, safety, and performance — dispose and memory leaks, texture management, color space, tone mapping, renderer settings, and Three.js version differences. Use for reviews, debugging leaks or color issues, and pre-ship checks; for ordinary R3F implementation, use the r3f-* skills instead.
 ---
 
 # Three.js Development Skill
