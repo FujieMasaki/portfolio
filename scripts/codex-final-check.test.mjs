@@ -81,12 +81,16 @@ const isAlive = (pid) => {
 };
 
 test("passes the exit status through when codex finishes in time", async () => {
+  const listeners = () => ["SIGTERM", "SIGINT", "SIGHUP"].map((signal) => process.listenerCount(signal));
+  const before = listeners();
   const result = await runWithTimeout(process.execPath, ["-e", "process.exit(4)"], {
     stdio: "ignore",
     timeoutMs: 5000,
+    exitOnSignal: true,
   });
   assert.equal(result.timedOut, false);
   assert.equal(result.status, 4);
+  assert.deepEqual(listeners(), before, "signal handlers are removed so Ctrl-C works again afterwards");
 });
 
 test("a timeout kills the whole process group, even processes that ignore SIGTERM", async () => {
