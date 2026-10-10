@@ -28,10 +28,15 @@ export const DISABLED_FEATURES = [
   "apps",
   "browser_use",
   "browser_use_external",
+  "browser_use_full_cdp_access",
   "computer_use",
   "hooks",
   "in_app_browser",
+  "in_app_local_automation",
+  "plugin_sharing",
   "plugins",
+  "remote_plugin",
+  "skill_mcp_dependency_install",
 ];
 
 // Codex reads these from the working tree even without the user config. The check only runs on

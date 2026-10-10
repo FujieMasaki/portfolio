@@ -33,7 +33,17 @@ test("always runs codex exec in the read-only sandbox", () => {
   assert.ok(args.includes('approval_policy="never"'));
   assert.ok(args.includes("--ignore-user-config"), "user MCP servers and plugins run outside the sandbox");
   assert.ok(args.includes('web_search="disabled"'));
-  for (const feature of ["apps", "browser_use", "computer_use", "hooks", "plugins"]) {
+  for (const feature of [
+    "apps",
+    "browser_use",
+    "browser_use_full_cdp_access",
+    "computer_use",
+    "hooks",
+    "in_app_local_automation",
+    "plugins",
+    "remote_plugin",
+    "skill_mcp_dependency_install",
+  ]) {
     assert.ok(DISABLED_FEATURES.includes(feature), feature);
     assert.equal(args[args.indexOf(feature) - 1], "--disable", feature);
   }
