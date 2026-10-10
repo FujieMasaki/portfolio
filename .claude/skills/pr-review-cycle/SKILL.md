@@ -6,7 +6,8 @@ description: 「PR作成して」と依頼されたら、PR作成→セルフレ
 # /pr-review-cycle
 
 [AGENTS.md](../../../AGENTS.md)の「Pull Requests」ルール（日本語タイトル/本文、
-`pull_request_template.md`準拠、確認なしでpush・PR作成まで進める）を前提に、PR作成後の
+`pull_request_template.md`準拠、会話で再確認を取りに止まらずpush・PR作成まで進める。許可ルールによる
+コマンドごとの確認は別に入る）を前提に、PR作成後の
 レビューループを自動で回す。PRの大きさ・図・人間のレビューの時機は
 [PRの大きさと人間のレビュー](../../../docs/development/pull-requests.md)に従う。
 
@@ -29,8 +30,11 @@ description: 「PR作成して」と依頼されたら、PR作成→セルフレ
   会話に明記する（PRコメントは書かない）。
 - `--no-verify`、force push、mainへの直接push、PRのマージをしない。
 - pushは`git push origin HEAD:<type>/<slug>`（初回は`-u`付き）の形だけを使う。
-- `.claude/settings.json`が確認なしで通すのは、読むだけのコマンドと検査・Codexのスクリプトだけ。
-  `git add`・`git commit`・`git push`・`git switch`・`gh pr create`・`gh pr edit`は毎回人間の確認を求める。
+- `.claude/settings.json`が確認なしで通すのは、読むだけのコマンド（`git diff`は`origin/`から始まる形、
+  `git fetch`は`git fetch origin main`だけ）と検査・Codexのスクリプトだけ。それ以外の`git fetch`・`git add`・
+  `git commit`・`git push`・`git switch`・`gh pr create`・`gh pr edit`は毎回人間の確認を求める。
+  取り返しのつかない操作の主な形（force push、mainへのpush、`--no-verify`、`git reset --hard`、`git branch -D`等）は
+  deny に置き、確認しても実行できない。
   許可ルールは事故を防ぐ柵であって安全の境界ではないため、確認を避ける目的で別の書き方に言い換えない。
 - 秘密情報（`.env*`等）を読まない・出力しない。
 - レビュー→修正ループの反復回数を数え、Codexとのループは5回、1回のサブエージェント段階は3回で必ず止まる
