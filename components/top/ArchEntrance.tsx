@@ -23,11 +23,13 @@ type Props = {
  */
 /**
  * アーチ内の画像の sizes。表示幅は「開口部の幅 × 画像の拡大率 × 舞台の幅」で、
- * 舞台の幅は縦長画面で 200vw、横長では画面の比率により 100〜約135vw になる。
+ * 舞台の幅は縦長のルール（縦横比 6/7 以下か幅 700px 以下）で 200vw、横長では画面の比率により 100〜約135vw になる。
  */
 function interiorSizes(openingWidth: number, frameWidth: string) {
   const ratio = (openingWidth / CANVAS.width) * (parseFloat(frameWidth) / 100);
-  return `(max-aspect-ratio: 6/7) ${Math.ceil(ratio * 200)}vw, ${Math.ceil(ratio * 135)}vw`;
+  const portrait = `${Math.ceil(ratio * 200)}vw`;
+  // sizes ではカンマが候補の区切りなので、縦長のルールに入る条件ごとに同じ値を並べる
+  return `(max-aspect-ratio: 6/7) ${portrait}, (max-width: 700px) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
 }
 
 export default function ArchEntrance({

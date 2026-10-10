@@ -6,7 +6,7 @@ type Props = {
   backgroundFilter: string;
 };
 
-const SIZES = "(max-aspect-ratio: 6/7) 200vw, 110vw";
+const SIZES = "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, 110vw";
 
 /**
  * 海と空のレイヤー。背景は1枚絵なので、同じ画像を水平線で上下に切り分けた写しを重ねて動かす。

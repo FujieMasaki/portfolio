@@ -61,7 +61,7 @@ export default function TopHero({ ambient = "evening" }: Props) {
             fill
             loading="eager"
             fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 200vw, 100vw"
+            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, 100vw"
           />
         </div>
 
@@ -87,7 +87,7 @@ export default function TopHero({ ambient = "evening" }: Props) {
             fill
             loading="eager"
             fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 160vw, 80vw"
+            sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, 80vw"
           />
         </div>
 
@@ -102,7 +102,7 @@ export default function TopHero({ ambient = "evening" }: Props) {
             fill
             loading="eager"
             fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 200vw, 100vw"
+            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, 100vw"
           />
         </div>
 
