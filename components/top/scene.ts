@@ -52,7 +52,13 @@ export type Arch = {
   id: ArchId;
   href: string;
   title: string;
-  caption: string;
+  /** hover / focus でカテゴリ名の下に添える一行。不要なら省く */
+  caption?: string;
+  /**
+   * アーチ本体の外形（外側のアーチの頂点から、手前の植物にかかる手前まで）。
+   * 部屋名プレートは、この範囲の上端（＝アーチの頂点）のすぐ上に取り付ける。
+   */
+  body: Rect;
   /** 建物 PNG の透過している開口部（上端は半円）。縁は建物が覆うので数 px 外側に取る */
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
@@ -66,8 +72,9 @@ export const ARCHES: Arch[] = [
     id: "about",
     href: "/about",
     title: "About",
-    caption: "Profile / Career",
+    caption: "About / Career / Interest",
     opening: { x: 464, y: 422, width: 142, height: 394 },
+    body: { x: 355, y: 340, width: 310, height: 300 },
     interior: {
       kind: "image",
       src: "/images/top/top-arch-about-gallery.png",
@@ -78,8 +85,9 @@ export const ARCHES: Arch[] = [
     id: "work",
     href: "/work",
     title: "Work",
-    caption: "Writing / Projects",
+    caption: "Writings / Projects",
     opening: { x: 767, y: 422, width: 150, height: 394 },
+    body: { x: 688, y: 340, width: 309, height: 300 },
     interior: {
       kind: "image",
       src: "/images/top/top-arch-work-single-frame.png",
@@ -90,8 +98,8 @@ export const ARCHES: Arch[] = [
     id: "contact",
     href: "/contact",
     title: "Contact",
-    caption: "Email / SNS",
     opening: { x: 1077, y: 422, width: 144, height: 394 },
+    body: { x: 1023, y: 340, width: 307, height: 300 },
     // 海の切り取りは一旦外している。戻すときは次を指定する:
     // interior: { kind: "view", objectPosition: "60% 30%" },
     flyby: true,

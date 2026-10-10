@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import ArchEntrance from "./ArchEntrance";
+import ArchSigns from "./ArchSigns";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
 import {
@@ -25,11 +26,12 @@ type Props = {
  * レイヤー（奥 → 手前）:
  *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞を含む。Sky.tsx）
  *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）
- *   3. arch       アーチ内の展示室・ツバメ（＋ hover の幕と案内文字）
+ *   3. arch       アーチ内の展示室・ツバメ（＋ hover のスモークと GO TO の案内）
  *   4. building   建物本体（開口部は透過）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
  *      sway       風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY。初期実装では空）
  *   6. atmosphere 周辺減光と夕方の光
+ *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  */
 export default function TopHero({ ambient = "evening" }: Props) {
   const { background, backgroundFilter, buildingFilter, sceneFilter } =
@@ -113,6 +115,8 @@ export default function TopHero({ ambient = "evening" }: Props) {
         ))}
 
         <div className={styles.atmosphere} aria-hidden="true" />
+
+        <ArchSigns />
       </ParallaxStage>
 
       <header className={styles.plaque}>

@@ -142,9 +142,7 @@
 .archScene {
   position: absolute;
   inset: 0;
-  transition:
-    transform 1.4s var(--ease-calm),
-    filter 1.4s var(--ease-calm);
+  transition: filter 0.8s var(--ease-calm);
 }
 
 .archImage {
@@ -171,78 +169,148 @@
   pointer-events: none;
 }
 
-.archVeil {
+/*
+ * hover / focus：開口部の内側だけに薄い黒のスモーク。
+ * 室内の照明や海が見える濃さに留め、ease-out で静かにフェードする。
+ * .arch 自体がアーチ形に切り抜かれているので、コンクリートや植物にはかからない。
+ */
+.archSmoke {
   position: absolute;
   inset: 0;
-  background: rgb(0 0 0 / 0.34);
+  background: rgb(0 0 0 / 0.24);
   opacity: 0;
-  transition: opacity 0.9s var(--ease-calm);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
+.arch:is(:hover, :focus-visible) .archSmoke {
+  opacity: 1;
+}
+
+/*
+ * hover / focus の案内：アーチの中央付近に「GO TO・カテゴリ名・説明」。
+ * 通常時は出さない（どこへ行けるかは ArchSigns の案内表示が担う）。
+ */
 .archLabel {
   position: absolute;
-  top: 30%;
   left: 0;
   right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55cqw;
-  padding-inline: 0.6cqw;
+  top: 40%;
+  translate: 0 -50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.75em;
   color: var(--hero-ink);
   text-align: center;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.32);
+  pointer-events: none;
+}
+
+.archGoTo,
+.archTitle,
+.archCaption {
+  white-space: nowrap;
   opacity: 0;
-  translate: 0 0.5cqw;
-  transition:
-    opacity 0.9s var(--ease-calm),
-    translate 0.9s var(--ease-calm);
+  transition: opacity 0.7s var(--ease-calm);
+}
+
+.archGoTo {
+  font-size: max(0.5cqw, 9px);
+  letter-spacing: 0.36em;
+  /* 字間の分だけ右にずれて見えるのを戻す */
+  margin-right: -0.36em;
 }
 
 .archTitle {
   font-family: var(--font-heading), serif;
-  font-size: max(1.15cqw, 13px);
+  font-size: max(1.2cqw, 16px);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  line-height: 1.2;
-}
-
-/* 案内板のような細い罫 */
-.archTitle::after {
-  content: "";
-  display: block;
-  width: 1.4em;
-  height: 1px;
-  margin: 0.6em auto 0;
-  background: currentColor;
-  opacity: 0.55;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  margin-right: -0.2em;
+  text-transform: uppercase;
 }
 
 .archCaption {
-  font-size: max(0.6cqw, 10px);
-  letter-spacing: 0.12em;
-  line-height: 1.5;
-  color: rgb(244 241 236 / 0.8);
+  font-size: max(0.56cqw, 9.5px);
+  letter-spacing: 0.04em;
+  color: rgb(244 241 236 / 0.86);
 }
 
-.arch:hover .archScene,
-.arch:focus-visible .archScene {
-  transform: scale(1.04);
-  filter: brightness(1.08);
+/* 小さな GO TO → カテゴリ名 → 説明 の順に、少しずつ現れる */
+.arch:is(:hover, :focus-visible) .archGoTo {
+  opacity: 0.78;
+  transition-delay: 0.1s;
 }
 
-.arch:hover .archVeil,
-.arch:focus-visible .archVeil {
+.arch:is(:hover, :focus-visible) .archTitle {
   opacity: 1;
+  transition-delay: 0.18s;
 }
 
-.arch:hover .archLabel,
-.arch:focus-visible .archLabel {
+.arch:is(:hover, :focus-visible) .archCaption {
   opacity: 1;
-  translate: 0 0;
+  transition-delay: 0.3s;
 }
 
-.arch:focus-visible .archVeil {
-  box-shadow: inset 0 0 0 1px rgb(244 241 236 / 0.6);
+/* ほかの入口は暗くせず、コントラストを数%落とすだけにする */
+.arches:has(.arch:is(:hover, :focus-visible)) .arch:not(:hover, :focus-visible) .archScene {
+  filter: contrast(0.96);
+}
+
+/* 7. 部屋名のプレート（ArchSigns） */
+.archSigns {
+  inset: 0;
+  pointer-events: none;
+}
+
+.archSign {
+  position: absolute;
+}
+
+/*
+ * 各アーチの真上に静かに取り付けた部屋名。文字と、上下の短い細線だけ。
+ * 四辺を囲わず背景も敷かないことで、ボタンや入力欄に見せない。
+ * 3つとも同じ幅・高さ・余白で、外側のアーチの中心軸（頂点）にそろえる。
+ * 見え方の強さは「文字 → 上下の線 → コンクリート」の順。
+ */
+.archPlate {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.25cqw);
+  translate: -50% 0;
+  width: max(7.4cqw, 7.4em);
+  margin: 0;
+  /* 字間の分だけ左に寄せて、中央を合わせる */
+  padding: 0.36em 0 0.32em 0.22em;
+  font-family: var(--font-heading), serif;
+  font-size: max(1cqw, 15px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+  color: rgb(62 53 44 / 0.92);
+  border-block: 1px solid rgb(112 103 92 / 0.4);
+  transition:
+    color 0.5s var(--ease-calm),
+    border-color 0.5s var(--ease-calm);
+}
+
+/* hover の無い端末では、プレートだけで入口だと分かるよう少し濃くする */
+@media (hover: none) {
+  .archPlate {
+    color: rgb(52 44 36 / 0.96);
+    border-color: rgb(104 95 85 / 0.5);
+  }
+}
+
+/* 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする */
+.stage:has(.arch[data-arch="about"]:is(:hover, :focus-visible)) .archSign[data-arch="about"] .archPlate,
+.stage:has(.arch[data-arch="work"]:is(:hover, :focus-visible)) .archSign[data-arch="work"] .archPlate,
+.stage:has(.arch[data-arch="contact"]:is(:hover, :focus-visible)) .archSign[data-arch="contact"] .archPlate {
+  color: rgb(44 37 30 / 0.98);
+  border-color: rgb(96 88 78 / 0.58);
 }
 
 /*
@@ -384,18 +452,6 @@
   }
 }
 
-/* タッチ端末：hover が無いので案内は常に控えめに出しておく */
-@media (hover: none) {
-  .archVeil {
-    opacity: 0.6;
-  }
-
-  .archLabel {
-    opacity: 1;
-    translate: 0 0;
-  }
-}
-
 /*
  * 縦長画面：舞台を画面下に置き、3つのアーチが画面幅に収まる大きさにする。
  * 舞台の上に余る空は、空レイヤーだけを上へ伸ばして埋める（水平線の高さは舞台と揃えたまま）。
@@ -447,13 +503,21 @@
     mask-composite: intersect;
   }
 
-  .archLabel {
-    top: 26%;
+  /* アーチの幅が狭いので、名前が切れないよう字間を詰める */
+  .archTitle {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    margin-right: -0.14em;
   }
 
-  .archCaption {
-    font-size: 9px;
-    letter-spacing: 0.06em;
+  /* アーチの間隔が狭いので、プレートは文字に合わせた幅にし、字間も少し詰める */
+  .archPlate {
+    left: var(--opening-center);
+    width: auto;
+    padding: 0.4em 0.6em 0.36em 0.74em;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
   }
 
   .plaque {
@@ -476,10 +540,8 @@
     animation: none;
   }
 
-  .sky,
-  .archScene,
-  .archVeil,
-  .archLabel {
+  /* 案内とスモークの切り替えは残し、パララックスだけ止める */
+  .sky {
     transition: none;
   }
 }

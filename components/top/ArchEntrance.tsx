@@ -16,7 +16,10 @@ type Props = {
  *
  * 建物 PNG の開口部の真後ろに置き、建物・前景植物は pointer-events: none にしているため、
  * ヒット領域はアーチ形状そのものになる（植物に隠れた下部も含む）。
- * 文字は植物にかからない「見えている開口部の中央やや下」に置く。
+ * 部屋名のプレート（ABOUT / WORK / CONTACT）は ArchSigns が建物の手前に描く。
+ * ここでは hover / focus のときだけ、開口部の内側に薄い黒のスモークをかけ、
+ * アーチの中央付近に「GO TO・カテゴリ名・説明」を浮かび上がらせる。
+ * スモークはリンク自体の切り抜き（アーチ形）の内側にあるので、コンクリートや植物にはかからない。
  */
 export default function ArchEntrance({
   arch,
@@ -65,11 +68,14 @@ export default function ArchEntrance({
         {arch.flyby && <SwallowFlyby />}
       </span>
 
-      <span className={styles.archVeil} aria-hidden="true" />
+      <span className={styles.archSmoke} aria-hidden="true" />
 
       <span className={styles.archLabel}>
+        <span className={styles.archGoTo} aria-hidden="true">
+          GO TO
+        </span>
         <span className={styles.archTitle}>{arch.title}</span>
-        <span className={styles.archCaption}>{arch.caption}</span>
+        {arch.caption && <span className={styles.archCaption}>{arch.caption}</span>}
       </span>
     </Link>
   );
