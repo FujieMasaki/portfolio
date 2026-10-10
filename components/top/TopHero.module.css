@@ -135,7 +135,12 @@
   display: block;
   overflow: hidden;
   cursor: pointer;
-  outline: none;
+  /*
+   * 通常はスモークと GO TO でフォーカスを示し、線は出さない。
+   * 透明な outline にしておくと、強制カラーモードではシステムの色に置き換わってフォーカスが見える。
+   */
+  outline: 2px solid transparent;
+  outline-offset: -2px;
   -webkit-tap-highlight-color: transparent;
 }
 

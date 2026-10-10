@@ -75,7 +75,12 @@ export default function ArchEntrance({
           GO TO
         </span>
         <span className={styles.archTitle}>{arch.title}</span>
-        {arch.caption && <span className={styles.archCaption}>{arch.caption}</span>}
+        {/* 説明は見た目の補足。読み上げではカテゴリ名だけをリンクの名前にする */}
+        {arch.caption && (
+          <span className={styles.archCaption} aria-hidden="true">
+            {arch.caption}
+          </span>
+        )}
       </span>
     </Link>
   );
