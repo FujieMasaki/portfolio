@@ -46,10 +46,10 @@
 - `r3f-lighting` の Drei `Environment` プリセットは外部ホスティングに依存する。配信するコード（preview を含む）では自前の HDR/EXR を使う。
 - Drei の `useGLTF` は既定で Draco decoder を外部の CDN（drei 10.7.8 では `https://www.gstatic.com/draco/versioned/decoders/1.5.5/`）から取得し、訪問者の IP と Referer が第三者に渡る。Draco / KTX2 / meshopt を使うときは、decoder・transcoder を `public/` に置いて自前で配信し（`useGLTF` の第2引数や `useGLTF.setDecoderPath` でパスを指定する）、外部の CDN を使わない。
 - skill 内の、訪問者の行動に基づくパーソナライズ、計測値の送信例（web-vitals を `/analytics` へ送る等）、外部の preconnect / dns-prefetch 先は採らない。計測・外部スクリプトは `docs/code-review/security.md` の §2 に従う。
-- skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。`package.json` に scripts を足す提案（`assets:audit` 等）も同じく人間に確認する。このリポジトリのパッケージマネージャは pnpm。
+- skill 内の依存追加の指示（`npm install -g pa11y`、bundle analyzer、`web-vitals`、GSAP・Locomotive Scroll などの「Related Skills」のライブラリ）には従わない。依存を足す必要があれば、理由を示して人間に確認する。`package.json` に scripts を足す提案（`assets:audit` 等）も同じく人間に確認する。このリポジトリのパッケージマネージャは pnpm で、skill 内の `npm run …` / `npm install` は pnpm に読み替える。検査は `pnpm lint`・`pnpm type-check`・`pnpm test`・`pnpm build` で行い、終わらない dev サーバー（`npm run dev` 等）は検査のために起動しない。
 - 同梱スクリプトに、外部への通信・コマンドの実行はないと確認済み。書き込みは `*.py` の `--report` / `--output` と対話モードだけで、ほかは読み取りと標準出力だけ。実行するときは repo root から次の形で行う（skill 内（`SKILL.md`・`scripts/README.md`・`reference/`・`CONTRIBUTING.md` 等）に書かれたパスより優先する）。
   - `node .claude/skills/developing-threejs-apps/scripts/three-doctor.mjs`（`asset-audit.mjs`・`skill-audit.mjs` も同じ形）。`SKILL.md` の `node scripts/...` はこのリポジトリでは別の `scripts/` を、`scripts/README.md` の `node skills/...` は存在しないパスを指すので使わない。
-  - `modern-web-design/scripts/*.py` は、引数なしだと標準入力を待って止まるので、`--file` / `--pattern` を付ける。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
+  - `python3 .claude/skills/modern-web-design/scripts/design_audit.py --file <path>` / `pattern_generator.py --pattern <name>`（または `--list`）。`design_audit.py` は `--file`、`pattern_generator.py` は `--pattern` か `--list` を付けないと、ほかの引数があっても対話モードに入り、標準入力を待って止まる。`--report` / `--output` は指定したパスを上書きするので、repo 内には書き出さない。
 - skill のコード例は、そのまま写さず、このリポジトリ（Next.js App Router の事前描画、React 19）で動くかを確かめてから使う。次の2つは不具合が確かめられているので流用しない。
   - `modern-web-design/references/accessibility_guide.md` の Accessible Modal：render 中に `useRef(document.activeElement)` を評価し、サーバー描画で `document is not defined` になる。フォーカス元は `useRef(null)` で持ち、開くときの effect の中で保存する。
   - `modern-web-design/scripts/pattern_generator.py` の `form` パターン：`blur` で `submit` を発火し、フォーカスを外しただけで成功通知と `form.reset()` が走って入力が消える。`--pattern form` は使わない。
