@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "@next/third-parties": "16.2.11",
