@@ -66,3 +66,9 @@
 | `developing-threejs-apps` | [kndoshn/threejs-skill-plugin](https://github.com/kndoshn/threejs-skill-plugin) `skills/developing-threejs-apps` | `0f395b6` | MIT |
 
 `developing-threejs-apps` は、通常実装で r3f-* と競合しないように、`SKILL.md` の `description` だけを監査用に書き換えている。
+
+ライセンス表示について:
+
+- `modern-web-design/LICENSE` は、取得元のリポジトリ直下の `LICENSE`（MIT、同じ commit）を同梱したもの。ただし取得元は、`plugins/individual/modern-web-design/.claude-plugin/plugin.json` で `Apache-2.0` と宣言し、同梱の `assets/README.md` にも Apache 2.0 とあり、取得元の中で表記が食い違っている。
+- `r3f-*` の取得元には `LICENSE` ファイルも著作権表示もなく、README に「MIT」とあるだけ。同梱できる表示がないため、ここに記録する。
+- `developing-threejs-apps/LICENSE` は取得元のもの。
