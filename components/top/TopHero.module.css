@@ -246,7 +246,11 @@
   text-transform: uppercase;
 }
 
+/* 狭いアーチでも切れないよう、説明だけは折り返しを許す */
 .archCaption {
+  max-width: 88%;
+  white-space: normal;
+  line-height: 1.5;
   font-size: max(0.56cqw, 9.5px);
   letter-spacing: 0.04em;
   color: rgb(244 241 236 / 0.86);
@@ -526,9 +530,9 @@
 
   /* アーチの幅が狭いので、名前が切れないよう字間を詰める */
   .archTitle {
-    font-size: 12px;
-    letter-spacing: 0.14em;
-    margin-right: -0.14em;
+    font-size: min(12px, 3vw);
+    letter-spacing: 0.1em;
+    margin-right: -0.1em;
   }
 
   /* アーチの間隔が狭いので、プレートは文字に合わせた幅にし、字間も少し詰める */
