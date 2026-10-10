@@ -51,7 +51,8 @@ export default function TopHero({ ambient = "evening" }: Props) {
             src="/images/top/top-foreground-tropical-plants.png"
             alt=""
             fill
-            priority
+            loading="eager"
+            fetchPriority="high"
             sizes="(max-aspect-ratio: 4/5) 200vw, 100vw"
           />
         </div>
@@ -76,7 +77,8 @@ export default function TopHero({ ambient = "evening" }: Props) {
             src="/images/top/top-building-arches.png"
             alt=""
             fill
-            priority
+            loading="eager"
+            fetchPriority="high"
             sizes="(max-aspect-ratio: 4/5) 160vw, 80vw"
           />
         </div>
@@ -90,7 +92,8 @@ export default function TopHero({ ambient = "evening" }: Props) {
             src="/images/top/top-foreground-tropical-plants.png"
             alt=""
             fill
-            priority
+            loading="eager"
+            fetchPriority="high"
             sizes="(max-aspect-ratio: 4/5) 200vw, 100vw"
           />
         </div>

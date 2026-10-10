@@ -24,7 +24,8 @@ export default function Sky({ background, backgroundFilter }: Props) {
       src={background}
       alt=""
       fill
-      priority
+      loading="eager"
+      fetchPriority="high"
       sizes={SIZES}
       style={{ filter: backgroundFilter }}
     />
