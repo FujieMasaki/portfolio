@@ -45,7 +45,7 @@
 - `r3f-*` の例は Fiber 9 / React 19 / three r185 / drei 10.7.8 が前提。導入するときは `package.json` と lockfile のバージョンを先に確認する。
 - Drei には、既定のままだと外部の URL から asset を取得し、訪問者の IP と Referer を第三者に渡すものがある。drei 10.7.8 で確かめた次のものは、それぞれの方法で外部の CDN を使わない。ここにないもの（フォントを指定しない `<Text>`、`FaceLandmarker` の jsDelivr・storage.googleapis.com など）も、使う前に既定の取得先を確かめる。
   - `Environment`：`preset` を付けると `files` と `path` が githack に置き換わる。`preset` は使わず、`public/` の HDR/EXR を `files`（と必要なら `path`）で渡す。
-  - Draco（`useGLTF`・`useGLTF.preload`・`<Gltf>`）：既定のままでは、Draco で圧縮したモデルを読むときに gstatic.com から decoder を取得する。DRACOLoader は module で1つを共有し、どの呼び出しも省略時は既定のパスを設定し直すので、`useGLTF` や `preload` を呼ぶより前に、module の最上位で `useGLTF.setDecoderPath('/draco/')` を呼ぶ形を主にする。第2引数でパスを渡す場合は、`preload` と `<Gltf useDraco>` にも同じパスを渡す。
+  - Draco（`useGLTF`・`useGLTF.preload`・`<Gltf>`）：既定のままでは、Draco で圧縮したモデルを読むときに gstatic.com から decoder を取得する。DRACOLoader は module で1つを共有し、第2引数を省いた呼び出しは毎回 `setDecoderPath` で決めたパス（未設定なら gstatic.com）を設定し直すので、`useGLTF` や `preload` を呼ぶより前に、module の最上位で `useGLTF.setDecoderPath('/draco/')` を呼ぶ形を主にする。第2引数でパスを渡す場合は、`preload` と `<Gltf useDraco>` にも同じパスを渡す。
   - KTX2（`useKTX2`・`useKTX2.preload`・`<Ktx2>`）：省略時は jsDelivr から transcoder を取得する。どれにも `basisPath` で `public/` のパスを渡す。`useGLTF` の第2引数と `setDecoderPath` は Draco のパスしか決めないので、glTF の中の KTX2 は第4引数 `extendLoader` で `KTX2Loader` の `setTranscoderPath` に指定する。
   - `MatcapTexture` / `useMatcapTexture` / `NormalTexture` / `useNormalTexture`：一覧（jsDelivr）と画像（githack）の取得先が固定で、自前のパスを渡せないので使わない。自前の画像を `useTexture` で読み、`meshMatcapMaterial` の `matcap` や `normalMap` に渡す。
   - `Cloud` / `Clouds`：`texture` の既定が githack。単体の `<Cloud>` は props なしの `<Clouds>` に包まれて差し替えられないので、必ず `<Clouds texture="/…">` の中で使う。
