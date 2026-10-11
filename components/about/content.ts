@@ -38,10 +38,9 @@ export const CAREER: CareerExhibit[] = [
     period: "2018 - 2020",
     photo: {
       src: "/images/about/about-career-hotel-exterior-arc.jpg",
-      alt: "植物と自転車が置かれた、ホテルとカフェの入口",
-      width: 768,
-      height: 513,
-      position: "58% 50%",
+      alt: "灯りのともる吹き抜けと植物が見える、ホテルとカフェのガラス張りの入口",
+      width: 1448,
+      height: 1086,
     },
   },
   {
@@ -51,7 +50,7 @@ export const CAREER: CareerExhibit[] = [
     period: "2020 - 2021",
     photo: {
       src: "/images/about/about-career-community-study-event.jpg",
-      alt: "スクリーンにコードを映し、テーブルを囲んで学ぶ勉強会",
+      alt: "2枚のスクリーンの前で、テーブルを囲んでノートパソコンを開く勉強会",
       width: 1448,
       height: 1086,
     },
@@ -91,6 +90,8 @@ export type Interest = {
     height: number;
     /** 展示物の範囲。未指定なら画像全体 */
     box?: Box;
+    /** 背景のある写真。透過できないので、小さな額に入れて展示台に立てる */
+    framed?: boolean;
   };
   /** 展示台の高さ（床からの比率の目安。1 が標準）と幅（列の比率） */
   plinth: { height: number; width: number };
@@ -105,13 +106,13 @@ export const INTERESTS: Interest[] = [
     note: ["毎日の服に馴染む、", "ちょうどいい一足。"],
     image: {
       src: "/images/about/about-interested-shoose.png",
-      alt: "グレーのスニーカー（New Balance 991v2）",
-      width: 1149,
-      height: 1369,
-      box: { x: 32, y: 378, width: 1117, height: 630 },
+      alt: "海沿いの道を歩く、黒いスニーカー（Columbia）の足元",
+      width: 1089,
+      height: 1445,
+      framed: true,
     },
     plinth: { height: 0.9, width: 1 },
-    objectWidth: 74,
+    objectWidth: 56,
   },
   {
     number: "02",

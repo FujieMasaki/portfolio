@@ -69,6 +69,19 @@
   transition: translate 0.35s var(--ease-calm);
 }
 
+/* 額に入れた写真（背景のある写真）。額ごと天板に立て、写真の色は Career の額と同じに保つ */
+.framed {
+  --frame: clamp(6px, 0.6vw, 9px);
+
+  margin-bottom: 0;
+  transition: translate 0.35s var(--ease-calm);
+}
+
+.framed img {
+  filter: saturate(0.88);
+  transition: none;
+}
+
 .plinth {
   position: relative;
   width: 100%;
@@ -135,8 +148,14 @@
   translate: 0 0;
 }
 
-.exhibit:focus-visible .object img {
+.exhibit:focus-visible .object img,
+.exhibit:focus-visible .framed {
   translate: 0 -3px;
+}
+
+/* 額は額ごと浮かせ、中の写真は動かさない */
+.exhibit:focus-visible .framed img {
+  translate: none;
 }
 
 @media (hover: hover) {
@@ -145,8 +164,13 @@
     translate: 0 0;
   }
 
-  .exhibit:hover .object img {
+  .exhibit:hover .object img,
+  .exhibit:hover .framed {
     translate: 0 -3px;
+  }
+
+  .exhibit:hover .framed img {
+    translate: none;
   }
 }
 
@@ -213,9 +237,15 @@
   }
 }
 
+/* 浮きと解説の移動を止め、表示の切り替えだけにする（hover / フォーカス時の指定より強くする） */
 @media (prefers-reduced-motion: reduce) {
-  .note,
-  .object img {
+  .exhibit .note,
+  .exhibit .object img,
+  .exhibit .framed,
+  .exhibit:hover .object img,
+  .exhibit:hover .framed,
+  .exhibit:focus-visible .object img,
+  .exhibit:focus-visible .framed {
     translate: none;
     transition: none;
   }
