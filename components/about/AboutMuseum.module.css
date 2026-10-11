@@ -1,0 +1,244 @@
+/*
+ * /about の展示室（壁・床・展示室の札・額）と、01 Personal Archive。
+ * 文字・額・壁の色は 02 Path と 03 Interests もここから使い、部屋ごとに別の体系を作らない。
+ */
+
+.museum {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* 壁に直接書いた文字。TOP の部屋名プレート（rgb(62 53 44)）と同じ系統で、壁に対して読める濃さにする */
+  --wall-ink: rgb(40 34 28);
+  --wall-ink-muted: rgb(58 51 44);
+  --wall-line: rgb(72 64 56 / 0.5);
+  --gutter: clamp(24px, 7vw, 128px);
+  --floor-h: clamp(72px, 11svh, 132px);
+
+  position: relative;
+  /* 床（z-index: -1）を、壁の背景の上・展示の下に描く */
+  isolation: isolate;
+  min-height: 100svh;
+  color: var(--wall-ink);
+  font-family:
+    var(--font-heading), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+  font-weight: 500;
+  /*
+   * 壁は1枚の素材をページ全体に敷く。about-wall.webp は about-background-img.png の上端 200px に
+   * 下端 200px を少しずつ重ねて溶かしたもので、縦に繰り返しても継ぎ目が出ない（1774 x 687）。
+   * ごく淡い暖色を乗算し、TOP の建物（夕方の光のコンクリート）と色温度をそろえる。
+   */
+  background-color: #faf4ec;
+  background-image: url("/images/about/about-wall.webp");
+  background-size: max(100%, 1280px) auto;
+  background-position: center top;
+  background-repeat: repeat-y;
+  background-blend-mode: multiply;
+}
+
+/* ---- 展示室の札（ABOUT / Personal Archive などの見出し） ---- */
+
+.heading {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.eyebrow {
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--wall-ink-muted);
+}
+
+.roomTitle {
+  font-size: clamp(34px, 3.4vw, 50px);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 2.2em 0 0;
+  font-size: clamp(14px, 1.05vw, 15.5px);
+  line-height: 2.2;
+  letter-spacing: 0.14em;
+  /* 幅の狭い画面で折り返すときに、語の途中で切らない（対応していないブラウザは通常の折り返し） */
+  word-break: auto-phrase;
+}
+
+/* ---- 額（木の額縁は about-frame.webp を border-image で伸ばして使う） ---- */
+
+.frame {
+  /* 木の太さ。額の大きさに合わせて各展示で上書きする */
+  --frame: 14px;
+
+  position: relative;
+  border: var(--frame) solid #6b4a2c;
+  /* about-frame.webp（910 x 1075）の木の部分の幅：上 53 / 右 56 / 下 57 / 左 55 px */
+  border-image: url("/images/about/about-frame.webp") 53 56 57 55 stretch;
+  background: #e8e2d8;
+  /* 壁から少しだけ浮いている程度の影。光源は上 */
+  box-shadow: 0 18px 26px -22px rgb(36 28 20 / 0.5);
+}
+
+/* 額の内側の縁に落ちる、ごく浅い陰 */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 2px 5px rgb(30 22 14 / 0.28);
+  pointer-events: none;
+}
+
+.photo {
+  object-fit: cover;
+  /* 鮮やかな昼の写真を、壁の光の中に置く */
+  filter: saturate(0.88);
+}
+
+/* ---- 現れ方 ---- */
+
+/*
+ * 02 / 03 の展示は、画面に入るときに一度だけ静かに現れる（スクロール位置に応じて進む CSS アニメーション）。
+ * 戻せば消えるが、移動量は 10px なので往復しても目立たない。
+ * 対応していないブラウザと prefers-reduced-motion では、何もせず最初から見える。
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .museum [data-reveal] {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 65%;
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+/* 01 は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ） */
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/* ==== 01 Personal Archive ==== */
+
+.archive {
+  --portrait-w: clamp(220px, 24vw, 340px);
+  --plant-w: clamp(180px, 21vw, 330px);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--portrait-w) var(--plant-w);
+  column-gap: clamp(32px, 6vw, 112px);
+  align-items: center;
+  min-height: max(100svh, 680px);
+  padding: clamp(112px, 16svh, 168px) var(--gutter)
+    calc(var(--floor-h) + clamp(48px, 8svh, 96px));
+}
+
+/* 床。壁の素材のまま少しだけ沈ませ、巾木の線で壁と分ける */
+.archive::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--floor-h);
+  background: rgb(64 52 40 / 0.08);
+  border-top: 1px solid rgb(72 62 52 / 0.22);
+  pointer-events: none;
+}
+
+.archiveText {
+  /* 写真より少し下に置き、2つの展示の高さをずらす */
+  padding-top: clamp(24px, 8svh, 96px);
+  animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  margin: 2.8em 0 0;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  color: var(--wall-ink-muted);
+}
+
+.place::after {
+  content: "";
+  width: 40px;
+  border-top: 1px solid var(--wall-line);
+}
+
+.portrait {
+  align-self: start;
+  margin: 0;
+  animation: arrive 1.6s var(--ease-calm) 0.5s both;
+}
+
+.portraitFrame {
+  --frame: calc(var(--portrait-w) * 0.06);
+
+  /* 額の外形（910 x 1075）と同じ比率。写真（3:4）は上下を少しだけ切って収める */
+  aspect-ratio: 910 / 1075;
+}
+
+/* クワズイモ。床に置いた鉢から、壁の右手に葉を広げる。展示の主役にしない */
+.plant {
+  position: absolute;
+  right: clamp(8px, 4vw, 88px);
+  bottom: calc(var(--floor-h) * 0.4);
+  z-index: 1;
+  width: var(--plant-w);
+  pointer-events: none;
+  /* 屋外の光で撮られた葉を、室内の柔らかい光に寄せる */
+  filter: saturate(0.82) brightness(0.96);
+  animation: arrive 1.6s var(--ease-calm) 0.8s both;
+}
+
+.plant img {
+  width: 100%;
+  height: auto;
+}
+
+/* 幅の狭い画面：文章 → 写真の順に縦に並べ、植物は写真の右下の床に置く */
+@media (max-width: 760px) {
+  .archive {
+    --portrait-w: min(62vw, 300px);
+    --plant-w: min(40vw, 200px);
+
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(48px, 9svh, 72px);
+    min-height: auto;
+    padding-top: clamp(104px, 16svh, 132px);
+    /* 植物の葉が写真に重ならないよう、写真の下に植物の高さとほぼ同じ余白を取る（植物の高さは幅の約 1.19 倍） */
+    padding-bottom: calc(var(--floor-h) + var(--plant-w) * 0.95);
+  }
+
+  .archiveText {
+    padding-top: 0;
+  }
+
+  .portrait {
+    width: var(--portrait-w);
+  }
+
+  .plant {
+    right: 4vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archiveText,
+  .portrait,
+  .plant {
+    animation: none;
+  }
+}
