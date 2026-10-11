@@ -44,7 +44,7 @@
 }
 
 .track:focus-visible {
-  outline: 1px solid var(--wall-line);
+  outline: 1px solid var(--wall-ink-muted);
   outline-offset: -12px;
 }
 
@@ -165,7 +165,7 @@
   transition: opacity 0.4s var(--ease-calm);
 }
 
-.step:disabled {
+.step[aria-disabled="true"] {
   opacity: 0.28;
   cursor: default;
 }

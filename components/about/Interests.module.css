@@ -47,8 +47,9 @@
   outline: none;
 }
 
+/* フォーカスの線は、壁に対して見分けられる濃さ（不透明の --wall-ink-muted）にする */
 .exhibit:focus-visible .plinth {
-  outline: 1px solid var(--wall-line);
+  outline: 1px solid var(--wall-ink-muted);
   outline-offset: 6px;
 }
 
@@ -157,7 +158,7 @@
   }
 }
 
-/* 幅の狭い画面：2列に置き、行ごとに床の線を引く */
+/* 幅の狭い画面：2列に置き、行ごとに床の線を引く。解説は場所を取るので、hover の有無によらず最初から見せる */
 @media (max-width: 760px) {
   .hall {
     --plinth-base: clamp(84px, 24vw, 110px);
@@ -206,6 +207,8 @@
     padding-left: clamp(16px, 2.2vw, 32px);
     font-size: 12px;
     white-space: normal;
+    opacity: 1;
+    translate: none;
     word-break: auto-phrase;
   }
 }

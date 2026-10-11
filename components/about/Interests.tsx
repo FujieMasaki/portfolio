@@ -46,7 +46,6 @@ export default function Interests() {
 function Exhibit({ item }: { item: Interest }) {
   const { image } = item;
   const box = image.box ?? { x: 0, y: 0, width: image.width, height: image.height };
-  const noteId = `interest-note-${item.number}`;
 
   return (
     <li
@@ -55,7 +54,6 @@ function Exhibit({ item }: { item: Interest }) {
       // 解説を見るために、キーボードでも展示物に「近づける」ようにする
       tabIndex={0}
       aria-labelledby={`interest-title-${item.number}`}
-      aria-describedby={noteId}
     >
       {/* 画像の透明な余白を除いた範囲（box）だけを見せ、展示物の底を展示台の天板に載せる */}
       <div
@@ -87,7 +85,7 @@ function Exhibit({ item }: { item: Interest }) {
         </h3>
       </div>
 
-      <p className={styles.note} id={noteId}>
+      <p className={styles.note} id={`interest-note-${item.number}`}>
         {item.note.map((line, index) => (
           <span key={line}>
             {index > 0 && <br />}

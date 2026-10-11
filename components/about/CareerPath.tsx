@@ -36,13 +36,18 @@ export default function CareerPath() {
           "--visible",
           (track.clientWidth / track.scrollWidth).toFixed(4),
         );
-        setEdge({ start: track.scrollLeft <= 2, end: track.scrollLeft >= max - 2 });
+        const start = track.scrollLeft <= 2;
+        const end = track.scrollLeft >= max - 2;
+        // スクロール中は毎フレーム呼ばれるので、端の状態が変わったときだけ描き直す
+        setEdge((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
       });
     };
     update();
     track.addEventListener("scroll", update, { passive: true });
+    // フォントの読み込みなどで展示の列の幅だけが変わっても、線と ← → を合わせ直す
     const observer = new ResizeObserver(update);
     observer.observe(track);
+    if (track.firstElementChild) observer.observe(track.firstElementChild);
     return () => {
       cancelAnimationFrame(frame);
       track.removeEventListener("scroll", update);
@@ -146,7 +151,8 @@ export default function CareerPath() {
           type="button"
           className={styles.step}
           onClick={() => step(-1)}
-          disabled={edge.start}
+          // disabled にすると、押してフォーカスがあるボタンからフォーカスが外れて見失うので aria-disabled にする
+          aria-disabled={edge.start}
           aria-label="前の展示へ"
         >
           ←
@@ -158,7 +164,7 @@ export default function CareerPath() {
           type="button"
           className={styles.step}
           onClick={() => step(1)}
-          disabled={edge.end}
+          aria-disabled={edge.end}
           aria-label="次の展示へ"
         >
           →
