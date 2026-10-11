@@ -94,7 +94,7 @@ export default function CareerPath() {
         // 横にスクロールできる範囲なので、キーボードでもフォーカスして矢印キーで動かせるようにする
         tabIndex={0}
         role="region"
-        aria-label="これまでの場所（横にスクロールできます）"
+        aria-label="これまでの場所"
       >
         <ol className={styles.rail}>
           {CAREER.map((exhibit) => (
