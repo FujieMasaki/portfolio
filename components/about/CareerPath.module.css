@@ -1,0 +1,238 @@
+/*
+ * 02 Path：写真を横に掛け並べた記録の展示。
+ * 壁・文字・額は AboutMuseum.module.css と共通。ここでは並べ方だけを決める。
+ */
+
+.path {
+  position: relative;
+  padding-block: clamp(96px, 14svh, 168px);
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  column-gap: clamp(32px, 4vw, 72px);
+  row-gap: 0;
+  padding-inline: var(--gutter);
+}
+
+.title {
+  font-size: clamp(40px, 4.2vw, 62px);
+  line-height: 1;
+}
+
+.lead {
+  margin: 0;
+  /* 見出しの下端と、文の2行目の下端をそろえる */
+  padding-bottom: 0.1em;
+}
+
+/*
+ * 横に流れる壁。スクロールバーは隠し、下の細い線で位置を示す。
+ * 縦のホイールは奪わず、ページの縦スクロールのまま。
+ */
+.track {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding: clamp(64px, 10svh, 112px) var(--gutter) 48px;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.track:focus-visible {
+  outline: 1px solid var(--wall-line);
+  outline-offset: -12px;
+}
+
+.rail {
+  display: flex;
+  align-items: center;
+  gap: clamp(72px, 7vw, 128px);
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exhibit {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 2.4vw, 44px);
+}
+
+/* 1点おきに、掛ける高さをわずかに変える */
+.exhibit:nth-child(even) {
+  translate: 0 24px;
+}
+
+.label {
+  flex: none;
+  width: 13em;
+  font-size: 13px;
+}
+
+.exhibit[data-text-only] .label {
+  width: 18em;
+}
+
+.number {
+  margin: 0;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: var(--wall-ink-muted);
+}
+
+.place {
+  margin: 0.7em 0 0;
+  font-size: clamp(20px, 1.6vw, 24px);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+}
+
+.place::after {
+  content: "";
+  display: block;
+  width: 24px;
+  margin-top: 0.9em;
+  border-top: 1px solid var(--wall-line);
+}
+
+.note {
+  margin: 1.2em 0 0;
+  line-height: 2;
+  letter-spacing: 0.12em;
+  word-break: auto-phrase;
+}
+
+/* NOW / NEXT：写真の代わりに、これからの言葉を少しだけ大きく置く */
+.exhibit[data-text-only] .note > :first-child {
+  display: block;
+  margin-bottom: 0.4em;
+  font-size: 18px;
+  letter-spacing: 0.06em;
+}
+
+.exhibit[data-text-only] .note > :first-child + * br {
+  display: none;
+}
+
+.period {
+  margin: 1.4em 0 0;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--wall-ink-muted);
+}
+
+.frame {
+  --frame: 13px;
+
+  flex: none;
+  height: clamp(220px, 34svh, 320px);
+}
+
+.frame[data-orientation="portrait"] {
+  aspect-ratio: 3 / 4;
+}
+
+.frame[data-orientation="landscape"] {
+  aspect-ratio: 5 / 4;
+}
+
+/* ← 線 → */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-inline: var(--gutter);
+}
+
+.step {
+  margin: 0;
+  padding: 8px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.4s var(--ease-calm);
+}
+
+.step:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.step:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 2px;
+}
+
+.rule {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: rgb(72 64 56 / 0.2);
+}
+
+/* いま見えている範囲だけを濃くする（--visible / --progress は CareerPath.tsx が入れる） */
+.ruleSeen {
+  position: absolute;
+  inset-block: 0;
+  left: calc((1 - var(--visible, 1)) * var(--progress, 0) * 100%);
+  width: calc(var(--visible, 1) * 100%);
+  background: var(--wall-ink-muted);
+}
+
+/* 幅の狭い画面：横には流さず、縦に掛け並べる */
+@media (max-width: 760px) {
+  .track {
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .rail {
+    flex-direction: column;
+    align-items: stretch;
+    gap: clamp(72px, 14vw, 96px);
+    width: auto;
+  }
+
+  .exhibit {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+
+  .exhibit:nth-child(even) {
+    translate: none;
+    align-items: flex-end;
+  }
+
+  .exhibit:nth-child(even) .label {
+    width: min(100%, 16em);
+  }
+
+  .frame {
+    height: auto;
+  }
+
+  .frame[data-orientation="portrait"] {
+    width: min(58vw, 260px);
+  }
+
+  .frame[data-orientation="landscape"] {
+    width: min(76vw, 360px);
+  }
+
+  .controls {
+    display: none;
+  }
+}
