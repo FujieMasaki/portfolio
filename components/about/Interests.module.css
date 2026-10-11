@@ -1,0 +1,219 @@
+/*
+ * 03 Things I'm Drawn To.：低い展示台に実物を置いた収蔵品の展示。
+ * 展示台は石 / コンクリートの塊として、壁と同じ素材を少し濃くして作る（画像にしない）。
+ */
+
+.interests {
+  position: relative;
+  padding-top: clamp(96px, 14svh, 168px);
+  /* スマホで床の線を左右へ伸ばすため、はみ出しを横だけ切る */
+  overflow-x: clip;
+}
+
+.header {
+  padding-inline: var(--gutter);
+}
+
+.hall {
+  --plinth-base: clamp(110px, 10vw, 150px);
+  --floor-band: clamp(128px, 17svh, 176px);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--hall-columns);
+  align-items: end;
+  column-gap: clamp(20px, 4vw, 72px);
+  margin: clamp(88px, 14svh, 160px) 0 0;
+  padding: 0 var(--gutter) var(--floor-band);
+  list-style: none;
+}
+
+/* 床。展示台の下端がこの線にそろう */
+.hall::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: var(--floor-band);
+  background: rgb(64 52 40 / 0.08);
+  border-top: 1px solid rgb(72 62 52 / 0.22);
+}
+
+.exhibit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: none;
+}
+
+.exhibit:focus-visible .plinth {
+  outline: 1px solid var(--wall-line);
+  outline-offset: 6px;
+}
+
+/* 展示物。画像は透明な余白ごと置き、見える範囲（box）を展示台の天板に合わせる */
+.object {
+  position: relative;
+  /* 天板の奥に少し沈めて、載っているように見せる */
+  margin-bottom: -3px;
+}
+
+.object img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  /* 展示物の真下に落ちる、ごく弱い接地の影 */
+  filter: drop-shadow(0 6px 5px rgb(30 22 14 / 0.2));
+  transition: translate 0.35s var(--ease-calm);
+}
+
+.plinth {
+  position: relative;
+  width: 100%;
+  height: calc(var(--plinth-base) * var(--plinth-h, 1));
+  padding: clamp(18px, 1.8vw, 26px) clamp(16px, 2.2vw, 32px);
+  background-color: #ddd6cc;
+  background-image: url("/images/about/about-wall.webp");
+  background-size: 900px auto;
+  background-blend-mode: multiply;
+  box-shadow: 0 22px 30px -26px rgb(30 22 14 / 0.45);
+}
+
+/* 天板。光を受ける上面だけ、わずかに明るい */
+.plinth::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: rgb(255 250 242 / 0.26);
+  border-bottom: 1px solid rgb(60 50 40 / 0.12);
+}
+
+.number {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--wall-ink-muted);
+}
+
+.title {
+  margin: 0.5em 0 0;
+  font-size: clamp(14px, 1.15vw, 17px);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.title::after {
+  content: "";
+  display: block;
+  width: 16px;
+  margin-top: 0.7em;
+  border-top: 1px solid var(--wall-line);
+}
+
+/* 展示解説。展示台の手前の床に、近づいたときだけ現れる */
+.note {
+  position: absolute;
+  top: calc(100% + 22px);
+  left: clamp(16px, 2.2vw, 32px);
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.9;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 0 6px;
+  transition:
+    opacity 0.32s var(--ease-calm),
+    translate 0.32s var(--ease-calm);
+}
+
+.exhibit:focus-visible .note {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.exhibit:focus-visible .object img {
+  translate: 0 -3px;
+}
+
+@media (hover: hover) {
+  .exhibit:hover .note {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .exhibit:hover .object img {
+    translate: 0 -3px;
+  }
+}
+
+/* hover の無い端末では、解説を最初から置いておく */
+@media (hover: none) {
+  .note {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+/* 幅の狭い画面：2列に置き、行ごとに床の線を引く */
+@media (max-width: 760px) {
+  .hall {
+    --plinth-base: clamp(84px, 24vw, 110px);
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 7vw;
+    row-gap: 0;
+    padding-bottom: 96px;
+  }
+
+  .hall::after {
+    display: none;
+  }
+
+  /*
+   * 展示物・展示台・解説を行ごとに同じ高さの段にそろえる（subgrid）。
+   * 解説の行数が違っても、同じ行の展示台の下端がずれない。
+   */
+  .exhibit {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    justify-items: center;
+  }
+
+  .object,
+  .plinth {
+    align-self: end;
+  }
+
+  /* 同じ行の展示台は下端がそろうので、線が左右でつながって1本の床になる */
+  .plinth::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: -4vw;
+    right: -4vw;
+    border-top: 1px solid rgb(72 62 52 / 0.22);
+  }
+
+  .note {
+    position: static;
+    justify-self: stretch;
+    margin: 18px 0 56px;
+    padding-left: clamp(16px, 2.2vw, 32px);
+    font-size: 12px;
+    white-space: normal;
+    word-break: auto-phrase;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note,
+  .object img {
+    translate: none;
+    transition: none;
+  }
+}

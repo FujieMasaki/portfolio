@@ -1,6 +1,7 @@
 import Image from "next/image";
 import MuseumNav from "@/components/museum/MuseumNav";
 import CareerPath from "./CareerPath";
+import Interests from "./Interests";
 import styles from "./AboutMuseum.module.css";
 
 /**
@@ -61,6 +62,7 @@ export default function AboutMuseum() {
         </section>
 
         <CareerPath />
+        <Interests />
       </main>
     </div>
   );
