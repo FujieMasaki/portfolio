@@ -1,0 +1,150 @@
+/*
+ * 館内の案内（Back to Home / Menu）。
+ * 壁に小さく書かれた案内表示として、背景・枠・影を持たせず、文字と細線だけで置く。
+ * 色は展示室側の --wall-ink を引き継ぎ、無ければ TOP の部屋名プレートと同じ色にする。
+ */
+
+.bar {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 64px) 0;
+  font-family: var(--font-heading), serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--wall-ink, rgb(62 53 44 / 0.92));
+  pointer-events: none;
+}
+
+.back,
+.menu {
+  pointer-events: auto;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  padding-block: 0.5em;
+}
+
+.arrow {
+  transition: translate 0.4s var(--ease-calm);
+}
+
+.back:focus-visible,
+.toggle:focus-visible,
+.item:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 6px;
+}
+
+.menu {
+  position: relative;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.1em;
+  margin: 0;
+  padding: 0.5em 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* 細い2本線。ハンバーガーの記号ほど主張させない */
+.lines {
+  position: relative;
+  width: 20px;
+  height: 7px;
+  border-block: 1px solid currentColor;
+  opacity: 0.8;
+}
+
+/*
+ * 項目は Menu の真下に縦に並べる。
+ * 閉じている間は visibility: hidden で、見えないリンクを Tab の順から外す。
+ */
+.list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: grid;
+  gap: 0.95em;
+  margin: 0;
+  padding: 1.3em 0 0;
+  list-style: none;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 0 8px;
+  visibility: hidden;
+  transition:
+    opacity 0.32s var(--ease-calm),
+    translate 0.32s var(--ease-calm),
+    visibility 0s linear 0.32s;
+}
+
+.menu[data-open] .list {
+  opacity: 1;
+  translate: 0 0;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+@media (hover: hover) {
+  .menu:hover .list {
+    opacity: 1;
+    translate: 0 0;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .back:hover .arrow {
+    translate: -3px 0;
+  }
+}
+
+.item {
+  display: inline-block;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid transparent;
+  opacity: 0.78;
+  transition: opacity 0.4s var(--ease-calm);
+}
+
+.item[aria-current="page"] {
+  opacity: 1;
+  border-bottom-color: currentColor;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .bar {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list,
+  .arrow {
+    translate: none;
+    transition: none;
+  }
+}
