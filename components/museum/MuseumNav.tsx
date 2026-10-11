@@ -86,6 +86,8 @@ export default function MuseumNav({ current }: Props) {
                   href={room.href}
                   className={styles.item}
                   aria-current={room.id === current ? "page" : undefined}
+                  // 閉じた Menu の中のリンクも画面内と見なされて先読みされるので、開いて選んだときだけ読む
+                  prefetch={false}
                   onClick={() => setOpen(false)}
                 >
                   {room.label}
