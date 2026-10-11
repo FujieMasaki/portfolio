@@ -70,7 +70,8 @@ function Exhibit({ item }: { item: Interest }) {
           alt={image.alt}
           width={image.width}
           height={image.height}
-          sizes="(max-width: 760px) 34vw, 22vw"
+          // 展示物の幅（列の幅 × objectWidth）に、切り落とす透明な余白の分を足した幅。広い列（Space）で約 26vw
+          sizes="(max-width: 760px) 36vw, 26vw"
           style={{
             width: `${(image.width / box.width) * 100}%`,
             left: `${(-box.x / box.width) * 100}%`,

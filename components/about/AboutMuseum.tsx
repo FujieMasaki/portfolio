@@ -43,7 +43,9 @@ export default function AboutMuseum() {
                 src="/images/about/about-me.webp"
                 alt="沖縄の海辺で、海に向かって砂浜を歩く後ろ姿"
                 fill
-                priority
+                // 入ってすぐ目に入る展示なので、TOP の舞台の画像と同じく最優先で読む
+                loading="eager"
+                fetchPriority="high"
                 sizes="(max-width: 760px) 62vw, (max-width: 1417px) 24vw, 340px"
                 className={styles.photo}
               />
