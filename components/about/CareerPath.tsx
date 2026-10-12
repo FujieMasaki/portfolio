@@ -110,10 +110,15 @@ export default function CareerPath() {
           : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
             ? event.deltaY * track.clientWidth
             : event.deltaY;
+      // 先頭・末尾に実際に着いていたら奪わず、ページの縦のスクロールに戻す。
+      // 向かう位置だけが端に着いていて、まだ寄せている途中なら、着くまでは横の操作として受ける（縦と横が同時に動かない）
+      const now = track.scrollLeft;
+      if (max <= 0 || (delta > 0 && now >= max - 1) || (delta < 0 && now <= 1)) {
+        stopGlide();
+        return;
+      }
       // 続けて回したときは、いま向かっている位置から先へ足す
-      const from = wheel.target ?? track.scrollLeft;
-      // 先頭・末尾に着いていたら奪わず、ページの縦のスクロールに戻す
-      if (max <= 0 || (delta > 0 && from >= max - 1) || (delta < 0 && from <= 1)) return;
+      const from = wheel.target ?? now;
       // 止められない wheel（ページのスクロールの途中から続くもの）では横に動かさず、縦と横が同時に動かないようにする
       if (!event.cancelable) return;
       passing = false;
