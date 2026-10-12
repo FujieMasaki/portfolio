@@ -11,7 +11,7 @@ import styles from "./TopHero.module.css";
  * 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする。
  * hover の無い端末でも、この部屋名だけで入口だと分かるようにし、押せばその入口へ行ける。
  */
-export default function ArchSigns() {
+const ArchSigns = () => {
   return (
     <div className={styles.archSigns} aria-hidden="true">
       {ARCHES.map((arch) => (
@@ -40,4 +40,6 @@ export default function ArchSigns() {
       ))}
     </div>
   );
-}
+};
+
+export default ArchSigns;

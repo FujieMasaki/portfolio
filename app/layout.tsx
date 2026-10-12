@@ -35,11 +35,11 @@ export const metadata: Metadata = {
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html
       lang="ja"
@@ -49,4 +49,6 @@ export default function RootLayout({
       <body>{children}</body>
     </html>
   );
-}
+};
+
+export default RootLayout;

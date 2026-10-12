@@ -7,7 +7,7 @@ type Item = {
   icon: ReactNode;
 };
 
-function Icon(props: SVGProps<SVGSVGElement>) {
+const Icon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -22,7 +22,7 @@ function Icon(props: SVGProps<SVGSVGElement>) {
       {...props}
     />
   );
-}
+};
 
 const ITEMS: Item[] = [
   {
@@ -119,7 +119,7 @@ const ITEMS: Item[] = [
   },
 ];
 
-export default function ThingsILike() {
+const ThingsILike = () => {
   return (
     <section
       className={styles.section}
@@ -145,4 +145,6 @@ export default function ThingsILike() {
       </div>
     </section>
   );
-}
+};
+
+export default ThingsILike;

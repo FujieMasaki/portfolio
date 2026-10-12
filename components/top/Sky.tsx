@@ -19,7 +19,7 @@ const SIZES = "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-asp
  *
  * 同じ src なので画像の取得は1回で済む。
  */
-export default function Sky({ background, backgroundFilter }: Props) {
+const Sky = ({ background, backgroundFilter }: Props) => {
   const image = (
     <Image
       src={background}
@@ -40,4 +40,6 @@ export default function Sky({ background, backgroundFilter }: Props) {
       <div className={styles.haze} />
     </div>
   );
-}
+};
+
+export default Sky;
