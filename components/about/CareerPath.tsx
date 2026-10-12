@@ -26,8 +26,12 @@ export default function CareerPath() {
   const ruleRef = useRef<HTMLSpanElement>(null);
   // ドラッグ中の状態。描画には使わないので ref に持つ
   const dragRef = useRef<{ id: number; x: number; left: number; moved: boolean } | null>(null);
-  // ホイールで向かっている位置と、そこへなめらかに寄せる描画のフレーム
-  const wheelRef = useRef<{ target: number | null; frame: number }>({ target: null, frame: 0 });
+  // ホイールで向かっている位置と、そこへなめらかに寄せる描画のフレーム。smooth は ← → でブラウザが横に動かしている途中か
+  const wheelRef = useRef<{ target: number | null; frame: number; smooth: boolean }>({
+    target: null,
+    frame: 0,
+    smooth: false,
+  });
   const [edge, setEdge] = useState({ start: true, end: false });
 
   useEffect(() => {
@@ -76,6 +80,14 @@ export default function CareerPath() {
       cancelAnimationFrame(wheel.frame);
       wheel.target = null;
       wheel.frame = 0;
+      // ← → で始めたブラウザの smooth scroll も、いまの位置で止める
+      if (wheel.smooth) {
+        wheel.smooth = false;
+        track.scrollTo({ left: track.scrollLeft, behavior: "instant" });
+      }
+    };
+    const onScrollEnd = () => {
+      wheel.smooth = false;
     };
     // 一続きのホイール（間が 0.2 秒未満）の中で、一度ページに任せたら最後まで任せる（途中から横の移動に変えない）
     let lastWheelAt = -Infinity;
@@ -139,6 +151,7 @@ export default function CareerPath() {
     const onKeyDown = () => stopGlide();
     update();
     track.addEventListener("scroll", update, { passive: true });
+    track.addEventListener("scrollend", onScrollEnd);
     track.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("wheel", onPageWheel, { passive: true, capture: true });
     track.addEventListener("keydown", onKeyDown);
@@ -152,6 +165,7 @@ export default function CareerPath() {
       cancelAnimationFrame(frame);
       stopGlide();
       track.removeEventListener("scroll", update);
+      track.removeEventListener("scrollend", onScrollEnd);
       track.removeEventListener("wheel", onWheel);
       window.removeEventListener("wheel", onPageWheel, { capture: true });
       track.removeEventListener("keydown", onKeyDown);
@@ -185,6 +199,8 @@ export default function CareerPath() {
     if (target === undefined) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     track.scrollBy({ left: target, behavior: reduce ? "auto" : "smooth" });
+    // ページに任せるホイールや「動きを減らす」の切り替えで、途中で止められるようにする（stopGlide）
+    wheelRef.current.smooth = !reduce;
   };
 
   /** 壁をつかんで横へ引く（マウスだけ。タッチ・ペンはブラウザのスクロールに任せる） */
