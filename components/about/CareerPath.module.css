@@ -24,7 +24,7 @@
   padding: clamp(64px, 10svh, 112px) var(--gutter) 48px;
   /*
    * 末尾まで進んだとき、最後の展示（Experience。文字だけで幅 22em × 13px）が壁の中央に来るだけの余白。
-   * % は壁（track）の幅に対する値。最後の展示の幅を変えたら、ここも合わせる
+   * % は包含ブロック（.path。壁と同じ幅）に対する値。最後の展示の幅を変えたら、ここも合わせる
    */
   padding-inline-end: max(var(--gutter), calc(50% - 22 * 13px / 2));
 }
