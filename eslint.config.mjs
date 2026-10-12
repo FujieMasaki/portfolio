@@ -7,9 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     // 関数は const とアロー関数で書く（function 宣言・function 式を使わない）。
-    // クラス・オブジェクトのメソッド記法（foo() {}）は対象にしない。
+    // クラス・オブジェクトのメソッド記法（foo() {}）と getter / setter（get foo() {}）は、アロー関数で書けないので対象にしない。
     // .claude/skills/ は外部から取り込んだ skill で、出典の commit のまま保つため対象にしない
-    ignores: [".claude/**"],
+    ignores: [".claude/skills/**"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -18,7 +18,8 @@ const eslintConfig = defineConfig([
           message: "function 宣言ではなく、const とアロー関数で書く（default export は const で定義してから export default する）",
         },
         {
-          selector: "FunctionExpression:not(MethodDefinition > FunctionExpression):not(Property[method=true] > FunctionExpression)",
+          selector:
+            "FunctionExpression:not(MethodDefinition > FunctionExpression):not(Property[method=true] > FunctionExpression):not(Property[kind=/^(get|set)$/] > FunctionExpression)",
           message: "function 式ではなく、アロー関数で書く",
         },
       ],
