@@ -80,29 +80,33 @@ export default function CareerPath() {
     // 一続きのホイール（間が 0.2 秒未満）の中で、一度ページに任せたら最後まで任せる（途中から横の移動に変えない）
     let lastWheelAt = -Infinity;
     let passing = false;
-    // 列の外で回したホイールも記録する。ページを縦に送っている途中で列がカーソルの下に入ってきても、横に切り替えない
+    // 列の外で回したホイールも記録する。ページを縦に送っている途中で列がカーソルの下に入ってきても、横に切り替えない。
+    // ページを送り始めたら、横に寄せている途中の動きも止める（ページと展示が同時に動かない）
     const onPageWheel = (event: WheelEvent) => {
       if (event.target instanceof Node && track.contains(event.target)) return;
       lastWheelAt = event.timeStamp;
       passing = true;
+      stopGlide();
     };
+    // ブラウザに任せる（横に動かさない）ときは、寄せている途中の動きを止める。同じ理由で、ページと展示が同時に動かない
     const onWheel = (event: WheelEvent) => {
+      if (!takeWheel(event)) stopGlide();
+    };
+    /** ホイールを横の移動として受けたら true。ブラウザ（ページの縦のスクロールなど）に任せるなら false */
+    const takeWheel = (event: WheelEvent) => {
       const continuing = event.timeStamp - lastWheelAt < 200;
       lastWheelAt = event.timeStamp;
-      if (continuing && passing) return;
+      if (continuing && passing) return false;
       passing = true;
       // 幅の狭い画面（縦に並べる）・ピンチのズームはブラウザに任せる
-      if (!desktop.matches || event.ctrlKey) return;
-      // 横の操作（トラックパッド・Shift + ホイール）はブラウザに任せ、ホイールで寄せている途中なら止める
-      if (event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) {
-        stopGlide();
-        return;
-      }
+      if (!desktop.matches || event.ctrlKey) return false;
+      // 横の操作（トラックパッド・Shift + ホイール）はブラウザに任せる
+      if (event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return false;
       // 展示の列がほぼ画面に入っているときだけ横に動かす（一部しか見えていないうちは、ページを縦に送る）
       const rail = track.firstElementChild?.getBoundingClientRect();
-      if (!rail || rail.height === 0) return;
+      if (!rail || rail.height === 0) return false;
       const seen = Math.min(rail.bottom, window.innerHeight) - Math.max(rail.top, 0);
-      if (seen / rail.height < 0.6) return;
+      if (seen / rail.height < 0.6) return false;
       const max = track.scrollWidth - track.clientWidth;
       const delta =
         event.deltaMode === WheelEvent.DOM_DELTA_LINE
@@ -113,14 +117,11 @@ export default function CareerPath() {
       // 先頭・末尾に実際に着いていたら奪わず、ページの縦のスクロールに戻す。
       // 向かう位置だけが端に着いていて、まだ寄せている途中なら、着くまでは横の操作として受ける（縦と横が同時に動かない）
       const now = track.scrollLeft;
-      if (max <= 0 || (delta > 0 && now >= max - 1) || (delta < 0 && now <= 1)) {
-        stopGlide();
-        return;
-      }
+      if (max <= 0 || (delta > 0 && now >= max - 1) || (delta < 0 && now <= 1)) return false;
       // 続けて回したときは、いま向かっている位置から先へ足す
       const from = wheel.target ?? now;
       // 止められない wheel（ページのスクロールの途中から続くもの）では横に動かさず、縦と横が同時に動かないようにする
-      if (!event.cancelable) return;
+      if (!event.cancelable) return false;
       passing = false;
       event.preventDefault();
       const to = Math.min(Math.max(from + delta, 0), max);
@@ -128,10 +129,11 @@ export default function CareerPath() {
         // 寄せている途中で設定が変わっていたら、その動きを止めてからすぐに動かす（古い位置へ戻らない）
         stopGlide();
         track.scrollLeft = to;
-        return;
+        return true;
       }
       wheel.target = to;
       if (!wheel.frame) wheel.frame = requestAnimationFrame(glide);
+      return true;
     };
     // キーボード（矢印キーなど）で動かし始めたら、ホイールで寄せている途中の動きを止める
     const onKeyDown = () => stopGlide();
