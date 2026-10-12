@@ -42,7 +42,8 @@ export default function MuseumNav({ current }: Props) {
       if (event.key !== "Escape") return;
       // マウスが乗ったままでも閉じる。もう一度開くのは、いったん離れて乗り直すかボタンを押したとき
       close();
-      buttonRef.current?.focus();
+      // フォーカスが Menu の中にあるときだけボタンへ戻す（hover で開いただけなら、ほかの場所のフォーカスを奪わない）
+      if (rootRef.current?.contains(document.activeElement)) buttonRef.current?.focus();
     };
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
