@@ -87,6 +87,8 @@ export default function CareerPath() {
       const from = wheel.target ?? track.scrollLeft;
       // 先頭・末尾に着いていたら奪わず、ページの縦のスクロールに戻す
       if (max <= 0 || (delta > 0 && from >= max - 1) || (delta < 0 && from <= 1)) return;
+      // 止められない wheel（ページのスクロールの途中から続くもの）では横に動かさず、縦と横が同時に動かないようにする
+      if (!event.cancelable) return;
       event.preventDefault();
       const to = Math.min(Math.max(from + delta, 0), max);
       if (reduce.matches) {
