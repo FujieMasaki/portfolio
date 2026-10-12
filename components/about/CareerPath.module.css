@@ -17,16 +17,11 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  /* 止まる位置はゆるく決める。近くに展示があるときだけ、その左端を壁の余白にそろえる */
-  scroll-snap-type: x proximity;
-  scroll-padding-inline: var(--gutter);
+  /*
+   * scroll-snap は使わない。ホイール・ドラッグで止めた位置から、近い展示の左端へ引き戻されてしまうため
+   * （1〜2目盛り回しても元に戻る）。展示の左端にそろえたいときは ← → で進む。
+   */
   padding: clamp(64px, 10svh, 112px) var(--gutter) 48px;
-}
-
-/* ドラッグ中とホイールで動かしている間は snap を止め、手の動きにそのまま付いてこさせる */
-.track[data-dragging],
-.track[data-wheeling] {
-  scroll-snap-type: none;
 }
 
 .track[data-dragging] {
@@ -64,7 +59,6 @@
   flex: 0 0 auto;
   align-items: center;
   gap: clamp(24px, 2.4vw, 44px);
-  scroll-snap-align: start;
 }
 
 /* 1点おきに、掛ける高さをわずかに変える */
@@ -271,7 +265,6 @@
 @media (max-width: 760px) {
   .track {
     overflow: visible;
-    scroll-snap-type: none;
     padding-bottom: 0;
   }
 

@@ -26,6 +26,8 @@ export default function CareerPath() {
   const ruleRef = useRef<HTMLSpanElement>(null);
   // ドラッグ中の状態。描画には使わないので ref に持つ
   const dragRef = useRef<{ id: number; x: number; left: number; moved: boolean } | null>(null);
+  // ホイールで向かっている位置と、そこへなめらかに寄せる描画のフレーム
+  const wheelRef = useRef<{ target: number | null; frame: number }>({ target: null, frame: 0 });
   const [edge, setEdge] = useState({ start: true, end: false });
 
   useEffect(() => {
@@ -46,9 +48,30 @@ export default function CareerPath() {
         setEdge((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
       });
     };
-    // 縦のホイールを横の移動に使う間は snap を止める（1目盛りずつ近い展示へ引き戻されないように）
-    let wheelTimer = 0;
+    const wheel = wheelRef.current;
     const desktop = window.matchMedia("(min-width: 761px)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // 向かう位置へ、毎フレーム残りの 2 割ずつ寄せる（1目盛りずつ飛ばない）
+    const glide = () => {
+      if (wheel.target === null) return;
+      const current = track.scrollLeft;
+      const rest = wheel.target - current;
+      if (Math.abs(rest) <= 2) {
+        track.scrollLeft = wheel.target;
+        wheel.target = null;
+        wheel.frame = 0;
+        return;
+      }
+      // スクロール位置は端数が丸められるので、1フレームに最低 2px は進める
+      track.scrollLeft = current + Math.sign(rest) * Math.max(Math.abs(rest) * 0.2, 2);
+      // 進めなかった（幅が変わって端に着いたなど）ときは、そこで止める
+      if (track.scrollLeft === current) {
+        wheel.target = null;
+        wheel.frame = 0;
+        return;
+      }
+      wheel.frame = requestAnimationFrame(glide);
+    };
     const onWheel = (event: WheelEvent) => {
       // 幅の狭い画面（縦に並べる）・ピンチのズーム・横の操作（トラックパッド・Shift + ホイール）はブラウザに任せる
       if (!desktop.matches || event.ctrlKey || event.shiftKey) return;
@@ -60,15 +83,18 @@ export default function CareerPath() {
           : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
             ? event.deltaY * track.clientWidth
             : event.deltaY;
+      // 続けて回したときは、いま向かっている位置から先へ足す
+      const from = wheel.target ?? track.scrollLeft;
       // 先頭・末尾に着いていたら奪わず、ページの縦のスクロールに戻す
-      if (max <= 0 || (delta > 0 && track.scrollLeft >= max - 1) || (delta < 0 && track.scrollLeft <= 1)) {
+      if (max <= 0 || (delta > 0 && from >= max - 1) || (delta < 0 && from <= 1)) return;
+      event.preventDefault();
+      const to = Math.min(Math.max(from + delta, 0), max);
+      if (reduce.matches) {
+        track.scrollLeft = to;
         return;
       }
-      event.preventDefault();
-      track.dataset.wheeling = "";
-      track.scrollLeft += delta;
-      clearTimeout(wheelTimer);
-      wheelTimer = window.setTimeout(() => delete track.dataset.wheeling, 180);
+      wheel.target = to;
+      if (!wheel.frame) wheel.frame = requestAnimationFrame(glide);
     };
     update();
     track.addEventListener("scroll", update, { passive: true });
@@ -79,18 +105,28 @@ export default function CareerPath() {
     if (track.firstElementChild) observer.observe(track.firstElementChild);
     return () => {
       cancelAnimationFrame(frame);
-      clearTimeout(wheelTimer);
-      delete track.dataset.wheeling;
+      cancelAnimationFrame(wheel.frame);
+      wheel.target = null;
+      wheel.frame = 0;
       track.removeEventListener("scroll", update);
       track.removeEventListener("wheel", onWheel);
       observer.disconnect();
     };
   }, []);
 
+  /** ホイールでなめらかに動かしている途中なら止める（ドラッグ・線・← → の操作を優先する） */
+  const stopWheelGlide = () => {
+    const wheel = wheelRef.current;
+    cancelAnimationFrame(wheel.frame);
+    wheel.target = null;
+    wheel.frame = 0;
+  };
+
   /** 隣の展示の左端が、壁の左の余白にそろう位置まで動かす */
   const step = (direction: 1 | -1) => {
     const track = trackRef.current;
     if (!track) return;
+    stopWheelGlide();
     const start =
       track.getBoundingClientRect().left +
       Number.parseFloat(getComputedStyle(track).paddingLeft);
@@ -108,6 +144,7 @@ export default function CareerPath() {
   /** 壁をつかんで横へ引く（マウスだけ。タッチ・ペンはブラウザのスクロールに任せる） */
   const onTrackPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType !== "mouse" || event.button !== 0) return;
+    stopWheelGlide();
     dragRef.current = {
       id: event.pointerId,
       x: event.clientX,
@@ -141,7 +178,6 @@ export default function CareerPath() {
   const endTrackDrag = (event: PointerEvent<HTMLDivElement>) => {
     if (dragRef.current?.id !== event.pointerId) return;
     dragRef.current = null;
-    // 離したあとに scroll-snap（proximity）が効き、近い展示があればそこで止まる
     delete event.currentTarget.dataset.dragging;
   };
 
@@ -159,6 +195,7 @@ export default function CareerPath() {
   const onRulePointerDown = (event: PointerEvent<HTMLSpanElement>) => {
     if (event.button !== 0) return;
     event.preventDefault();
+    stopWheelGlide();
     event.currentTarget.setPointerCapture(event.pointerId);
     if (trackRef.current) trackRef.current.dataset.dragging = "";
     scrubTo(event.clientX);
