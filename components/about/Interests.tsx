@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { INTERESTS, type Interest } from "./content";
 import shared from "./AboutMuseum.module.css";
 import styles from "./Interests.module.css";
@@ -37,6 +38,16 @@ export default function Interests() {
           <Exhibit key={item.number} item={item} />
         ))}
       </ul>
+
+      <nav className={styles.nextRoom} aria-label="次の展示室" data-reveal>
+        <Link href="/work" className={styles.nextLink}>
+          <span className={styles.nextLabel}>Next room</span>
+          <span className={styles.nextTitle}>Work</span>
+          <svg className={styles.nextArrow} viewBox="0 0 32 10" aria-hidden="true">
+            <path d="M0 5h31M26 1l5 4-5 4" />
+          </svg>
+        </Link>
+      </nav>
     </section>
   );
 }
@@ -60,6 +71,7 @@ function Exhibit({ item }: { item: Interest }) {
         className={styles.object}
         style={{
           width: `${item.objectWidth}%`,
+          translate: item.objectShift ? `${item.objectShift}% 0` : undefined,
           aspectRatio: `${box.width} / ${box.height}`,
         }}
       >
