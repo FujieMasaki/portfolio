@@ -1,5 +1,5 @@
 /*
- * 02 Career：写真を横に掛け並べた、記憶と時間の展示。
+ * ABOUT / Career：写真を横に掛け並べた、記憶と時間の展示。
  * 壁・文字・見出し・額は AboutMuseum.module.css と共通。ここでは並べ方と写真の質感だけを決める。
  */
 
@@ -11,7 +11,7 @@
 /*
  * 横に流れる壁。ブラウザのスクロールバーは隠し、下の細い線をスクロールバーとして使う
  * （2本の線が並ぶと、カルーセルの部品に見えるため）。
- * 縦のホイールは奪わず、ページの縦スクロールのまま。
+ * 縦のホイールは、展示の上にある間だけ横の移動に使い、先頭・末尾ではページの縦スクロールに戻す（CareerPath.tsx）。
  */
 .track {
   overflow-x: auto;
@@ -23,9 +23,13 @@
   padding: clamp(64px, 10svh, 112px) var(--gutter) 48px;
 }
 
-/* ドラッグ中は snap を止め、指の動きにそのまま付いてこさせる */
-.track[data-dragging] {
+/* ドラッグ中とホイールで動かしている間は snap を止め、手の動きにそのまま付いてこさせる */
+.track[data-dragging],
+.track[data-wheeling] {
   scroll-snap-type: none;
+}
+
+.track[data-dragging] {
   cursor: grabbing;
   user-select: none;
 }
@@ -68,21 +72,31 @@
   translate: 0 24px;
 }
 
+/* 美術館のキャプション：番号と年 → 題 → 1行のテーマ → 短い解説 */
 .label {
   flex: none;
-  width: 13em;
+  width: 20em;
   font-size: 13px;
 }
 
 .exhibit[data-text-only] .label {
-  width: 18em;
+  width: 22em;
 }
 
 .number {
+  display: flex;
+  align-items: baseline;
+  gap: 1.4em;
   margin: 0;
   font-style: italic;
   letter-spacing: 0.08em;
   color: var(--wall-ink-muted);
+}
+
+.period {
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 0.16em;
 }
 
 .place {
@@ -101,30 +115,21 @@
   border-top: 1px solid var(--wall-line);
 }
 
-.note {
-  margin: 1.2em 0 0;
-  line-height: 2;
-  letter-spacing: 0.12em;
+.theme {
+  margin: 1.1em 0 0;
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: 0.1em;
   word-break: auto-phrase;
 }
 
-/* NOW / NEXT：写真の代わりに、これからの言葉を少しだけ大きく置く */
-.exhibit[data-text-only] .note > :first-child {
-  display: block;
-  margin-bottom: 0.4em;
-  font-size: 18px;
-  letter-spacing: 0.06em;
-}
-
-.exhibit[data-text-only] .note > :first-child + * br {
-  display: none;
-}
-
-.period {
-  margin: 1.4em 0 0;
-  font-size: 12px;
-  letter-spacing: 0.16em;
+.note {
+  margin: 0.9em 0 0;
+  font-size: 12.5px;
+  line-height: 2;
+  letter-spacing: 0.1em;
   color: var(--wall-ink-muted);
+  word-break: auto-phrase;
 }
 
 .frame {
@@ -149,7 +154,7 @@
  */
 /* 共通の .photo（AboutMuseum.module.css）より強く指定する */
 .frame .memory {
-  filter: saturate(0.8) contrast(0.9) brightness(1.03) sepia(0.06);
+  filter: saturate(0.78) contrast(0.88) brightness(1.04) sepia(0.08);
   transition: filter 0.5s var(--ease-calm);
 }
 
@@ -159,8 +164,8 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-color: rgb(236 222 200 / 0.07);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.4 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-color: rgb(236 220 194 / 0.09);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.4 0 0 0 0.65 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   background-size: 160px;
   mix-blend-mode: soft-light;
   opacity: 0.9;
@@ -183,27 +188,47 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   padding-inline: var(--gutter);
 }
 
+/* 矢印は文字のまま。丸い背景や枠は付けない */
 .step {
   margin: 0;
-  padding: 8px;
+  padding: 8px 10px;
   border: 0;
   background: none;
   font: inherit;
-  font-size: 18px;
+  font-size: 24px;
   line-height: 1;
-  color: inherit;
+  color: var(--wall-ink-muted);
   cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.4s var(--ease-calm);
+  opacity: 0.92;
+  transition:
+    color 0.4s var(--ease-calm),
+    opacity 0.4s var(--ease-calm),
+    translate 0.4s var(--ease-calm);
 }
 
 .step[aria-disabled="true"] {
   opacity: 0.28;
   cursor: default;
+}
+
+/* 近づくと少し明るくなり、進む向きへわずかに寄る */
+@media (hover: hover) {
+  .step:not([aria-disabled="true"]):hover {
+    color: var(--wall-ink);
+    opacity: 1;
+  }
+
+  .step[data-direction="prev"]:not([aria-disabled="true"]):hover {
+    translate: -3px 0;
+  }
+
+  .step[data-direction="next"]:not([aria-disabled="true"]):hover {
+    translate: 3px 0;
+  }
 }
 
 .step:focus-visible {
@@ -216,7 +241,7 @@
   position: relative;
   flex: 1;
   height: 1px;
-  background: rgb(72 64 56 / 0.2);
+  background: rgb(72 64 56 / 0.22);
   cursor: pointer;
   touch-action: none;
 }
@@ -227,13 +252,19 @@
   inset: -10px 0;
 }
 
-/* いま見えている範囲だけを濃くする（--visible / --progress は CareerPath.tsx が入れる） */
-.ruleSeen {
+/*
+ * いまの位置を示す、展示1つ分の幅の短い光（--thumb / --progress は CareerPath.tsx が入れる）。
+ * TOP の室内灯のような淡い琥珀色で、ごく弱くにじませる。
+ */
+.ruleThumb {
   position: absolute;
-  inset-block: 0;
-  left: calc((1 - var(--visible, 1)) * var(--progress, 0) * 100%);
-  width: calc(var(--visible, 1) * 100%);
-  background: var(--wall-ink-muted);
+  top: -1px;
+  left: calc((1 - var(--thumb, 0.2)) * var(--progress, 0) * 100%);
+  width: calc(var(--thumb, 0.2) * 100%);
+  height: 3px;
+  border-radius: 2px;
+  background: rgb(196 148 84);
+  box-shadow: 0 0 8px rgb(230 186 120 / 0.55);
 }
 
 /* 幅の狭い画面：横には流さず、縦に掛け並べる */
@@ -283,10 +314,16 @@
   }
 }
 
+/* 動きを止める（hover 時の指定より強くする） */
 @media (prefers-reduced-motion: reduce) {
   .frame .memory,
-  .frame::before {
+  .frame::before,
+  .step {
     transition: none;
+  }
+
+  .step[data-direction]:not([aria-disabled="true"]):hover {
+    translate: none;
   }
 }
 
@@ -296,7 +333,8 @@
     background: GrayText;
   }
 
-  .ruleSeen {
+  .ruleThumb {
     background: CanvasText;
+    box-shadow: none;
   }
 }

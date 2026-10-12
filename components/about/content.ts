@@ -4,10 +4,14 @@
 
 export type CareerExhibit = {
   number: string;
+  /** 年（NEXT は年の代わりに "Next"） */
+  period: string;
+  /** 展示の題（英語） */
   title: string;
+  /** 1行のテーマ */
+  theme: string;
   /** 壁の解説。改行位置も展示の一部なので行ごとに分ける */
   lines: string[];
-  period: string;
   photo?: {
     src: string;
     alt: string;
@@ -18,12 +22,14 @@ export type CareerExhibit = {
   };
 };
 
+/** 文面は公開中のプロフィール（masakifujie.com の Career）を、美術館のキャプションの長さに要約したもの */
 export const CAREER: CareerExhibit[] = [
   {
     number: "01",
-    title: "Canada",
-    lines: ["自分の世界が", "広がった風景"],
-    period: "2016 - 2017",
+    period: "2015 - 2016",
+    title: "Explore / Canada",
+    theme: "新しい環境で、自分から動く",
+    lines: ["ワーキングホリデーでトロントへ。", "知り合いのいない街で、", "住む場所も仕事も自分で探した。"],
     photo: {
       src: "/images/about/about-career-canada-red-maple.jpg",
       alt: "カナダの公園で、赤く色づいたカエデの木",
@@ -33,9 +39,15 @@ export const CAREER: CareerExhibit[] = [
   },
   {
     number: "02",
-    title: "Hotel",
-    lines: ["空間が人の体験を", "変えることを知った時間"],
     period: "2018 - 2020",
+    title: "Hospitality",
+    theme: "人が過ごす時間を考える",
+    lines: [
+      "沖縄のホテル・カフェで、",
+      "接客と運営に関わった。",
+      "訪れる人の時間を考えるうちに、",
+      "関心は空間・サービス・IT へ広がった。",
+    ],
     photo: {
       src: "/images/about/about-career-hotel-exterior-arc.jpg",
       alt: "灯りのともる吹き抜けと植物が見える、ホテルとカフェのガラス張りの入口",
@@ -45,9 +57,14 @@ export const CAREER: CareerExhibit[] = [
   },
   {
     number: "03",
-    title: "Community",
-    lines: ["人が集まり、学び、", "つながる場をつくる"],
-    period: "2020 - 2021",
+    period: "2020 - 2022",
+    title: "Community & Place",
+    theme: "人と人がつながる環境をつくる",
+    lines: [
+      "コワーキング、シェアハウス、",
+      "スクールの運営と、人をつなぐ企画。",
+      "エンジニアという仕事に出会った。",
+    ],
     photo: {
       src: "/images/about/about-career-community-study-event.jpg",
       alt: "2枚のスクリーンの前で、テーブルを囲んでノートパソコンを開く勉強会",
@@ -57,9 +74,14 @@ export const CAREER: CareerExhibit[] = [
   },
   {
     number: "04",
-    title: "Web Engineer",
-    lines: ["デジタルでものをつくる", "場所を手に入れた時期"],
-    period: "2021 - Now",
+    period: "2022 - Present",
+    title: "Software & Product",
+    theme: "テクノロジーで体験をつくる",
+    lines: [
+      "飲食・小売、旅行、AI SaaS の開発。",
+      "UI・仕様・分析・業務改善にも関わり、",
+      "何をつくり、どんな体験にするかへ。",
+    ],
     photo: {
       src: "/images/about/about-workspace.webp",
       alt: "モニターとノートパソコンを並べた、自宅の作業机",
@@ -69,9 +91,14 @@ export const CAREER: CareerExhibit[] = [
   },
   {
     number: "05",
-    title: "NOW / NEXT",
-    lines: ["Designing Experiences", "これから、つくっていきたいもの。"],
-    period: "",
+    period: "Next",
+    title: "Experience",
+    theme: "リアルとデジタルをつなぐ",
+    lines: [
+      "ホテル、コミュニティ、Web 開発を経て、",
+      "場所とデジタルをつなぐ体験づくりへ。",
+      "いまは Focus on Dot を個人で企画・開発中。",
+    ],
   },
 ];
 
@@ -99,6 +126,7 @@ export type Interest = {
   objectWidth: number;
 };
 
+/** 解説は公開中のプロフィール（masakifujie.com の Likes）を要約したもの。Style は別途調整するので変えない */
 export const INTERESTS: Interest[] = [
   {
     number: "01",
@@ -117,7 +145,7 @@ export const INTERESTS: Interest[] = [
   {
     number: "02",
     title: "Basketball",
-    note: ["観るのも、", "やるのも好き。"],
+    note: ["琉球ゴールデンキングスを応援しています。", "選手の動きや戦術を見るのも好き。"],
     image: {
       src: "/images/about/basket-ball.png",
       alt: "使い込まれたバスケットボール",
@@ -131,7 +159,7 @@ export const INTERESTS: Interest[] = [
   {
     number: "03",
     title: "Space",
-    note: ["居心地のいい場所や、", "空間の工夫を見るのが好き。"],
+    note: ["居心地のいい場所や、", "空間・サービスの工夫を見るのが好き。"],
     image: {
       src: "/images/about/interented-space.png",
       alt: "3つのアーチを持つこの美術館の建物を、小さくした建築模型",
@@ -145,9 +173,10 @@ export const INTERESTS: Interest[] = [
   {
     number: "04",
     title: "Alone Time",
-    note: ["一人で考えを整理する", "ための時間。"],
+    note: ["サウナやお風呂で、", "何も考えずに過ごす時間が好き。"],
     image: {
       src: "/images/about/interested-book.png",
+      // 読書ではなく、一人で静かに過ごす時間の象徴として置く
       alt: "一冊の本",
       width: 1295,
       height: 1214,

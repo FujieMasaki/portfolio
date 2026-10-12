@@ -1,22 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import Image from "next/image";
 import { CAREER } from "./content";
 import shared from "./AboutMuseum.module.css";
 import styles from "./CareerPath.module.css";
 
 /**
- * 02 Career。これまで通ってきた場所を、壁に横へ掛け並べた写真としてたどる。
+ * ABOUT / Career。これまで通ってきた場所を、壁に横へ掛け並べた写真としてたどる。
  *
- * 横の移動はブラウザのスクロールそのまま（トラックパッド・横スワイプ・Shift + ホイール・矢印キー）で、
- * 縦のホイールを横へ置き換える scroll jack はしない。
- * 縦のホイールしかないマウスでも歩いて見ていけるように、次の3つを足す。
+ * 横の移動はブラウザのスクロールを土台にする（トラックパッドの横の操作・横スワイプ・矢印キーはそのまま）。
+ * マウスでも壁沿いに歩いて見ていけるように、次の4つを足す。
+ *   - 展示の上で回した縦のホイールを、横の移動に使う。先頭・末尾に着いたら、ページの縦のスクロールに戻す
  *   - 壁をつかんで横へ引く（マウスのドラッグ。タッチはブラウザの横スワイプのまま）
- *   - 下の細い線をスクロールバーとして使う（いまどこを見ているかを示し、つかんで動かせる）
+ *   - 下の細い線の上を動く短い光（展示1つ分の幅）で、いまどこにいるかを示す。線はつかんで動かせる
  *   - ← → で隣の展示へ進む
  * 幅の狭い画面では縦に並べ、線とボタンは出さない（CSS）。
  */
+
+/** 線の上の光の幅（線の長さに対する割合）。展示1つ分にする */
+const THUMB = 1 / CAREER.length;
 export default function CareerPath() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -35,27 +38,51 @@ export default function CareerPath() {
       frame = requestAnimationFrame(() => {
         const max = track.scrollWidth - track.clientWidth;
         const progress = max > 0 ? track.scrollLeft / max : 0;
-        // 線の上の濃い部分＝いま見えている範囲
+        // 線の上の光の位置
         section.style.setProperty("--progress", progress.toFixed(4));
-        section.style.setProperty(
-          "--visible",
-          (track.clientWidth / track.scrollWidth).toFixed(4),
-        );
         const start = track.scrollLeft <= 2;
         const end = track.scrollLeft >= max - 2;
         // スクロール中は毎フレーム呼ばれるので、端の状態が変わったときだけ描き直す
         setEdge((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
       });
     };
+    // 縦のホイールを横の移動に使う間は snap を止める（1目盛りずつ近い展示へ引き戻されないように）
+    let wheelTimer = 0;
+    const desktop = window.matchMedia("(min-width: 761px)");
+    const onWheel = (event: WheelEvent) => {
+      // 幅の狭い画面（縦に並べる）・ピンチのズーム・横の操作（トラックパッド・Shift + ホイール）はブラウザに任せる
+      if (!desktop.matches || event.ctrlKey || event.shiftKey) return;
+      if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      const max = track.scrollWidth - track.clientWidth;
+      const delta =
+        event.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? event.deltaY * 16
+          : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+            ? event.deltaY * track.clientWidth
+            : event.deltaY;
+      // 先頭・末尾に着いていたら奪わず、ページの縦のスクロールに戻す
+      if (max <= 0 || (delta > 0 && track.scrollLeft >= max - 1) || (delta < 0 && track.scrollLeft <= 1)) {
+        return;
+      }
+      event.preventDefault();
+      track.dataset.wheeling = "";
+      track.scrollLeft += delta;
+      clearTimeout(wheelTimer);
+      wheelTimer = window.setTimeout(() => delete track.dataset.wheeling, 180);
+    };
     update();
     track.addEventListener("scroll", update, { passive: true });
+    track.addEventListener("wheel", onWheel, { passive: false });
     // フォントの読み込みなどで展示の列の幅だけが変わっても、線と ← → を合わせ直す
     const observer = new ResizeObserver(update);
     observer.observe(track);
     if (track.firstElementChild) observer.observe(track.firstElementChild);
     return () => {
       cancelAnimationFrame(frame);
+      clearTimeout(wheelTimer);
+      delete track.dataset.wheeling;
       track.removeEventListener("scroll", update);
+      track.removeEventListener("wheel", onWheel);
       observer.disconnect();
     };
   }, []);
@@ -118,16 +145,14 @@ export default function CareerPath() {
     delete event.currentTarget.dataset.dragging;
   };
 
-  /** 下の線の上の位置に合わせて、見えている範囲（濃い部分）の中心をそこへ動かす */
+  /** 下の線の上の位置に合わせて、光の中心をそこへ動かす */
   const scrubTo = (clientX: number) => {
     const track = trackRef.current;
     const rule = ruleRef.current;
     if (!track || !rule) return;
     const rect = rule.getBoundingClientRect();
-    const visible = track.clientWidth / track.scrollWidth;
-    if (visible >= 1) return;
-    const seenLeft = (clientX - rect.left) / rect.width - visible / 2;
-    const progress = Math.min(Math.max(seenLeft / (1 - visible), 0), 1);
+    const thumbLeft = (clientX - rect.left) / rect.width - THUMB / 2;
+    const progress = Math.min(Math.max(thumbLeft / (1 - THUMB), 0), 1);
     track.scrollLeft = progress * (track.scrollWidth - track.clientWidth);
   };
 
@@ -151,6 +176,7 @@ export default function CareerPath() {
     <section
       ref={sectionRef}
       className={styles.path}
+      style={{ "--thumb": THUMB } as CSSProperties}
       aria-labelledby="career-title"
     >
       <header className={shared.sectionHeader} data-reveal>
@@ -158,7 +184,6 @@ export default function CareerPath() {
           <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Career</span>
         </h2>
-        <p className={shared.subtitle}>Path</p>
         <p className={shared.lead}>
           これまでの時間の中で、
           <br />
@@ -190,8 +215,12 @@ export default function CareerPath() {
               data-text-only={exhibit.photo ? undefined : ""}
             >
               <div className={styles.label}>
-                <p className={styles.number}>{exhibit.number}</p>
+                <p className={styles.number}>
+                  {exhibit.number}
+                  <span className={styles.period}>{exhibit.period}</span>
+                </p>
                 <h3 className={styles.place}>{exhibit.title}</h3>
+                <p className={styles.theme}>{exhibit.theme}</p>
                 <p className={styles.note}>
                   {exhibit.lines.map((line, index) => (
                     <span key={line}>
@@ -200,7 +229,6 @@ export default function CareerPath() {
                     </span>
                   ))}
                 </p>
-                {exhibit.period && <p className={styles.period}>{exhibit.period}</p>}
               </div>
 
               {exhibit.photo && (
@@ -232,6 +260,7 @@ export default function CareerPath() {
         <button
           type="button"
           className={styles.step}
+          data-direction="prev"
           onClick={() => step(-1)}
           // disabled にすると、押してフォーカスがあるボタンからフォーカスが外れて見失うので aria-disabled にする
           aria-disabled={edge.start}
@@ -250,11 +279,12 @@ export default function CareerPath() {
           onPointerCancel={endRuleDrag}
           onLostPointerCapture={endRuleDrag}
         >
-          <span className={styles.ruleSeen} />
+          <span className={styles.ruleThumb} />
         </span>
         <button
           type="button"
           className={styles.step}
+          data-direction="next"
           onClick={() => step(1)}
           aria-disabled={edge.end}
           aria-label="次の展示へ"
