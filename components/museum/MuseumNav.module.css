@@ -15,7 +15,8 @@
   justify-content: space-between;
   padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 64px) 0;
   font-family: var(--font-heading), serif;
-  font-size: 14px;
+  /* 壁の質感に埋もれない大きさ。太さではなく大きさで読みやすくする */
+  font-size: 16.5px;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.12em;

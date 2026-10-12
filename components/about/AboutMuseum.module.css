@@ -160,8 +160,9 @@
 /* ==== ABOUT / Masaki Fujie ==== */
 
 /*
- * 構図：文章は左、額（主展示）は画面の中央からやや右、植物は右端の床に鉢ごと置く。
- * 左右を均等に割らず、額の右に植物のための余白を残した非対称の壁にする。
+ * 構図：文章は左、額（主展示）は文章の近く、植物は右端の床に鉢ごと置く。
+ * 文章と写真が1つの展示に見える距離に置き、額の右に植物のための余白を広めに残した非対称の壁にする。
+ * 文章の列は文章の幅より狭くしない（見出しが額に重ならない）。
  */
 .archive {
   --portrait-w: clamp(240px, 26vw, 400px);
@@ -169,7 +170,7 @@
 
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--portrait-w) minmax(0, 0.72fr);
+  grid-template-columns: minmax(max-content, 1fr) var(--portrait-w) minmax(0, 1.2fr);
   column-gap: clamp(32px, 5vw, 96px);
   align-items: center;
   overflow: clip;
@@ -201,14 +202,14 @@
   align-items: center;
   gap: 1.2em;
   margin: 2.8em 0 0;
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.24em;
   color: var(--wall-ink-muted);
 }
 
 .place::after {
   content: "";
-  width: 40px;
+  width: 56px;
   border-top: 1px solid var(--wall-line);
 }
 
