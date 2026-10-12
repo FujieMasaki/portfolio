@@ -14,7 +14,7 @@ const FOOTER_LINKS: FooterLink[] = [
   { label: "Focus on Dot（準備中）", disabled: true },
 ];
 
-export default function Footer() {
+const Footer = () => {
   return (
     <footer className={styles.footer}>
       <span className={styles.name}>Masaki Fujie</span>
@@ -41,4 +41,6 @@ export default function Footer() {
       <span className={styles.copyright}>© 2026 Masaki Fujie</span>
     </footer>
   );
-}
+};
+
+export default Footer;

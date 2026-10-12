@@ -11,7 +11,7 @@ type Place = {
   icon: React.ReactNode;
 };
 
-function Icon(props: SVGProps<SVGSVGElement>) {
+const Icon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -26,7 +26,7 @@ function Icon(props: SVGProps<SVGSVGElement>) {
       {...props}
     />
   );
-}
+};
 
 const PLACES: Place[] = [
   {
@@ -82,7 +82,7 @@ const PLACES: Place[] = [
   },
 ];
 
-export default function PlacesToKnowMe() {
+const PlacesToKnowMe = () => {
   return (
     <section className={styles.section} aria-labelledby="more-title" id="more">
       <h2 className={styles.eyebrow} id="more-title">
@@ -139,4 +139,6 @@ export default function PlacesToKnowMe() {
       </div>
     </section>
   );
-}
+};
+
+export default PlacesToKnowMe;

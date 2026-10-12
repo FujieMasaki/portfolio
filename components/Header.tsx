@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { label: "CONTACT", href: "#contact", id: "contact" },
 ];
 
-export default function Header() {
+const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -162,4 +162,6 @@ export default function Header() {
       </nav>
     </header>
   );
-}
+};
+
+export default Header;

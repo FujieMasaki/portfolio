@@ -30,7 +30,7 @@ const STEPS = 24;
  * - 縦：入る高さから抜ける高さへゆるやかに移りつつ、ゆっくりした波と小さな波を重ねる
  * - 向き：軌道の傾きに合わせてわずかに機体を傾ける（小さな波の分だけ時々向きが変わる）
  */
-function buildFlightPath(flight: Flight, width: number, height: number, birdWidth: number) {
+const buildFlightPath = (flight: Flight, width: number, height: number, birdWidth: number) => {
   const [phaseA, phaseB, phaseSpeed, waves] = flight.seed;
   const startX = -birdWidth * 1.4;
   const endX = width + birdWidth * 0.4;
@@ -62,7 +62,7 @@ function buildFlightPath(flight: Flight, width: number, height: number, birdWidt
     });
   }
   return frames;
-}
+};
 
 /**
  * Contact のアーチ越しに、遠くの海の上をリュウキュウツバメが横切る。
@@ -73,13 +73,13 @@ function buildFlightPath(flight: Flight, width: number, height: number, birdWidt
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
 /** 「動きを減らす」の設定を購読する（閲覧の途中で変わっても追従する） */
-function subscribeReducedMotion(onChange: () => void) {
+const subscribeReducedMotion = (onChange: () => void) => {
   const query = window.matchMedia(REDUCED_MOTION);
   query.addEventListener("change", onChange);
   return () => query.removeEventListener("change", onChange);
-}
+};
 
-export default function SwallowFlyby() {
+const SwallowFlyby = () => {
   const [flight, setFlight] = useState<Flight | null>(null);
   // サーバーでは燕を描かないので、動きを減らす側（true）として扱う
   const reducedMotion = useSyncExternalStore(
@@ -150,4 +150,6 @@ export default function SwallowFlyby() {
       </svg>
     </span>
   );
-}
+};
+
+export default SwallowFlyby;

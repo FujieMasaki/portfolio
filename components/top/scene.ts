@@ -11,14 +11,14 @@ export const CANVAS = { width: 1672, height: 941 } as const;
 
 type Rect = { x: number; y: number; width: number; height: number };
 
-export function toPercentBox({ x, y, width, height }: Rect) {
+export const toPercentBox = ({ x, y, width, height }: Rect) => {
   return {
     left: `${(x / CANVAS.width) * 100}%`,
     top: `${(y / CANVAS.height) * 100}%`,
     width: `${(width / CANVAS.width) * 100}%`,
     height: `${(height / CANVAS.height) * 100}%`,
   };
-}
+};
 
 /**
  * 建物 PNG (1774 x 887) の配置。

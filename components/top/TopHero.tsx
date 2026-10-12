@@ -33,7 +33,7 @@ type Props = {
  *   6. atmosphere 周辺減光と夕方の光
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  */
-export default function TopHero({ ambient = "evening" }: Props) {
+const TopHero = ({ ambient = "evening" }: Props) => {
   const { background, backgroundFilter, buildingFilter, sceneFilter } =
     AMBIENTS[ambient];
 
@@ -137,4 +137,6 @@ export default function TopHero({ ambient = "evening" }: Props) {
       </noscript>
     </section>
   );
-}
+};
+
+export default TopHero;

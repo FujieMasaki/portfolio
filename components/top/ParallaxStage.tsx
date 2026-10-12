@@ -19,7 +19,7 @@ type Props = {
 /** JS 側の保険。TopHero.module.css の .stage:not([data-ready]) の保険（6 秒）より先に表示する */
 const JS_FALLBACK_MS = 5000;
 
-export default function ParallaxStage({ className, children }: Props) {
+const ParallaxStage = ({ className, children }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   /** "true" は通常どおりフェードイン、"late" は CSS の保険ですでに表示されているのでそのまま見せる */
   const [ready, setReady] = useState<"true" | "late" | null>(null);
@@ -107,4 +107,6 @@ export default function ParallaxStage({ className, children }: Props) {
       {children}
     </div>
   );
-}
+};
+
+export default ParallaxStage;

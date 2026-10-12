@@ -26,19 +26,19 @@ type Props = {
  * 舞台の幅は縦長のルール（縦横比 6/7 以下か幅 700px 以下）で 200vw。横長では画面の比率により変わり、
  * 縦横比 4/3 以下では最大約 207vw、それより横長では 100〜約135vw になる。
  */
-function interiorSizes(openingWidth: number, frameWidth: string) {
+const interiorSizes = (openingWidth: number, frameWidth: string) => {
   const ratio = (openingWidth / CANVAS.width) * (parseFloat(frameWidth) / 100);
   const portrait = `${Math.ceil(ratio * 200)}vw`;
   // sizes ではカンマが候補の区切りなので、縦長のルールに入る条件ごとに同じ値を並べる
   // 縦横比 4/3 以下の横長でも舞台は約 207vw まで広がるので、縦長と同じ値を使う
   return `(max-aspect-ratio: 6/7) ${portrait}, (max-width: 700px) ${portrait}, (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
-}
+};
 
-export default function ArchEntrance({
+const ArchEntrance = ({
   arch,
   background,
   backgroundFilter,
-}: Props) {
+}: Props) => {
   const { opening, interior } = arch;
   // 上端を半円にするための縦方向の半径（開口部の高さに対する比率）
   const radiusY = `${(opening.width / 2 / opening.height) * 100}%`;
@@ -99,4 +99,6 @@ export default function ArchEntrance({
       </span>
     </Link>
   );
-}
+};
+
+export default ArchEntrance;
