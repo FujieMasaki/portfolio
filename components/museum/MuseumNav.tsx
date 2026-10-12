@@ -70,7 +70,12 @@ export default function MuseumNav({ current }: Props) {
           if (event.pointerType === "mouse") setMode((value) => (value === "closed" ? "hover" : value));
         }}
         onPointerLeave={(event) => {
-          if (event.pointerType === "mouse") setMode((value) => (value === "hover" ? "closed" : value));
+          if (event.pointerType !== "mouse") return;
+          // キーボードで Menu の中を操作している間は閉じない（フォーカスが外へ出たら onBlur で閉じる）。
+          // クリックで残ったフォーカスは :focus-visible にならないので、マウスだけの操作ではこれまでどおり閉じる
+          const focused = document.activeElement;
+          if (focused && event.currentTarget.contains(focused) && focused.matches(":focus-visible")) return;
+          setMode((value) => (value === "hover" ? "closed" : value));
         }}
         // フォーカスが Menu の外へ出たら閉じる（Tab で通り過ぎたとき）
         onBlur={(event) => {
