@@ -129,8 +129,6 @@ export type Interest = {
     height: number;
     /** 展示物の範囲。未指定なら画像全体 */
     box?: Box;
-    /** 背景のある写真。透過できないので、小さな額に入れて展示台に立てる */
-    framed?: boolean;
   };
   /** 展示台の高さ（床からの比率の目安。1 が標準）と幅（列の比率） */
   plinth: { height: number; width: number };
@@ -147,13 +145,13 @@ export const INTERESTS: Interest[] = [
     note: ["考えたいときは、", "まず歩くことが多いです。"],
     image: {
       src: "/images/about/about-interested-shoose.png",
-      alt: "海沿いの道を歩く、黒いスニーカー（Columbia）の足元",
-      width: 1089,
-      height: 1445,
-      framed: true,
+      alt: "グレーのスエードとメッシュのスニーカー（New Balance 991）",
+      width: 1448,
+      height: 1086,
+      box: { x: 61, y: 115, width: 1359, height: 874 },
     },
     plinth: { height: 0.9, width: 1 },
-    objectWidth: 56,
+    objectWidth: 70,
   },
   {
     number: "02",

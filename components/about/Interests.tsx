@@ -5,7 +5,7 @@ import shared from "./AboutMuseum.module.css";
 import styles from "./Interests.module.css";
 
 /**
- * ABOUT / Interests：低い展示台（CSS）に、実物（透過画像。背景のある写真は小さな額）を1つずつ置いた収蔵品の展示。
+ * ABOUT / Interests：低い展示台（CSS）に、実物（透過画像）を1つずつ置いた収蔵品の展示。
  *
  * 展示台の高さと幅は少しずつ変え、下端（床の線）だけをそろえる。
  * 解説は展示台の下の床に小さく置き、hover / キーボードのフォーカスで静かに現れる。
@@ -53,48 +53,28 @@ function Exhibit({ item }: { item: Interest }) {
       // フォーカスで現れる解説も、読み上げで一緒に伝える
       aria-describedby={`interest-note-${item.number}`}
     >
-      {image.framed ? (
-        // 背景のある写真は透過できないので、小さな額に入れて展示台に立てる
-        <div
-          className={`${shared.frame} ${styles.object} ${styles.framed}`}
+      {/* 画像の透明な余白を除いた範囲（box）だけを見せ、展示物の底を展示台の天板に載せる */}
+      <div
+        className={styles.object}
+        style={{
+          width: `${item.objectWidth}%`,
+          aspectRatio: `${box.width} / ${box.height}`,
+        }}
+      >
+        <Image
+          src={image.src}
+          alt={image.alt}
+          width={image.width}
+          height={image.height}
+          // 展示物の幅（列の幅 × objectWidth）に、切り落とす透明な余白の分を足した幅。広い列（Space）で約 26vw
+          sizes="(max-width: 760px) 36vw, 26vw"
           style={{
-            width: `${item.objectWidth}%`,
-            aspectRatio: `${image.width} / ${image.height}`,
+            width: `${(image.width / box.width) * 100}%`,
+            left: `${(-box.x / box.width) * 100}%`,
+            top: `${(-box.y / box.height) * 100}%`,
           }}
-        >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            // 額の幅（列の幅 × objectWidth）
-            sizes="(max-width: 760px) 24vw, 12vw"
-            className={shared.photo}
-          />
-        </div>
-      ) : (
-        // 画像の透明な余白を除いた範囲（box）だけを見せ、展示物の底を展示台の天板に載せる
-        <div
-          className={styles.object}
-          style={{
-            width: `${item.objectWidth}%`,
-            aspectRatio: `${box.width} / ${box.height}`,
-          }}
-        >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            width={image.width}
-            height={image.height}
-            // 展示物の幅（列の幅 × objectWidth）に、切り落とす透明な余白の分を足した幅。広い列（Space）で約 26vw
-            sizes="(max-width: 760px) 36vw, 26vw"
-            style={{
-              width: `${(image.width / box.width) * 100}%`,
-              left: `${(-box.x / box.width) * 100}%`,
-              top: `${(-box.y / box.height) * 100}%`,
-            }}
-          />
-        </div>
-      )}
+        />
+      </div>
 
       <div className={styles.plinth}>
         <p className={styles.number}>{item.number}</p>
