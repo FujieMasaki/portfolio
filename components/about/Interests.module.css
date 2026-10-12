@@ -81,7 +81,8 @@
 .plinth {
   position: relative;
   width: 100%;
-  height: calc(var(--plinth-base) * var(--plinth-h, 1));
+  /* 低い台の題が2行に折り返す幅（タブレットの縦向きなど）でも、文字が台の外へ出ないよう高さは下限で決める */
+  min-height: calc(var(--plinth-base) * var(--plinth-h, 1));
   padding: clamp(18px, 1.8vw, 26px) clamp(16px, 2.2vw, 32px);
   background-color: #ddd6cc;
   background-image: url("/images/about/about-wall.webp");
