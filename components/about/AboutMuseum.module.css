@@ -1,6 +1,6 @@
 /*
- * /about の展示室（壁・床・展示室の札・額）と、01 Personal Archive。
- * 文字・額・壁の色は 02 Career と 03 Interests もここから使い、部屋ごとに別の体系を作らない。
+ * /about の展示室（壁・床・展示室の札・額）と、ABOUT / Masaki Fujie。
+ * 文字・額・壁・床は Career と Interests もここから使い、部屋ごとに別の体系を作らない。
  */
 
 .museum {
@@ -10,10 +10,23 @@
   --wall-ink-muted: rgb(58 51 44);
   --wall-line: rgb(72 64 56 / 0.5);
   --gutter: clamp(24px, 7vw, 128px);
-  --floor-h: clamp(72px, 11svh, 132px);
+  --floor-h: clamp(96px, 14svh, 160px);
+
+  /*
+   * 床。別の画像は使わず、壁と同じ素材の別の場所（下寄り）を1枚だけ敷き、ほんの少しだけ暗く・暖かくする。
+   * 横には繰り返さない（素材の左右の端は継ぎ目になるため。幅は壁と同じ max(100%, 1280px)）。
+   * 壁との境は線を引かず、壁の付け根に落ちるごく淡い陰と、上端を数 px で溶かす mask で分ける。
+   * 使う側（::after など）で、background と mask にこの値をそのまま入れる（Interests の床も同じ）。
+   */
+  --floor-background:
+    linear-gradient(to bottom, rgb(56 42 28 / 0.07), rgb(56 42 28 / 0) 24px),
+    linear-gradient(to bottom, rgb(150 116 80 / 0.08), rgb(150 116 80 / 0.04)),
+    url("/images/about/about-wall.webp") center 70% / max(100%, 1280px) auto no-repeat #f4ebdf;
+  --floor-blend: normal, normal, multiply;
+  --floor-mask: linear-gradient(to bottom, transparent, #000 14px);
 
   position: relative;
-  /* 03 の床（z-index: -1）を、壁の背景の上・展示の下に描く */
+  /* Interests の床（z-index: -1）を、壁の背景の上・展示の下に描く */
   isolation: isolate;
   min-height: 100svh;
   color: var(--wall-ink);
@@ -33,9 +46,9 @@
   background-blend-mode: multiply;
 }
 
-/* ---- 展示室の札（ABOUT / Personal Archive・Career・Interests の見出し） ---- */
+/* ---- 展示室の札（ABOUT / Masaki Fujie・Career・Interests の見出し。3つとも同じ大きさ） ---- */
 
-/* 02・03 の札。01 と同じく、壁の左の余白にそろえて縦に積む */
+/* Career・Interests の札。Masaki Fujie と同じく、壁の左の余白にそろえて縦に積む */
 .sectionHeader {
   padding-inline: var(--gutter);
 }
@@ -47,8 +60,9 @@
   font-weight: 500;
 }
 
+/* 展示室のカテゴリ。題より目立たせず、壁に埋もれない大きさにする */
 .eyebrow {
-  font-size: 12px;
+  font-size: 15px;
   line-height: 1;
   letter-spacing: 0.34em;
   text-transform: uppercase;
@@ -60,19 +74,6 @@
   line-height: 1.12;
   letter-spacing: 0.04em;
   text-wrap: balance;
-}
-
-/* 札の題の下に添える、小さな英語の副題（Path / Things I'm drawn to.） */
-.subtitle {
-  margin: 1.1em 0 0;
-  font-size: clamp(14px, 1.05vw, 15.5px);
-  font-style: italic;
-  letter-spacing: 0.08em;
-  color: var(--wall-ink-muted);
-}
-
-.subtitle + .lead {
-  margin-top: 1.2em;
 }
 
 .lead {
@@ -117,7 +118,7 @@
 /* ---- 現れ方 ---- */
 
 /*
- * 02 / 03 の展示は、画面に入るときに静かに現れる（スクロール位置に応じて進む CSS アニメーション）。
+ * Career / Interests の展示は、画面に入るときに静かに現れる（スクロール位置に応じて進む CSS アニメーション）。
  * 画面の下へ戻すとまた薄くなるが、移動量は 10px なので往復しても目立たない。
  * 対応していないブラウザと prefers-reduced-motion では、何もせず最初から見える。
  */
@@ -148,7 +149,7 @@
   }
 }
 
-/* 01 は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ） */
+/* Masaki Fujie は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ） */
 @keyframes arrive {
   from {
     opacity: 0;
@@ -156,36 +157,36 @@
   }
 }
 
-/* ==== 01 Personal Archive ==== */
+/* ==== ABOUT / Masaki Fujie ==== */
 
 /*
- * 構図：文章は左、額（主展示）は画面の中央からやや右、植物は右端の床に置いて一部を見切る。
+ * 構図：文章は左、額（主展示）は画面の中央からやや右、植物は右端の床に鉢ごと置く。
  * 左右を均等に割らず、額の右に植物のための余白を残した非対称の壁にする。
  */
 .archive {
   --portrait-w: clamp(240px, 26vw, 400px);
-  --plant-w: clamp(240px, 27vw, 440px);
+  --plant-w: clamp(200px, 24vw, 400px);
 
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--portrait-w) minmax(0, 0.72fr);
   column-gap: clamp(32px, 5vw, 96px);
   align-items: center;
-  /* 植物を右端と下端で見切る */
   overflow: clip;
   min-height: max(100svh, 680px);
   padding: clamp(112px, 16svh, 168px) var(--gutter)
     calc(var(--floor-h) + clamp(48px, 8svh, 96px));
 }
 
-/* 床。壁の素材のまま少しだけ沈ませ、巾木の線で壁と分ける */
+/* 床。壁の前に立って展示を見ている、ごく浅い奥行きだけをつくる */
 .archive::after {
   content: "";
   position: absolute;
   inset: auto 0 0;
   height: var(--floor-h);
-  background: rgb(64 52 40 / 0.08);
-  border-top: 1px solid rgb(72 62 52 / 0.22);
+  background: var(--floor-background);
+  background-blend-mode: var(--floor-blend);
+  mask-image: var(--floor-mask);
   pointer-events: none;
 }
 
@@ -226,39 +227,51 @@
 }
 
 /*
- * クワズイモ。展示物ではなく、部屋の端に置かれている植物として扱う。
- * 右端から葉の一部を、床から鉢の下側を見切り、全体を見せない。
- * 屋外の光で撮られた葉の彩度を落とし、壁と同じ暖かい室内の光に寄せる。接地の影はごく薄く、鉢の真下にだけ落とす。
+ * クワズイモ。展示物ではなく、展示室の床に置かれている植物として扱う。
+ * 鉢まで全体を見せ、右端に寄せて床の奥行きの中ほどに置く（壁際より少し手前）。
+ * 屋外の光で撮られた葉の彩度を落とし、壁と同じ暖かい室内の光に寄せる。
  */
 .plant {
   position: absolute;
-  right: calc(var(--plant-w) * -0.16);
-  bottom: calc(var(--plant-w) * -0.1);
+  right: clamp(12px, 3vw, 56px);
+  bottom: calc(var(--floor-h) * 0.3);
   z-index: 1;
   width: var(--plant-w);
   pointer-events: none;
-  filter: saturate(0.62) brightness(0.93) sepia(0.12)
-    drop-shadow(0 10px 12px rgb(40 30 20 / 0.12));
   animation: arrive 1.6s var(--ease-calm) 0.8s both;
 }
 
 .plant img {
+  position: relative;
+  display: block;
   width: 100%;
   height: auto;
+  filter: saturate(0.62) brightness(0.93) sepia(0.12);
 }
 
-/* 幅の狭い画面：文章 → 写真 → 植物の順に縦に並べる。植物は写真の下、右端の床で見切る */
+/* 鉢の真下に落ちる、ごく薄い接地の影（床の上で横に広がる楕円） */
+.plant::before {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: -2.5%;
+  height: 7%;
+  background: radial-gradient(closest-side, rgb(40 30 20 / 0.22), rgb(40 30 20 / 0));
+}
+
+/* 幅の狭い画面：文章 → 写真 → 植物の順に縦に並べる。植物は写真の下、右端の床に置く */
 @media (max-width: 760px) {
   .archive {
     --portrait-w: min(62vw, 300px);
-    --plant-w: min(52vw, 260px);
+    --plant-w: min(44vw, 200px);
 
     grid-template-columns: minmax(0, 1fr);
     row-gap: clamp(48px, 9svh, 72px);
     min-height: auto;
     padding-top: clamp(104px, 16svh, 132px);
-    /* 植物の葉が写真に重ならないよう、写真の下に植物の見えている高さとほぼ同じ余白を取る（植物の高さは幅の約 1.19 倍） */
-    padding-bottom: calc(var(--plant-w) * 1.05);
+    /* 植物の葉が写真に重ならないよう、写真の下に植物の高さ（幅の約 1.19 倍）と床の分の余白を取る */
+    padding-bottom: calc(var(--plant-w) * 1.19 + var(--floor-h) * 0.3 + 24px);
   }
 
   .archiveText {

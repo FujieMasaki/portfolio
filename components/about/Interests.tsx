@@ -5,7 +5,7 @@ import shared from "./AboutMuseum.module.css";
 import styles from "./Interests.module.css";
 
 /**
- * 03 Interests（Things I'm drawn to.）：低い展示台（CSS）に、実物（透過画像。背景のある写真は小さな額）を1つずつ置いた収蔵品の展示。
+ * ABOUT / Interests：低い展示台（CSS）に、実物（透過画像。背景のある写真は小さな額）を1つずつ置いた収蔵品の展示。
  *
  * 展示台の高さと幅は少しずつ変え、下端（床の線）だけをそろえる。
  * 解説は展示台の下の床に小さく置き、hover / キーボードのフォーカスで静かに現れる。
@@ -19,7 +19,6 @@ export default function Interests() {
           <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Interests</span>
         </h2>
-        <p className={shared.subtitle}>Things I&rsquo;m drawn to.</p>
         <p className={shared.lead}>
           日々の暮らしのなかで、ふと惹かれるものたち。
           <br />

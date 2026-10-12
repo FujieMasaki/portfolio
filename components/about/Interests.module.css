@@ -1,5 +1,5 @@
 /*
- * 03 Interests：低い展示台に実物を置いた収蔵品の展示。
+ * ABOUT / Interests：低い展示台に実物を置いた収蔵品の展示。
  * 展示台は石 / コンクリートの塊として、壁と同じ素材を少し濃くして作る（画像にしない）。
  */
 
@@ -24,15 +24,16 @@
   list-style: none;
 }
 
-/* 床。展示台の下端がこの線にそろう */
+/* 床。Masaki Fujie の床と同じ作り（AboutMuseum.module.css の --floor-*）。展示台の下端が床の奥の端にそろう */
 .hall::after {
   content: "";
   position: absolute;
   inset: auto 0 0;
   z-index: -1;
   height: var(--floor-band);
-  background: rgb(64 52 40 / 0.08);
-  border-top: 1px solid rgb(72 62 52 / 0.22);
+  background: var(--floor-background);
+  background-blend-mode: var(--floor-blend);
+  mask-image: var(--floor-mask);
 }
 
 .exhibit {
@@ -129,10 +130,13 @@
   top: calc(100% + 22px);
   left: clamp(16px, 2.2vw, 32px);
   margin: 0;
+  /* 隣の列の解説と重ならないよう、列の幅（＋列の間の半分ほど）で折り返す */
+  width: max-content;
+  max-width: calc(100% - clamp(16px, 2.2vw, 32px) + clamp(10px, 2vw, 36px));
   font-size: 12.5px;
   line-height: 1.9;
   letter-spacing: 0.1em;
-  white-space: nowrap;
+  word-break: auto-phrase;
   opacity: 0;
   translate: 0 6px;
   transition:
@@ -226,8 +230,9 @@
     justify-self: stretch;
     margin: 18px 0 56px;
     padding-left: clamp(16px, 2.2vw, 32px);
+    width: auto;
+    max-width: none;
     font-size: 12px;
-    white-space: normal;
     opacity: 1;
     translate: none;
     word-break: auto-phrase;
