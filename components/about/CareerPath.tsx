@@ -80,6 +80,12 @@ export default function CareerPath() {
     // 一続きのホイール（間が 0.2 秒未満）の中で、一度ページに任せたら最後まで任せる（途中から横の移動に変えない）
     let lastWheelAt = -Infinity;
     let passing = false;
+    // 列の外で回したホイールも記録する。ページを縦に送っている途中で列がカーソルの下に入ってきても、横に切り替えない
+    const onPageWheel = (event: WheelEvent) => {
+      if (event.target instanceof Node && track.contains(event.target)) return;
+      lastWheelAt = event.timeStamp;
+      passing = true;
+    };
     const onWheel = (event: WheelEvent) => {
       const continuing = event.timeStamp - lastWheelAt < 200;
       lastWheelAt = event.timeStamp;
@@ -127,6 +133,7 @@ export default function CareerPath() {
     update();
     track.addEventListener("scroll", update, { passive: true });
     track.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("wheel", onPageWheel, { passive: true, capture: true });
     track.addEventListener("keydown", onKeyDown);
     // 閲覧中に「動きを減らす」を有効にしたら、寄せている途中の動きもその場で止める
     reduce.addEventListener("change", stopGlide);
@@ -139,6 +146,7 @@ export default function CareerPath() {
       stopGlide();
       track.removeEventListener("scroll", update);
       track.removeEventListener("wheel", onWheel);
+      window.removeEventListener("wheel", onPageWheel, { capture: true });
       track.removeEventListener("keydown", onKeyDown);
       reduce.removeEventListener("change", stopGlide);
       observer.disconnect();
