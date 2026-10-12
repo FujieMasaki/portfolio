@@ -1,6 +1,6 @@
 /*
- * 02 Path：写真を横に掛け並べた記録の展示。
- * 壁・文字・額は AboutMuseum.module.css と共通。ここでは並べ方だけを決める。
+ * 02 Career：写真を横に掛け並べた、記憶と時間の展示。
+ * 壁・文字・見出し・額は AboutMuseum.module.css と共通。ここでは並べ方と写真の質感だけを決める。
  */
 
 .path {
@@ -8,35 +8,32 @@
   padding-block: clamp(96px, 14svh, 168px);
 }
 
-.header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  column-gap: clamp(32px, 4vw, 72px);
-  row-gap: 0;
-  padding-inline: var(--gutter);
-}
-
-.title {
-  font-size: clamp(40px, 4.2vw, 62px);
-  line-height: 1;
-}
-
-.lead {
-  margin: 0;
-  /* 見出しの下端と、文の2行目の下端をそろえる */
-  padding-bottom: 0.1em;
-}
-
 /*
- * 横に流れる壁。スクロールバーは隠し、下の細い線で位置を示す。
+ * 横に流れる壁。ブラウザのスクロールバーは隠し、下の細い線をスクロールバーとして使う
+ * （2本の線が並ぶと、カルーセルの部品に見えるため）。
  * 縦のホイールは奪わず、ページの縦スクロールのまま。
  */
 .track {
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
+  /* 止まる位置はゆるく決める。近くに展示があるときだけ、その左端を壁の余白にそろえる */
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--gutter);
   padding: clamp(64px, 10svh, 112px) var(--gutter) 48px;
+}
+
+/* ドラッグ中は snap を止め、指の動きにそのまま付いてこさせる */
+.track[data-dragging] {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+@media (hover: hover) and (min-width: 761px) {
+  .track {
+    cursor: grab;
+  }
 }
 
 .track::-webkit-scrollbar {
@@ -60,8 +57,10 @@
 
 .exhibit {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: clamp(24px, 2.4vw, 44px);
+  scroll-snap-align: start;
 }
 
 /* 1点おきに、掛ける高さをわずかに変える */
@@ -143,6 +142,43 @@
   aspect-ratio: 5 / 4;
 }
 
+/*
+ * 写真の質感：少し色褪せた記憶。
+ * 彩度とコントラストを落とし、黒をわずかに浮かせ、ごく薄い暖色と細かな粒子を重ねる。
+ * 画像ファイルは加工せず、全部の写真に同じ処理をかける。セピアや周辺の暗さは足さない。
+ */
+/* 共通の .photo（AboutMuseum.module.css）より強く指定する */
+.frame .memory {
+  filter: saturate(0.8) contrast(0.9) brightness(1.03) sepia(0.06);
+  transition: filter 0.5s var(--ease-calm);
+}
+
+/* 黒を浮かせる暖色の薄い層と、フィルムのような細かな粒子 */
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: rgb(236 222 200 / 0.07);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.45 0 0 0 0 0.4 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px;
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-calm);
+}
+
+/* 近づくと、少しだけ鮮明になる */
+@media (hover: hover) {
+  .exhibit:hover .memory {
+    filter: saturate(0.92) contrast(0.96) brightness(1.01) sepia(0.03);
+  }
+
+  .exhibit:hover .frame::before {
+    opacity: 0.6;
+  }
+}
+
 /* ← 線 → */
 .controls {
   display: flex;
@@ -175,11 +211,20 @@
   outline-offset: 2px;
 }
 
+/* スクロールバーの代わりの線。つかみやすいように、見た目の線より上下に広く反応させる */
 .rule {
   position: relative;
   flex: 1;
   height: 1px;
   background: rgb(72 64 56 / 0.2);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.rule::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0;
 }
 
 /* いま見えている範囲だけを濃くする（--visible / --progress は CareerPath.tsx が入れる） */
@@ -195,6 +240,7 @@
 @media (max-width: 760px) {
   .track {
     overflow: visible;
+    scroll-snap-type: none;
     padding-bottom: 0;
   }
 
@@ -234,5 +280,12 @@
 
   .controls {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame .memory,
+  .frame::before {
+    transition: none;
   }
 }
