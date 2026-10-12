@@ -138,7 +138,7 @@ export type Interest = {
   objectShift?: number;
 };
 
-/** 好きなもの・ことを、普段の言葉で短く紹介する解説 */
+/** 好きなこと・関心（物そのものではなく、歩く・見る・過ごすといった体験）を、普段の言葉で短く紹介する解説 */
 export const INTERESTS: Interest[] = [
   {
     number: "01",

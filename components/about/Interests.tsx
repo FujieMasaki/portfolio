@@ -22,7 +22,7 @@ export default function Interests() {
           <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Interests</span>
         </h2>
-        <p className={shared.lead}>好きなもの・こと、興味があるものたちです</p>
+        <p className={shared.lead}>好きなことや、関心のあること。</p>
       </header>
 
       <ul
