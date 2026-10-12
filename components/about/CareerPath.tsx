@@ -72,10 +72,31 @@ export default function CareerPath() {
       }
       wheel.frame = requestAnimationFrame(glide);
     };
+    const stopGlide = () => {
+      cancelAnimationFrame(wheel.frame);
+      wheel.target = null;
+      wheel.frame = 0;
+    };
+    // 一続きのホイール（間が 0.2 秒未満）の中で、一度ページに任せたら最後まで任せる（途中から横の移動に変えない）
+    let lastWheelAt = -Infinity;
+    let passing = false;
     const onWheel = (event: WheelEvent) => {
-      // 幅の狭い画面（縦に並べる）・ピンチのズーム・横の操作（トラックパッド・Shift + ホイール）はブラウザに任せる
-      if (!desktop.matches || event.ctrlKey || event.shiftKey) return;
-      if (Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      const continuing = event.timeStamp - lastWheelAt < 200;
+      lastWheelAt = event.timeStamp;
+      if (continuing && passing) return;
+      passing = true;
+      // 幅の狭い画面（縦に並べる）・ピンチのズームはブラウザに任せる
+      if (!desktop.matches || event.ctrlKey) return;
+      // 横の操作（トラックパッド・Shift + ホイール）はブラウザに任せ、ホイールで寄せている途中なら止める
+      if (event.shiftKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) {
+        stopGlide();
+        return;
+      }
+      // 展示の列がほぼ画面に入っているときだけ横に動かす（一部しか見えていないうちは、ページを縦に送る）
+      const rail = track.firstElementChild?.getBoundingClientRect();
+      if (!rail || rail.height === 0) return;
+      const seen = Math.min(rail.bottom, window.innerHeight) - Math.max(rail.top, 0);
+      if (seen / rail.height < 0.6) return;
       const max = track.scrollWidth - track.clientWidth;
       const delta =
         event.deltaMode === WheelEvent.DOM_DELTA_LINE
@@ -89,6 +110,7 @@ export default function CareerPath() {
       if (max <= 0 || (delta > 0 && from >= max - 1) || (delta < 0 && from <= 1)) return;
       // 止められない wheel（ページのスクロールの途中から続くもの）では横に動かさず、縦と横が同時に動かないようにする
       if (!event.cancelable) return;
+      passing = false;
       event.preventDefault();
       const to = Math.min(Math.max(from + delta, 0), max);
       if (reduce.matches) {
@@ -98,9 +120,12 @@ export default function CareerPath() {
       wheel.target = to;
       if (!wheel.frame) wheel.frame = requestAnimationFrame(glide);
     };
+    // キーボード（矢印キーなど）で動かし始めたら、ホイールで寄せている途中の動きを止める
+    const onKeyDown = () => stopGlide();
     update();
     track.addEventListener("scroll", update, { passive: true });
     track.addEventListener("wheel", onWheel, { passive: false });
+    track.addEventListener("keydown", onKeyDown);
     // フォントの読み込みなどで展示の列の幅だけが変わっても、線と ← → を合わせ直す
     const observer = new ResizeObserver(update);
     observer.observe(track);
@@ -112,6 +137,7 @@ export default function CareerPath() {
       wheel.frame = 0;
       track.removeEventListener("scroll", update);
       track.removeEventListener("wheel", onWheel);
+      track.removeEventListener("keydown", onKeyDown);
       observer.disconnect();
     };
   }, []);
