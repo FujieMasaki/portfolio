@@ -135,9 +135,11 @@
   }
 }
 
+/* 動きを止める（hover 時の指定より強くする） */
 @media (prefers-reduced-motion: reduce) {
   .list,
-  .arrow {
+  .arrow,
+  .back:hover .arrow {
     translate: none;
     transition: none;
   }
