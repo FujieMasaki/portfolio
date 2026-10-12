@@ -182,16 +182,18 @@ export default function CareerPath() {
     wheel.frame = 0;
   };
 
-  /** 隣の展示の左端が、壁の左の余白にそろう位置まで動かす */
+  /** 隣の展示を、壁（画面）の中央まで動かす。展示の前に1点ずつ立って見る */
   const step = (direction: 1 | -1) => {
     const track = trackRef.current;
     if (!track) return;
     stopWheelGlide();
-    const start =
-      track.getBoundingClientRect().left +
-      Number.parseFloat(getComputedStyle(track).paddingLeft);
+    const center = track.getBoundingClientRect().left + track.clientWidth / 2;
     const items = Array.from(track.querySelectorAll<HTMLElement>("[data-exhibit]"));
-    const offsets = items.map((item) => item.getBoundingClientRect().left - start);
+    // 各展示の中心が、壁の中央からどれだけ離れているか（右が正）
+    const offsets = items.map((item) => {
+      const rect = item.getBoundingClientRect();
+      return rect.left + rect.width / 2 - center;
+    });
     const target =
       direction === 1
         ? offsets.find((offset) => offset > 4)
