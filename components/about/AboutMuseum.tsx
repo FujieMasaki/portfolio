@@ -17,7 +17,7 @@ import styles from "./AboutMuseum.module.css";
  * Masaki Fujie は読み込み時に一度だけ現れる。Career / Interests の展示は CSS の scroll-driven animation で現れ、
  * 対応していないブラウザと prefers-reduced-motion では最初から全部見える（AboutMuseum.module.css の [data-reveal]）。
  */
-export default function AboutMuseum() {
+const AboutMuseum = () => {
   return (
     <div className={styles.museum}>
       <MuseumNav current="about" />
@@ -71,4 +71,6 @@ export default function AboutMuseum() {
       </main>
     </div>
   );
-}
+};
+
+export default AboutMuseum;

@@ -24,7 +24,7 @@ type Props = {
  * どちらの開き方も同じ state で持つので、aria-expanded が表示と一致し、Escape でいつでも閉じられる。
  * 閉じている間は visibility: hidden にして、見えないリンクに Tab でフォーカスが入らないようにする。
  */
-export default function MuseumNav({ current }: Props) {
+const MuseumNav = ({ current }: Props) => {
   // "hover"：マウスが乗っている間だけ開く / "pinned"：ボタンで開いた（マウスが離れても開いたまま）
   const [mode, setMode] = useState<"closed" | "hover" | "pinned">("closed");
   const open = mode !== "closed";
@@ -116,4 +116,6 @@ export default function MuseumNav({ current }: Props) {
       </div>
     </header>
   );
-}
+};
+
+export default MuseumNav;

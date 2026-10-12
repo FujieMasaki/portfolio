@@ -14,7 +14,7 @@ import styles from "./Interests.module.css";
  *
  * 展示を見終えて床を少し歩いた先に、次の展示室（Work）への案内を置く。ボタンにはせず、壁の札と同じ文字で示す。
  */
-export default function Interests() {
+const Interests = () => {
   return (
     <section className={styles.interests} aria-labelledby="interests-title">
       <header className={shared.sectionHeader} data-reveal>
@@ -50,9 +50,9 @@ export default function Interests() {
       </nav>
     </section>
   );
-}
+};
 
-function Exhibit({ item }: { item: Interest }) {
+const Exhibit = ({ item }: { item: Interest }) => {
   const { image } = item;
   const box = image.box ?? { x: 0, y: 0, width: image.width, height: image.height };
 
@@ -107,10 +107,10 @@ function Exhibit({ item }: { item: Interest }) {
       </p>
     </li>
   );
-}
+};
 
 /** 解説の1行。リンクにする語があれば、キャプションの文字のまま控えめなリンクにする */
-function NoteLine({ line, link }: { line: string; link?: Interest["link"] }) {
+const NoteLine = ({ line, link }: { line: string; link?: Interest["link"] }) => {
   const at = link ? line.indexOf(link.text) : -1;
   if (!link || at < 0) return line;
   return (
@@ -123,4 +123,6 @@ function NoteLine({ line, link }: { line: string; link?: Interest["link"] }) {
       {line.slice(at + link.text.length)}
     </>
   );
-}
+};
+
+export default Interests;

@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     "Masaki Fujie / 藤江正樹 — これまでの時間と、今の自分をつくっているものを展示する部屋。",
 };
 
-export default function AboutPage() {
+const AboutPage = () => {
   return <AboutMuseum />;
-}
+};
+
+export default AboutPage;
