@@ -93,6 +93,12 @@ export default function CareerPath() {
     const drag = dragRef.current;
     if (!drag || drag.id !== event.pointerId) return;
     const track = event.currentTarget;
+    // 壁の外でボタンを離すと pointerup が届かないので、ボタンが離れていたらここで終える
+    if ((event.buttons & 1) === 0) {
+      dragRef.current = null;
+      delete track.dataset.dragging;
+      return;
+    }
     const dx = event.clientX - drag.x;
     if (!drag.moved) {
       // クリックや文字の選択と区別するため、少し動いてからドラッグとして扱う
@@ -173,6 +179,7 @@ export default function CareerPath() {
         onPointerMove={onTrackPointerMove}
         onPointerUp={endTrackDrag}
         onPointerCancel={endTrackDrag}
+        onLostPointerCapture={endTrackDrag}
       >
         <ol className={styles.rail}>
           {CAREER.map((exhibit) => (

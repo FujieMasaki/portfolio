@@ -289,3 +289,14 @@
     transition: none;
   }
 }
+
+/* 強制カラーモードでは背景色が消えるので、線をシステムの文字色で描く */
+@media (forced-colors: active) {
+  .rule {
+    background: GrayText;
+  }
+
+  .ruleSeen {
+    background: CanvasText;
+  }
+}
