@@ -114,6 +114,8 @@ export default function CareerPath() {
       event.preventDefault();
       const to = Math.min(Math.max(from + delta, 0), max);
       if (reduce.matches) {
+        // 寄せている途中で設定が変わっていたら、その動きを止めてからすぐに動かす（古い位置へ戻らない）
+        stopGlide();
         track.scrollLeft = to;
         return;
       }
@@ -126,18 +128,19 @@ export default function CareerPath() {
     track.addEventListener("scroll", update, { passive: true });
     track.addEventListener("wheel", onWheel, { passive: false });
     track.addEventListener("keydown", onKeyDown);
+    // 閲覧中に「動きを減らす」を有効にしたら、寄せている途中の動きもその場で止める
+    reduce.addEventListener("change", stopGlide);
     // フォントの読み込みなどで展示の列の幅だけが変わっても、線と ← → を合わせ直す
     const observer = new ResizeObserver(update);
     observer.observe(track);
     if (track.firstElementChild) observer.observe(track.firstElementChild);
     return () => {
       cancelAnimationFrame(frame);
-      cancelAnimationFrame(wheel.frame);
-      wheel.target = null;
-      wheel.frame = 0;
+      stopGlide();
       track.removeEventListener("scroll", update);
       track.removeEventListener("wheel", onWheel);
       track.removeEventListener("keydown", onKeyDown);
+      reduce.removeEventListener("change", stopGlide);
       observer.disconnect();
     };
   }, []);
