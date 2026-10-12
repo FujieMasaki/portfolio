@@ -10,6 +10,8 @@ import styles from "./Interests.module.css";
  * 展示台の高さと幅は少しずつ変え、下端（床の線）だけをそろえる。
  * 解説は展示台の下の床に小さく置き、hover / キーボードのフォーカスで静かに現れる。
  * hover の無い端末では、最初から解説を見せる（Interests.module.css の @media (hover: none)）。
+ *
+ * 展示を見終えて床を少し歩いた先に、次の展示室（Work）への案内を置く。ボタンにはせず、壁の札と同じ文字で示す。
  */
 export default function Interests() {
   return (

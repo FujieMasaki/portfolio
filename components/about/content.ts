@@ -134,6 +134,8 @@ export type Interest = {
   plinth: { height: number; width: number };
   /** 展示物の幅（展示台の幅に対する %） */
   objectWidth: number;
+  /** 展示物を天板の中央から横へずらす量（展示物の幅に対する %、負の値で左） */
+  objectShift?: number;
 };
 
 /** 好きなもの・ことを、普段の言葉で短く紹介する解説 */
@@ -151,7 +153,9 @@ export const INTERESTS: Interest[] = [
       box: { x: 61, y: 115, width: 1359, height: 874 },
     },
     plinth: { height: 0.9, width: 1 },
-    objectWidth: 70,
+    // 商品写真のように天板の中央に大きく据えず、少し小さく、左に寄せて「普段の一足」を置いたように見せる
+    objectWidth: 61,
+    objectShift: -12,
   },
   {
     number: "02",
