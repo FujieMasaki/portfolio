@@ -1,5 +1,5 @@
 /*
- * 03 Things I'm Drawn To.：低い展示台に実物を置いた収蔵品の展示。
+ * 03 Interests：低い展示台に実物を置いた収蔵品の展示。
  * 展示台は石 / コンクリートの塊として、壁と同じ素材を少し濃くして作る（画像にしない）。
  */
 
@@ -8,10 +8,6 @@
   padding-top: clamp(96px, 14svh, 168px);
   /* スマホで床の線を左右へ伸ばすため、はみ出しを横だけ切る */
   overflow-x: clip;
-}
-
-.header {
-  padding-inline: var(--gutter);
 }
 
 .hall {
