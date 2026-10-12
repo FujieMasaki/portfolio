@@ -317,7 +317,7 @@ export default function CareerPath() {
             >
               <div className={styles.label}>
                 <p className={styles.number}>
-                  {exhibit.number}
+                  <span className={styles.index}>{exhibit.number}</span>
                   <span className={styles.period}>{exhibit.period}</span>
                 </p>
                 <h3 className={styles.place}>{exhibit.title}</h3>
@@ -334,23 +334,28 @@ export default function CareerPath() {
               </div>
 
               {exhibit.photo && (
-                <div
-                  className={`${shared.frame} ${styles.frame}`}
-                  // 縦長の写真は 3:4、横長は 5:4 の額に収める（大きさをそろえすぎず、均等な並びにしない）
-                  data-orientation={
-                    exhibit.photo.width < exhibit.photo.height ? "portrait" : "landscape"
-                  }
-                >
-                  <Image
-                    src={exhibit.photo.src}
-                    alt={exhibit.photo.alt}
-                    fill
-                    sizes="(max-width: 760px) 76vw, 400px"
-                    className={`${shared.photo} ${styles.memory}`}
-                    // 壁をつかんで引くときに、画像そのものをドラッグしない
-                    draggable={false}
-                    style={{ objectPosition: exhibit.photo.position }}
-                  />
+                // 写真を掛ける場所。幅の狭い画面では大きさをそろえた枠にし、写真は元の縦横比のまま中央に掛ける
+                <div className={styles.media}>
+                  <div
+                    className={`${shared.frame} ${styles.frame}`}
+                    // 幅の狭い画面では、写真の縦横比（--ratio）のまま額を作る
+                    style={{ "--ratio": exhibit.photo.width / exhibit.photo.height } as CSSProperties}
+                    // 広い画面では、縦長の写真は 3:4、横長は 5:4 の額に収める（大きさをそろえすぎず、均等な並びにしない）
+                    data-orientation={
+                      exhibit.photo.width < exhibit.photo.height ? "portrait" : "landscape"
+                    }
+                  >
+                    <Image
+                      src={exhibit.photo.src}
+                      alt={exhibit.photo.alt}
+                      fill
+                      sizes="(max-width: 760px) 84vw, 400px"
+                      className={`${shared.photo} ${styles.memory}`}
+                      // 壁をつかんで引くときに、画像そのものをドラッグしない
+                      draggable={false}
+                      style={{ objectPosition: exhibit.photo.position }}
+                    />
+                  </div>
                 </div>
               )}
             </li>

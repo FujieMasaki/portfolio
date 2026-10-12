@@ -66,6 +66,11 @@
   gap: clamp(24px, 2.4vw, 44px);
 }
 
+/* 写真を掛ける場所。広い画面では何も足さず、額をそのまま展示の中に置く */
+.media {
+  display: contents;
+}
+
 /* 1点おきに、掛ける高さをわずかに変える */
 .exhibit:nth-child(even) {
   translate: 0 24px;
@@ -262,45 +267,77 @@
   box-shadow: 0 0 8px rgb(230 186 120 / 0.55);
 }
 
-/* 幅の狭い画面：横には流さず、縦に掛け並べる */
+/*
+ * 幅の狭い画面：横には流さず、縦に掛け並べる。
+ * 展示は同じ幅で中央に置き、番号 → 題 → 写真 → 解説 → 年 の同じ順に並べて、展示ごとのリズムをそろえる。
+ * 写真は切りそろえず元の縦横比のまま、大きさをそろえた掛ける場所（.media）の中央に掛ける。文字は左揃えのまま
+ */
 @media (max-width: 760px) {
   .track {
     overflow: visible;
+    padding-inline: 0;
     padding-bottom: 0;
   }
 
   .rail {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
     gap: clamp(72px, 14vw, 96px);
     width: auto;
   }
 
   .exhibit {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 28px;
+    align-items: stretch;
+    gap: 0;
+    width: min(88vw, 520px);
   }
 
   .exhibit:nth-child(even) {
     translate: none;
-    align-items: flex-end;
   }
 
-  .exhibit:nth-child(even) .label {
-    width: min(100%, 16em);
+  /* キャプションの中身を展示の並びに直接置き、写真の前後に振り分ける（読み上げの順は変えない） */
+  .label,
+  .number {
+    display: contents;
   }
 
-  .frame {
+  .index {
+    order: 1;
+  }
+
+  .place {
+    order: 2;
+  }
+
+  .media {
+    --area-h: min(84vw, 440px);
+
+    order: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: var(--area-h);
+    margin-top: 28px;
+  }
+
+  .note {
+    order: 4;
+  }
+
+  .period {
+    order: 5;
+    margin-top: 1.6em;
+  }
+
+  /* 写真の縦横比（--ratio）のまま、掛ける場所に収まる大きさにする（額の木の分は外側に足す） */
+  .frame[data-orientation] {
+    box-sizing: content-box;
+    width: min(calc(100% - 2 * var(--frame)), calc((var(--area-h) - 2 * var(--frame)) * var(--ratio)));
     height: auto;
-  }
-
-  .frame[data-orientation="portrait"] {
-    width: min(58vw, 260px);
-  }
-
-  .frame[data-orientation="landscape"] {
-    width: min(76vw, 360px);
+    aspect-ratio: var(--ratio);
   }
 
   .controls {
