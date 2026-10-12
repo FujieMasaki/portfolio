@@ -7,9 +7,11 @@ import styles from "./AboutMuseum.module.css";
 /**
  * /about の展示室。TOP の左のアーチから入った先に、同じ壁が続く3つの展示がある。
  *
- *   01 Personal Archive  人物展示（壁・文章・額装した写真・植物だけ）
- *   02 Path              記録の展示（写真を横に掛け並べ、時間の順にたどる）
- *   03 Things I'm Drawn To.  収蔵品の展示（低い展示台に実物を置く）
+ *   ABOUT / Personal Archive  人物の展示（壁・文章・額装した写真・部屋の端の植物だけ）
+ *   ABOUT / Career            記憶と時間の展示（少し色褪せた写真を横に掛け並べ、時間の順にたどる）
+ *   ABOUT / Interests         自分を構成する収蔵品の展示（低い展示台に実物を置く）
+ *
+ * 3つの札は同じ形（ABOUT ＋ 題、必要なら小さな英語の副題 ＋ 文）にそろえる。
  *
  * 壁（about-wall.webp）は .museum に1枚だけ敷き、セクションごとに背景を変えない。
  * 01 は読み込み時に一度だけ現れる。02 / 03 の展示は CSS の scroll-driven animation で現れ、対応していないブラウザと
@@ -46,7 +48,7 @@ export default function AboutMuseum() {
                 // 入ってすぐ目に入る展示なので、TOP の舞台の画像と同じく最優先で読む
                 loading="eager"
                 fetchPriority="high"
-                sizes="(max-width: 760px) 62vw, (max-width: 1417px) 24vw, 340px"
+                sizes="(max-width: 760px) 62vw, (max-width: 923px) 240px, (max-width: 1538px) 26vw, 400px"
                 className={styles.photo}
               />
             </div>
@@ -58,7 +60,7 @@ export default function AboutMuseum() {
               alt=""
               width={1150}
               height={1368}
-              sizes="(max-width: 760px) 40vw, (max-width: 1572px) 21vw, 330px"
+              sizes="(max-width: 760px) 52vw, (max-width: 889px) 240px, (max-width: 1630px) 27vw, 440px"
             />
           </div>
         </section>

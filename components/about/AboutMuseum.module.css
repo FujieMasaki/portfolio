@@ -1,6 +1,6 @@
 /*
  * /about の展示室（壁・床・展示室の札・額）と、01 Personal Archive。
- * 文字・額・壁の色は 02 Path と 03 Interests もここから使い、部屋ごとに別の体系を作らない。
+ * 文字・額・壁の色は 02 Career と 03 Interests もここから使い、部屋ごとに別の体系を作らない。
  */
 
 .museum {
@@ -33,7 +33,12 @@
   background-blend-mode: multiply;
 }
 
-/* ---- 展示室の札（ABOUT / Personal Archive などの見出し） ---- */
+/* ---- 展示室の札（ABOUT / Personal Archive・Career・Interests の見出し） ---- */
+
+/* 02・03 の札。01 と同じく、壁の左の余白にそろえて縦に積む */
+.sectionHeader {
+  padding-inline: var(--gutter);
+}
 
 .heading {
   display: grid;
@@ -55,6 +60,19 @@
   line-height: 1.12;
   letter-spacing: 0.04em;
   text-wrap: balance;
+}
+
+/* 札の題の下に添える、小さな英語の副題（Path / Things I'm drawn to.） */
+.subtitle {
+  margin: 1.1em 0 0;
+  font-size: clamp(14px, 1.05vw, 15.5px);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: var(--wall-ink-muted);
+}
+
+.subtitle + .lead {
+  margin-top: 1.2em;
 }
 
 .lead {
@@ -130,15 +148,21 @@
 
 /* ==== 01 Personal Archive ==== */
 
+/*
+ * 構図：文章は左、額（主展示）は画面の中央からやや右、植物は右端の床に置いて一部を見切る。
+ * 左右を均等に割らず、額の右に植物のための余白を残した非対称の壁にする。
+ */
 .archive {
-  --portrait-w: clamp(220px, 24vw, 340px);
-  --plant-w: clamp(180px, 21vw, 330px);
+  --portrait-w: clamp(240px, 26vw, 400px);
+  --plant-w: clamp(240px, 27vw, 440px);
 
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--portrait-w) var(--plant-w);
-  column-gap: clamp(32px, 6vw, 112px);
+  grid-template-columns: minmax(0, 1fr) var(--portrait-w) minmax(0, 0.72fr);
+  column-gap: clamp(32px, 5vw, 96px);
   align-items: center;
+  /* 植物を右端と下端で見切る */
+  overflow: clip;
   min-height: max(100svh, 680px);
   padding: clamp(112px, 16svh, 168px) var(--gutter)
     calc(var(--floor-h) + clamp(48px, 8svh, 96px));
@@ -177,8 +201,9 @@
   border-top: 1px solid var(--wall-line);
 }
 
+/* 額は壁の中ほどの高さに掛け、この部屋の主展示にする */
 .portrait {
-  align-self: start;
+  align-self: center;
   margin: 0;
   animation: arrive 1.6s var(--ease-calm) 0.5s both;
 }
@@ -190,16 +215,20 @@
   aspect-ratio: 910 / 1075;
 }
 
-/* クワズイモ。床に置いた鉢から、壁の右手に葉を広げる。展示の主役にしない */
+/*
+ * クワズイモ。展示物ではなく、部屋の端に置かれている植物として扱う。
+ * 右端から葉の一部を、床から鉢の下側を見切り、全体を見せない。
+ * 屋外の光で撮られた葉の彩度を落とし、壁と同じ暖かい室内の光に寄せる。接地の影はごく薄く、鉢の真下にだけ落とす。
+ */
 .plant {
   position: absolute;
-  right: clamp(8px, 4vw, 88px);
-  bottom: calc(var(--floor-h) * 0.4);
+  right: calc(var(--plant-w) * -0.16);
+  bottom: calc(var(--plant-w) * -0.1);
   z-index: 1;
   width: var(--plant-w);
   pointer-events: none;
-  /* 屋外の光で撮られた葉を、室内の柔らかい光に寄せる */
-  filter: saturate(0.82) brightness(0.96);
+  filter: saturate(0.62) brightness(0.93) sepia(0.12)
+    drop-shadow(0 10px 12px rgb(40 30 20 / 0.12));
   animation: arrive 1.6s var(--ease-calm) 0.8s both;
 }
 
@@ -208,18 +237,18 @@
   height: auto;
 }
 
-/* 幅の狭い画面：文章 → 写真の順に縦に並べ、植物は写真の右下の床に置く */
+/* 幅の狭い画面：文章 → 写真 → 植物の順に縦に並べる。植物は写真の下、右端の床で見切る */
 @media (max-width: 760px) {
   .archive {
     --portrait-w: min(62vw, 300px);
-    --plant-w: min(40vw, 200px);
+    --plant-w: min(52vw, 260px);
 
     grid-template-columns: minmax(0, 1fr);
     row-gap: clamp(48px, 9svh, 72px);
     min-height: auto;
     padding-top: clamp(104px, 16svh, 132px);
-    /* 植物の葉が写真に重ならないよう、写真の下に植物の高さとほぼ同じ余白を取る（植物の高さは幅の約 1.19 倍） */
-    padding-bottom: calc(var(--floor-h) + var(--plant-w) * 0.95);
+    /* 植物の葉が写真に重ならないよう、写真の下に植物の見えている高さとほぼ同じ余白を取る（植物の高さは幅の約 1.19 倍） */
+    padding-bottom: calc(var(--plant-w) * 1.05);
   }
 
   .archiveText {
@@ -227,11 +256,8 @@
   }
 
   .portrait {
+    justify-self: center;
     width: var(--portrait-w);
-  }
-
-  .plant {
-    right: 4vw;
   }
 }
 
