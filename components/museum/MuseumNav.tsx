@@ -20,12 +20,15 @@ type Props = {
 /**
  * 館内（/about など）の最小限の案内。左上に入口へ戻る道、右上に Menu だけを置く。
  *
- * Menu は、hover できる端末では hover で一時的に開き（CSS の @media (hover: hover)）、
- * クリック・タップ・キーボードではボタンで開閉する（aria-expanded）。
+ * Menu は、マウスでは hover で一時的に開き（"hover"）、クリック・タップ・キーボードではボタンで開閉する（"pinned"）。
+ * どちらの開き方も同じ state で持つので、aria-expanded が表示と一致し、Escape でいつでも閉じられる。
  * 閉じている間は visibility: hidden にして、見えないリンクに Tab でフォーカスが入らないようにする。
  */
 export default function MuseumNav({ current }: Props) {
-  const [open, setOpen] = useState(false);
+  // "hover"：マウスが乗っている間だけ開く / "pinned"：ボタンで開いた（マウスが離れても開いたまま）
+  const [mode, setMode] = useState<"closed" | "hover" | "pinned">("closed");
+  const open = mode !== "closed";
+  const close = () => setMode("closed");
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const listId = useId();
@@ -33,11 +36,12 @@ export default function MuseumNav({ current }: Props) {
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(event.target as Node)) close();
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      setOpen(false);
+      // マウスが乗ったままでも閉じる。もう一度開くのは、いったん離れて乗り直すかボタンを押したとき
+      close();
       buttonRef.current?.focus();
     };
     document.addEventListener("pointerdown", onPointerDown);
@@ -61,9 +65,15 @@ export default function MuseumNav({ current }: Props) {
         ref={rootRef}
         className={styles.menu}
         data-open={open || undefined}
+        onPointerEnter={(event) => {
+          if (event.pointerType === "mouse") setMode((value) => (value === "closed" ? "hover" : value));
+        }}
+        onPointerLeave={(event) => {
+          if (event.pointerType === "mouse") setMode((value) => (value === "hover" ? "closed" : value));
+        }}
         // フォーカスが Menu の外へ出たら閉じる（Tab で通り過ぎたとき）
         onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+          if (!event.currentTarget.contains(event.relatedTarget)) close();
         }}
       >
         <button
@@ -72,7 +82,8 @@ export default function MuseumNav({ current }: Props) {
           className={styles.toggle}
           aria-expanded={open}
           aria-controls={listId}
-          onClick={() => setOpen((value) => !value)}
+          // hover で開いているときに押すと、開いたまま留める
+          onClick={() => setMode((value) => (value === "pinned" ? "closed" : "pinned"))}
         >
           Menu
           <span className={styles.lines} aria-hidden="true" />
@@ -88,7 +99,7 @@ export default function MuseumNav({ current }: Props) {
                   aria-current={room.id === current ? "page" : undefined}
                   // 閉じた Menu の中のリンクも画面内と見なされて先読みされるので、開いて選んだときだけ読む
                   prefetch={false}
-                  onClick={() => setOpen(false)}
+                  onClick={close}
                 >
                   {room.label}
                 </Link>

@@ -103,14 +103,8 @@
   transition-delay: 0s;
 }
 
+/* hover で開くかどうかは MuseumNav.tsx の state が決める（Escape で閉じられるよう、CSS の :hover では開かない） */
 @media (hover: hover) {
-  .menu:hover .list {
-    opacity: 1;
-    translate: 0 0;
-    visibility: visible;
-    transition-delay: 0s;
-  }
-
   .back:hover .arrow {
     translate: -3px 0;
   }
