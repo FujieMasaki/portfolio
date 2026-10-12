@@ -12,7 +12,8 @@
 
 .hall {
   --plinth-base: clamp(110px, 10vw, 150px);
-  --floor-band: clamp(128px, 17svh, 176px);
+  /* 解説（最大4行ほど）が床の帯に収まる高さ */
+  --floor-band: clamp(168px, 20svh, 200px);
 
   position: relative;
   display: grid;
@@ -127,9 +128,11 @@
 /* 展示解説。展示台の手前の床に、近づいたときだけ現れる */
 .note {
   position: absolute;
-  top: calc(100% + 22px);
+  /* 展示台との間（22px）も解説に含め、リンクへマウスを下ろす途中で hover が切れないようにする */
+  top: 100%;
   left: clamp(16px, 2.2vw, 32px);
   margin: 0;
+  padding-top: 22px;
   /* 隣の列の解説と重ならないよう、列の幅（＋列の間の半分ほど）で折り返す */
   width: max-content;
   max-width: calc(100% - clamp(16px, 2.2vw, 32px) + clamp(10px, 2vw, 36px));
@@ -139,14 +142,49 @@
   word-break: auto-phrase;
   opacity: 0;
   translate: 0 6px;
+  /* 見えていない間は、床の何もない場所に hover しただけで現れないようにする */
+  pointer-events: none;
   transition:
     opacity 0.32s var(--ease-calm),
     translate 0.32s var(--ease-calm);
 }
 
-.exhibit:focus-visible .note {
+/* 解説の中のリンクへ Tab で進んでも、解説は出たままにする */
+.exhibit:focus-visible .note,
+.exhibit:has(.noteLink:focus-visible) .note {
   opacity: 1;
   translate: 0 0;
+  pointer-events: auto;
+}
+
+/* 解説の中のリンク。キャプションの文字のまま、細い下線だけで示す */
+.noteLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--wall-line);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.3s var(--ease-calm);
+}
+
+@media (hover: hover) {
+  .noteLink:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.noteLink:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 3px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .exhibit:focus-visible .object img,
@@ -160,9 +198,22 @@
 }
 
 @media (hover: hover) {
+  /* 解説は1つずつしか出ないので、隣の列にかかっても行のまま見せる（列が細い画面で細かく折り返さない） */
+  .note {
+    max-width: none;
+    white-space: nowrap;
+  }
+
+  /* 右端の展示は、解説を展示台の右端にそろえて内側へ出し、画面の外で切れないようにする */
+  .exhibit:last-child .note {
+    left: auto;
+    right: 0;
+  }
+
   .exhibit:hover .note {
     opacity: 1;
     translate: 0 0;
+    pointer-events: auto;
   }
 
   .exhibit:hover .object img,
@@ -180,6 +231,14 @@
   .note {
     opacity: 1;
     translate: none;
+    pointer-events: auto;
+  }
+}
+
+/* hover の無い幅の広い端末（タブレット）：全部の解説が同時に出て、列の幅で折り返すので、床の帯を高くする */
+@media (hover: none) and (min-width: 761px) {
+  .hall {
+    --floor-band: clamp(200px, 24svh, 240px);
   }
 }
 
@@ -229,12 +288,14 @@
     position: static;
     justify-self: stretch;
     margin: 18px 0 56px;
-    padding-left: clamp(16px, 2.2vw, 32px);
+    padding: 0 0 0 clamp(16px, 2.2vw, 32px);
     width: auto;
     max-width: none;
     font-size: 12px;
+    white-space: normal;
     opacity: 1;
     translate: none;
+    pointer-events: auto;
     word-break: auto-phrase;
   }
 }

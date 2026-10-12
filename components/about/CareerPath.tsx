@@ -222,9 +222,9 @@ export default function CareerPath() {
           <span className={shared.roomTitle}>Career</span>
         </h2>
         <p className={shared.lead}>
-          これまでの時間の中で、
+          人や場所に関わる仕事と、
           <br />
-          出会った場所、人、仕事。
+          プロダクト開発を経験してきました。
         </p>
       </header>
 
@@ -257,15 +257,16 @@ export default function CareerPath() {
                   <span className={styles.period}>{exhibit.period}</span>
                 </p>
                 <h3 className={styles.place}>{exhibit.title}</h3>
-                <p className={styles.theme}>{exhibit.theme}</p>
-                <p className={styles.note}>
-                  {exhibit.lines.map((line, index) => (
-                    <span key={line}>
-                      {index > 0 && <br />}
-                      {line}
-                    </span>
-                  ))}
-                </p>
+                {exhibit.paragraphs.map((lines) => (
+                  <p key={lines[0]} className={styles.note}>
+                    {lines.map((line, index) => (
+                      <span key={line}>
+                        {index > 0 && <br />}
+                        {line}
+                      </span>
+                    ))}
+                  </p>
+                ))}
               </div>
 
               {exhibit.photo && (

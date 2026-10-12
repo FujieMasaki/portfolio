@@ -19,11 +19,7 @@ export default function Interests() {
           <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Interests</span>
         </h2>
-        <p className={shared.lead}>
-          日々の暮らしのなかで、ふと惹かれるものたち。
-          <br />
-          どれも、わたしというかたちをつくる大切な要素です。
-        </p>
+        <p className={shared.lead}>好きなもの・こと、興味があるものたちです</p>
       </header>
 
       <ul
@@ -54,6 +50,8 @@ function Exhibit({ item }: { item: Interest }) {
       // 解説を見るために、キーボードでも展示物に「近づける」ようにする
       tabIndex={0}
       aria-labelledby={`interest-title-${item.number}`}
+      // フォーカスで現れる解説も、読み上げで一緒に伝える
+      aria-describedby={`interest-note-${item.number}`}
     >
       {image.framed ? (
         // 背景のある写真は透過できないので、小さな額に入れて展示台に立てる
@@ -109,10 +107,26 @@ function Exhibit({ item }: { item: Interest }) {
         {item.note.map((line, index) => (
           <span key={line}>
             {index > 0 && <br />}
-            {line}
+            <NoteLine line={line} link={item.link} />
           </span>
         ))}
       </p>
     </li>
+  );
+}
+
+/** 解説の1行。リンクにする語があれば、キャプションの文字のまま控えめなリンクにする */
+function NoteLine({ line, link }: { line: string; link?: Interest["link"] }) {
+  const at = link ? line.indexOf(link.text) : -1;
+  if (!link || at < 0) return line;
+  return (
+    <>
+      {line.slice(0, at)}
+      <a className={styles.noteLink} href={link.href} target="_blank" rel="noopener noreferrer">
+        {link.text}
+        <span className={styles.visuallyHidden}>（新しいタブで開く）</span>
+      </a>
+      {line.slice(at + link.text.length)}
+    </>
   );
 }

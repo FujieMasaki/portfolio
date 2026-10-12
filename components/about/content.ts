@@ -4,14 +4,15 @@
 
 export type CareerExhibit = {
   number: string;
-  /** 年（NEXT は年の代わりに "Next"） */
+  /** 年（最後の展示は年の代わりに "Next"） */
   period: string;
   /** 展示の題（英語） */
   title: string;
-  /** 1行のテーマ */
-  theme: string;
-  /** 壁の解説。改行位置も展示の一部なので行ごとに分ける */
-  lines: string[];
+  /**
+   * 壁の解説。段落ごとに、その時期に何をしていたか → そこで何を得たか、の順に書く。
+   * 改行位置も展示の一部なので、段落の中は行ごとに分ける
+   */
+  paragraphs: string[][];
   photo?: {
     src: string;
     alt: string;
@@ -22,14 +23,16 @@ export type CareerExhibit = {
   };
 };
 
-/** 文面は公開中のプロフィール（masakifujie.com の Career）を、美術館のキャプションの長さに要約したもの */
+/** 文面は公開中のプロフィール（masakifujie.com の Career）をもとに、その時期に何をして何を得たかを短く書いたもの */
 export const CAREER: CareerExhibit[] = [
   {
     number: "01",
     period: "2015 - 2016",
     title: "Explore / Canada",
-    theme: "新しい環境で、自分から動く",
-    lines: ["ワーキングホリデーでトロントへ。", "知り合いのいない街で、", "住む場所も仕事も自分で探した。"],
+    paragraphs: [
+      ["ワーキングホリデーで", "カナダ・トロントへ。", "知り合いのいない環境で、", "住む場所や仕事を自分で探しました。"],
+      ["この経験から、新しい環境でも", "まず自分から動くようになりました。"],
+    ],
     photo: {
       src: "/images/about/about-career-canada-red-maple.jpg",
       alt: "カナダの公園で、赤く色づいたカエデの木",
@@ -41,12 +44,14 @@ export const CAREER: CareerExhibit[] = [
     number: "02",
     period: "2018 - 2020",
     title: "Hospitality",
-    theme: "人が過ごす時間を考える",
-    lines: [
-      "沖縄のホテル・カフェで、",
-      "接客と運営に関わった。",
-      "訪れる人の時間を考えるうちに、",
-      "関心は空間・サービス・IT へ広がった。",
+    paragraphs: [
+      ["沖縄のホテル・カフェで、", "接客や運営に携わりました。"],
+      [
+        "お客様がより良い時間を過ごすために",
+        "何ができるかを考える中で、",
+        "接客の良さと、ITで改善できることの",
+        "両方に興味を持つようになりました。",
+      ],
     ],
     photo: {
       src: "/images/about/about-career-hotel-exterior-arc.jpg",
@@ -59,11 +64,14 @@ export const CAREER: CareerExhibit[] = [
     number: "03",
     period: "2020 - 2022",
     title: "Community & Place",
-    theme: "人と人がつながる環境をつくる",
-    lines: [
-      "コワーキング、シェアハウス、",
-      "スクールの運営と、人をつなぐ企画。",
-      "エンジニアという仕事に出会った。",
+    paragraphs: [
+      ["コワーキングスペースやシェアハウス、", "プログラミングスクールの", "運営に関わりました。"],
+      [
+        "イベントを企画したり、",
+        "人同士をつないだりする中で",
+        "現役エンジニアと出会い、",
+        "Webエンジニアに興味を持ちました。",
+      ],
     ],
     photo: {
       src: "/images/about/about-career-community-study-event.jpg",
@@ -76,11 +84,15 @@ export const CAREER: CareerExhibit[] = [
     number: "04",
     period: "2022 - Present",
     title: "Software & Product",
-    theme: "テクノロジーで体験をつくる",
-    lines: [
-      "飲食・小売、旅行、AI SaaS の開発。",
-      "UI・仕様・分析・業務改善にも関わり、",
-      "何をつくり、どんな体験にするかへ。",
+    paragraphs: [
+      ["Webエンジニアとして、", "飲食・小売、旅行、AI SaaS などの", "プロダクト開発を経験。"],
+      [
+        "UI改善や仕様検討、分析、",
+        "業務改善にも関わり、実装だけでなく",
+        "「何をつくるか」",
+        "「どんな体験にするか」を",
+        "考えることが増えました。",
+      ],
     ],
     photo: {
       src: "/images/about/about-workspace.webp",
@@ -93,11 +105,15 @@ export const CAREER: CareerExhibit[] = [
     number: "05",
     period: "Next",
     title: "Experience",
-    theme: "リアルとデジタルをつなぐ",
-    lines: [
-      "ホテル、コミュニティ、Web 開発を経て、",
-      "場所とデジタルをつなぐ体験づくりへ。",
-      "いまは Focus on Dot を個人で企画・開発中。",
+    paragraphs: [
+      [
+        "ホテルやコミュニティ運営、",
+        "Web開発を経験する中で、",
+        "リアルな場所とデジタルの両方に",
+        "関心を持つようになりました。",
+      ],
+      ["これからは、その両方を使った", "体験づくりに関わっていきたいと", "考えています。"],
+      ["現在は個人で、", "音声ジャーナリングサービス", "「Focus on Dot」を企画・開発しています。"],
     ],
   },
 ];
@@ -108,8 +124,10 @@ type Box = { x: number; y: number; width: number; height: number };
 export type Interest = {
   number: string;
   title: string;
-  /** 展示物に近づいたときに現れる解説 */
+  /** 展示物に近づいたときに現れる解説。改行位置も展示の一部なので行ごとに分ける */
   note: string[];
+  /** 解説の中で、外部のページへつなぐ語（キャプションの文字のまま、控えめなリンクにする） */
+  link?: { text: string; href: string };
   image: {
     src: string;
     alt: string;
@@ -126,12 +144,13 @@ export type Interest = {
   objectWidth: number;
 };
 
-/** 解説は公開中のプロフィール（masakifujie.com の Likes）を要約したもの。Style は別途調整するので変えない */
+/** 好きなもの・ことを、普段の言葉で短く紹介する解説 */
 export const INTERESTS: Interest[] = [
   {
     number: "01",
-    title: "Style",
-    note: ["毎日の服に馴染む、", "ちょうどいい一足。"],
+    // ファッションではなく、歩くこと・移動すること・考えを整理する時間の展示
+    title: "Walk",
+    note: ["考えたいときは、", "まず歩くことが多いです。"],
     image: {
       src: "/images/about/about-interested-shoose.png",
       alt: "海沿いの道を歩く、黒いスニーカー（Columbia）の足元",
@@ -145,7 +164,8 @@ export const INTERESTS: Interest[] = [
   {
     number: "02",
     title: "Basketball",
-    note: ["琉球ゴールデンキングスを応援しています。", "選手の動きや戦術を見るのも好き。"],
+    note: ["琉球ゴールデンキングスを", "応援しています。", "試合だけでなく、選手の動きや", "戦術を見るのも好きです。"],
+    link: { text: "琉球ゴールデンキングス", href: "https://goldenkings.jp/" },
     image: {
       src: "/images/about/basket-ball.png",
       alt: "使い込まれたバスケットボール",
@@ -159,7 +179,7 @@ export const INTERESTS: Interest[] = [
   {
     number: "03",
     title: "Space",
-    note: ["居心地のいい場所や、", "空間・サービスの工夫を見るのが好き。"],
+    note: ["居心地のいい場所や、", "空間の工夫を見るのが好きです。"],
     image: {
       src: "/images/about/interented-space.png",
       alt: "3つのアーチを持つこの美術館の建物を、小さくした建築模型",
@@ -173,7 +193,7 @@ export const INTERESTS: Interest[] = [
   {
     number: "04",
     title: "Alone Time",
-    note: ["サウナやお風呂で、", "何も考えずに過ごす時間が好き。"],
+    note: ["一人で考えを整理する時間や、", "サウナやお風呂で", "ぼーっと過ごす時間が好きです。"],
     image: {
       src: "/images/about/interested-book.png",
       // 読書ではなく、一人で静かに過ごす時間の象徴として置く

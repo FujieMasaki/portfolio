@@ -66,7 +66,7 @@
   translate: 0 24px;
 }
 
-/* 美術館のキャプション：番号と年 → 題 → 1行のテーマ → 短い解説 */
+/* 美術館のキャプション：番号と年 → 題 → 何をしていたか → そこで何を得たか */
 .label {
   flex: none;
   width: 20em;
@@ -109,21 +109,17 @@
   border-top: 1px solid var(--wall-line);
 }
 
-.theme {
-  margin: 1.1em 0 0;
-  font-size: 15px;
-  line-height: 1.7;
-  letter-spacing: 0.1em;
+.note {
+  margin: 1.3em 0 0;
+  font-size: 12.5px;
+  line-height: 1.95;
+  letter-spacing: 0.08em;
   word-break: auto-phrase;
 }
 
-.note {
-  margin: 0.9em 0 0;
-  font-size: 12.5px;
-  line-height: 2;
-  letter-spacing: 0.1em;
-  color: var(--wall-ink-muted);
-  word-break: auto-phrase;
+/* 段落の間は、題との間より少しだけ詰める */
+.note + .note {
+  margin-top: 0.9em;
 }
 
 .frame {
