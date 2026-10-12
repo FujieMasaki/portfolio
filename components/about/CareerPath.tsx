@@ -248,6 +248,7 @@ export default function CareerPath() {
           onPointerMove={onRulePointerMove}
           onPointerUp={endRuleDrag}
           onPointerCancel={endRuleDrag}
+          onLostPointerCapture={endRuleDrag}
         >
           <span className={styles.ruleSeen} />
         </span>
