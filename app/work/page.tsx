@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 /*
- * Publishing の記事（Zenn・note の RSS）を1日ごとに読み直すため、ページも1日ごとに作り直す。
+ * Writing の記事（Zenn・note の RSS）を1日ごとに読み直すため、ページも1日ごとに作り直す。
  * 値は components/work/feeds.ts の FEED_REVALIDATE と同じにする（ここは静的に解析されるので、式や定数を書けない）。
  */
 export const revalidate = 86400;

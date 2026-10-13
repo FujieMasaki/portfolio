@@ -1,16 +1,16 @@
 /**
  * /work の展示内容。文面や画像・リンク先を差し替えるときはここだけを直す。
- * Publishing の記事そのものは、Zenn・note の RSS から読む（feeds.ts）。
+ * Writing の記事そのものは、Zenn・note の RSS から読む（feeds.ts）。
  */
 
-export type PublishingSource = {
+export type WritingSource = {
   name: string;
-  /** 一覧の札のリンク先（書き手のページ） */
+  /** View all のリンク先（書き手のページ） */
   site: string;
   feed: string;
 };
 
-export const PUBLISHING: PublishingSource[] = [
+export const WRITING: WritingSource[] = [
   { name: "Zenn", site: "https://zenn.dev/fujee", feed: "https://zenn.dev/fujee/feed" },
   { name: "note", site: "https://note.com/fujee", feed: "https://note.com/fujee/rss" },
 ];

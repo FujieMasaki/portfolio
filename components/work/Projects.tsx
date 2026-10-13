@@ -5,7 +5,7 @@ import room from "./WorkMuseum.module.css";
 import styles from "./Projects.module.css";
 
 /**
- * WORK / Projects：今つくっているもの。壁に解説を書き、低い石の棚に実機（ノートパソコンとスマートフォン）を置く。
+ * WORK の Projects：今つくっているもの。壁に解説を書き、壁から張り出した薄い石の棚に実機（ノートパソコンとスマートフォン）を置く。
  * 公開したページが無い間は View Project を出さず、これからやること（Next）もリンクにしない（content.ts）。
  * 左下から、床に置いた植物の葉が少しだけ入る。
  */
@@ -15,8 +15,7 @@ const Projects = () => {
   return (
     <section className={`${room.section} ${styles.projects}`} aria-labelledby="projects-title">
       <header className={room.label} data-reveal>
-        <h2 className={`${shared.heading} ${room.ruled}`} id="projects-title">
-          <span className={shared.eyebrow}>02</span>
+        <h2 className={shared.heading} id="projects-title">
           <span className={shared.roomTitle}>Projects</span>
         </h2>
         <p className={shared.lead}>
@@ -51,7 +50,7 @@ const Projects = () => {
           )}
         </div>
 
-        {/* 低い石の棚。ノートパソコンの右に、少し重ねてスマートフォンを立てる */}
+        {/* 壁から張り出した薄い石の棚。ノートパソコンの右に、少し重ねてスマートフォンを立てる */}
         <div className={styles.display}>
           <div className={styles.devices}>
             <Device

@@ -5,15 +5,14 @@ import room from "./WorkMuseum.module.css";
 import styles from "./Studies.module.css";
 
 /**
- * WORK / Personal Studies：体験から学んだことと、ふと浮かんだアイデアをまとめる場所。
+ * WORK の Personal Studies：体験から学んだことと、ふと浮かんだアイデアをまとめる場所。
  * 壁に掛けた2枚の説明板として見せる。まとめたページができるまではリンクを出さない（content.ts の link）。
  */
 const Studies = () => {
   return (
     <section className={room.section} aria-labelledby="studies-title">
       <header className={room.label} data-reveal>
-        <h2 className={`${shared.heading} ${room.ruled}`} id="studies-title">
-          <span className={shared.eyebrow}>03</span>
+        <h2 className={shared.heading} id="studies-title">
           <span className={shared.roomTitle}>Personal Studies</span>
         </h2>
         <p className={shared.lead}>

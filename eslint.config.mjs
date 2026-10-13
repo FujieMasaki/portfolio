@@ -29,7 +29,7 @@ const eslintConfig = defineConfig([
           selector:
             "ObjectExpression:has(> Property[key.name='signal']):matches(:has(> Property[key.name='next']), :has(> Property[key.name='cache'][value.value='force-cache']))",
           message:
-            "fetch のキャッシュ（next・cache: \"force-cache\"）と signal を一緒に使わない。再生成の取り直しでは signal が外れる。cache: \"no-store\" で読み、関数ごと unstable_cache で覚える（components/work/Publishing.tsx の getFeed）",
+            "fetch のキャッシュ（next・cache: \"force-cache\"）と signal を一緒に使わない。再生成の取り直しでは signal が外れる。cache: \"no-store\" で読み、関数ごと unstable_cache で覚える（components/work/Writing.tsx の getFeed）",
         },
       ],
     },

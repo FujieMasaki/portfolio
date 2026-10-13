@@ -1,39 +1,37 @@
 import { unstable_cache } from "next/cache";
 import shared from "@/components/about/AboutMuseum.module.css";
-import { PUBLISHING } from "./content";
+import { WRITING } from "./content";
 import { FEED_REVALIDATE, formatMonth, readFeed, type FeedEntry } from "./feeds";
 import room from "./WorkMuseum.module.css";
-import styles from "./Publishing.module.css";
+import styles from "./Writing.module.css";
 
-/** 媒体ごとに並べる記事の数 */
-const ENTRIES_PER_SOURCE = 4;
+/** 媒体ごとに展示する文章の数。一覧ではなく、いくつかの文章を壁に掛けて見せる */
+const ENTRIES_PER_SOURCE = 3;
 
 /**
  * 記事を1日だけ覚えておく。期限が切れたら、次の再生成のときに readFeed をそのまま呼び直す（タイムアウトも効く）。
  * キャッシュの key は、この key と引数（RSS の URL・媒体のページ・件数）から作られる。
  * 読めなかったとき（例外）は覚えないので、次に作り直すときにまた読みに行く。
  */
-const getFeed = unstable_cache(readFeed, ["work-publishing-feed"], { revalidate: FEED_REVALIDATE });
+const getFeed = unstable_cache(readFeed, ["work-writing-feed"], { revalidate: FEED_REVALIDATE });
 
-/** 読めなかった媒体は null（一覧を出さない） */
+/** 読めなかった媒体は null（記事を並べない） */
 const loadFeed = (feed: string, site: string) =>
   getFeed(feed, site, ENTRIES_PER_SOURCE).catch(() => null);
 
 /**
- * WORK / Publishing：Zenn・note に書いてきた記事を、壁に書いた目録のように並べる展示。
- * 記事はサーバーで RSS から読み、1日だけ覚えておく（feeds.ts・getFeed）。読めなかった媒体は、一覧を出さずに札（媒体名 ↗）だけを置く。
+ * WORK の Writing：Zenn・note に書いた文章を、壁のキャプションのように数点ずつ展示する。
+ * 題を主、年月を従にし、題の下に年月を小さく添える。媒体ごとの最後に、すべての記事への View all を置く。
+ * 記事はサーバーで RSS から読み、1日だけ覚えておく（feeds.ts・getFeed）。読めなかった媒体は、媒体名と View all だけを置く。
  */
-const Publishing = async () => {
-  const feeds = await Promise.all(
-    PUBLISHING.map((source) => loadFeed(source.feed, source.site)),
-  );
+const Writing = async () => {
+  const feeds = await Promise.all(WRITING.map((source) => loadFeed(source.feed, source.site)));
 
   return (
-    <section className={room.section} aria-labelledby="publishing-title">
+    <section className={room.section} aria-labelledby="writing-title">
       <header className={room.label} data-reveal>
-        <h2 className={`${shared.heading} ${room.ruled}`} id="publishing-title">
-          <span className={shared.eyebrow}>01</span>
-          <span className={shared.roomTitle}>Publishing</span>
+        <h2 className={shared.heading} id="writing-title">
+          <span className={shared.roomTitle}>Writing</span>
         </h2>
         <p className={shared.lead}>
           学んだことや、考えたことを
@@ -43,22 +41,23 @@ const Publishing = async () => {
       </header>
 
       <div className={styles.shelves} data-reveal>
-        {PUBLISHING.map((source, index) => (
-          // 領域の名前は媒体名だけにする（リンクの「新しいタブで開く」を含めない）
-          <section key={source.name} className={styles.source} aria-labelledby={`publishing-${source.name}`}>
-            <h3 className={styles.sourceName}>
-              <ExternalLink href={source.site} className={styles.sourceLink}>
-                <span id={`publishing-${source.name}`}>{source.name}</span>
-                <svg className={styles.arrow} viewBox="0 0 10 10" aria-hidden="true">
-                  <path d="M1 9 9 1M3 1h6v6" />
-                </svg>
-              </ExternalLink>
+        {WRITING.map((source, index) => (
+          <section key={source.name} className={styles.source} aria-labelledby={`writing-${source.name}`}>
+            <h3 className={styles.sourceName} id={`writing-${source.name}`}>
+              {source.name}
             </h3>
             {feeds[index] ? (
               <EntryList entries={feeds[index]} />
             ) : (
               <p className={styles.empty}>記事は {source.name} で読めます。</p>
             )}
+            <ExternalLink href={source.site} className={styles.viewAll}>
+              View all
+              <svg className={styles.arrow} viewBox="0 0 10 10" aria-hidden="true">
+                <path d="M1 9 9 1M3 1h6v6" />
+              </svg>
+              <span className={styles.visuallyHidden}>（{source.name}・新しいタブで開く）</span>
+            </ExternalLink>
           </section>
         ))}
       </div>
@@ -75,13 +74,14 @@ const EntryList = ({ entries }: { entries: FeedEntry[] }) => (
           <time className={styles.date} dateTime={entry.publishedAt}>
             {formatMonth(entry.publishedAt)}
           </time>
+          <span className={styles.visuallyHidden}>（新しいタブで開く）</span>
         </ExternalLink>
       </li>
     ))}
   </ul>
 );
 
-/** 外部のページを新しいタブで開くリンク。読み上げでは、新しいタブで開くことを伝える */
+/** 外部のページを新しいタブで開くリンク */
 const ExternalLink = ({
   href,
   className,
@@ -93,8 +93,7 @@ const ExternalLink = ({
 }) => (
   <a href={href} className={className} target="_blank" rel="noopener noreferrer">
     {children}
-    <span className={styles.visuallyHidden}>（新しいタブで開く）</span>
   </a>
 );
 
-export default Publishing;
+export default Writing;

@@ -1,6 +1,6 @@
 /*
  * /work の展示室。壁・文字・札・床は /about と共通（AboutMuseum.module.css）で、ここでは
- * 部屋の札（WORK）・右上の植物と葉の影・3つの展示の並べ方・床だけを決める。
+ * 部屋の札（WORK と短い文）・右上の植物と葉の影・3つの展示の並べ方・床だけを決める。
  */
 
 .work {
@@ -22,17 +22,21 @@
   animation: arrive 1.6s var(--ease-calm) 0.2s both;
 }
 
-/* 部屋の名前。展示の題（Publishing など）より一段大きくする */
-.introTitle {
-  font-size: clamp(44px, 4.6vw, 68px);
+/* 展示室の札（WORK）。/about の「ABOUT」と同じ文字（AboutMuseum.module.css の .eyebrow）で、見出しの既定の余白だけを外す */
+.roomName {
+  margin: 0;
+  font-weight: 500;
 }
 
-/* 題の下の短い線。展示の題（01 Publishing など）にも同じ線を引く */
-.ruled::after {
-  content: "";
-  width: 24px;
-  margin-top: 0.4rem;
-  border-top: 1px solid var(--wall-line);
+/*
+ * 部屋の短い文。/about の札の題（Masaki Fujie）と本文（lead）の間の大きさにし、
+ * 展示の題（Writing など）より目立たせず、LP の見出しのようにはしない。
+ */
+.statement {
+  margin: 1.6rem 0 0;
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1.85;
+  letter-spacing: 0.14em;
 }
 
 @keyframes arrive {
