@@ -19,7 +19,6 @@ const Interests = () => {
     <section className={styles.interests} aria-labelledby="interests-title">
       <header className={shared.sectionHeader} data-reveal>
         <h2 className={shared.heading} id="interests-title">
-          <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Interests</span>
         </h2>
         <p className={shared.lead}>好きなことや、関心のあること。</p>

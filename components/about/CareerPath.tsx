@@ -34,7 +34,6 @@ const CareerPath = () => {
     >
       <header className={shared.sectionHeader} data-reveal>
         <h2 className={shared.heading} id="career-title">
-          <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Career</span>
         </h2>
         <p className={shared.lead}>
