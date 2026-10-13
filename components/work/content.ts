@@ -46,7 +46,7 @@ export const PROJECT: Project = {
   kind: "Personal Project",
   status: "In progress",
   title: "Focus on Dot",
-  description: ["音声で思考を整理する、", "ジャーナリングサービスを企画・開発しています。", "現在、体験設計と MVP を検討中です。"],
+  description: ["音声で思考を整理する、", "ジャーナリングサービスを企画・開発しています。", "現在、MVPを開発中です。"],
   next: ["Experience Design", "Prototype (MVP)", "LP"],
   laptop: {
     src: "/images/work/focus-on-dot-laptop.png",
