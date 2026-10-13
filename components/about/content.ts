@@ -181,7 +181,7 @@ export const INTERESTS: Interest[] = [
       alt: "3つのアーチを持つこの美術館の建物を、小さくした建築模型",
       width: 1536,
       height: 1024,
-      box: { x: 39, y: 363, width: 1476, height: 661 },
+      box: { x: 19, y: 242, width: 1499, height: 714 },
     },
     plinth: { height: 1.05, width: 1.45 },
     objectWidth: 82,
