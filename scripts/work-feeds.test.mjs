@@ -30,6 +30,13 @@ test("新しい順に並べ、limit 件までにする", () => {
   );
 });
 
+test("同じ URL の記事は1件だけにする", () => {
+  const pubDate = "Sat, 19 Sep 2026 02:58:05 GMT";
+  const xml = [1, 2].map(() => item({ title: "同じ記事", link: `${SITE}/articles/a`, pubDate })).join("");
+
+  assert.equal(parseFeed(xml, SITE, 4).length, 1);
+});
+
 test("site の外の URL・題や日付の無い記事は使わない", () => {
   const pubDate = "Sat, 19 Sep 2026 02:58:05 GMT";
   const xml = [

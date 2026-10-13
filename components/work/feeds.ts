@@ -53,6 +53,8 @@ export const parseFeed = (xml: string, site: string, limit: number): FeedEntry[]
     const url = readTag(item, "link");
     const published = new Date(readTag(item, "pubDate") ?? "");
     if (!title || !url?.startsWith(`${site}/`) || Number.isNaN(published.getTime())) continue;
+    // 同じ記事が2度載っていても、目録には1行だけ置く（URL を一覧の key にする）
+    if (entries.some((entry) => entry.url === url)) continue;
     entries.push({ title, url, publishedAt: published.toISOString() });
   }
   return entries.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, limit);
