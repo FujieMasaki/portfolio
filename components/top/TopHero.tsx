@@ -44,7 +44,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
         <h1 className={styles.name} id="top-title">
           Masaki Fujie
         </h1>
-        <p className={styles.role}>Product Engineer</p>
+        <p className={styles.role}>Web Engineer</p>
       </header>
 
       <ParallaxStage className={styles.stage}>

@@ -17,7 +17,7 @@ const notoSansJP = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   title: "Masaki Fujie",
-  description: "Masaki Fujie / 藤江正樹 — Product Engineer",
+  description: "Masaki Fujie / 藤江正樹 — Web Engineer",
   icons: {
     icon: [
       {
