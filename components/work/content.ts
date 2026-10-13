@@ -5,7 +5,7 @@
 
 export type WritingSource = {
   name: string;
-  /** View all のリンク先（書き手のページ） */
+  /** 媒体名のリンク先（書き手のページ。すべての記事） */
   site: string;
   feed: string;
 };

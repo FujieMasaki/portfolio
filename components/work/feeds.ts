@@ -3,7 +3,7 @@
  *
  * 取得はビルド時と、1日ごとの再生成のときだけ。訪問者のブラウザからは外部へ通信しない。
  * 1日のキャッシュは Writing.tsx の unstable_cache が持ち、ここの fetch はキャッシュしない（理由は readFeed）。
- * 取得や解析に失敗したら、記事を並べずに媒体名と View all だけを見せる（Writing.tsx）。
+ * 取得や解析に失敗したら、記事を並べずに媒体名のリンクだけを見せる（Writing.tsx）。
  *
  * scripts/work-feeds.test.mjs から Node で直接読むので、ほかのファイルを import せず、型の注釈以外の TypeScript の構文を使わない。
  */

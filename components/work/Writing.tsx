@@ -21,8 +21,8 @@ const loadFeed = (feed: string, site: string) =>
 
 /**
  * WORK の Writing：Zenn・note に書いた文章を、壁のキャプションのように数点ずつ展示する。
- * 題を主、年月を従にし、題の下に年月を小さく添える。媒体ごとの最後に、すべての記事への View all を置く。
- * 記事はサーバーで RSS から読み、1日だけ覚えておく（feeds.ts・getFeed）。読めなかった媒体は、媒体名と View all だけを置く。
+ * 題を主、年月を従にし、題の下に年月を小さく添える。媒体名（Zenn ↗・note ↗）から、すべての記事へ移れる。
+ * 記事はサーバーで RSS から読み、1日だけ覚えておく（feeds.ts・getFeed）。読めなかった媒体は、媒体名のリンクだけを置く。
  */
 const Writing = async () => {
   const feeds = await Promise.all(WRITING.map((source) => loadFeed(source.feed, source.site)));
@@ -45,20 +45,19 @@ const Writing = async () => {
           // 媒体ごとの枠はランドマークにせず、h3 の見出しだけで区切る
           <div key={source.name} className={styles.source}>
             <h3 className={styles.sourceName}>
-              {source.name}
+              <ExternalLink href={source.site} className={styles.sourceLink}>
+                {source.name}
+                <svg className={styles.arrow} viewBox="0 0 10 10" aria-hidden="true">
+                  <path d="M1 9 9 1M3 1h6v6" />
+                </svg>
+                <span className={styles.visuallyHidden}>（新しいタブで開く）</span>
+              </ExternalLink>
             </h3>
             {feeds[index] ? (
               <EntryList entries={feeds[index]} />
             ) : (
               <p className={styles.empty}>記事は {source.name} で読めます。</p>
             )}
-            <ExternalLink href={source.site} className={styles.viewAll}>
-              View all
-              <svg className={styles.arrow} viewBox="0 0 10 10" aria-hidden="true">
-                <path d="M1 9 9 1M3 1h6v6" />
-              </svg>
-              <span className={styles.visuallyHidden}>（{source.name}・新しいタブで開く）</span>
-            </ExternalLink>
           </div>
         ))}
       </div>

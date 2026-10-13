@@ -26,14 +26,23 @@
   padding-right: clamp(24px, 3.4vw, 56px);
 }
 
+/* 媒体名（Zenn ↗・note ↗）。ブランドの表記のまま（大文字にしない）、すべての記事へのリンクにする */
 .sourceName {
-  margin: 0 0 clamp(10px, 1.2vw, 16px);
-  font-size: 12px;
+  margin: 0 0 clamp(6px, 0.8vw, 10px);
+  font-size: 14px;
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   color: var(--wall-ink-muted);
+  text-decoration: none;
+  transition: color 0.4s var(--ease-calm);
 }
 
 .list {
@@ -43,16 +52,17 @@
   list-style: none;
 }
 
-/* 文章1点。題の下に年月を添え、ごく淡い線で次の文章と分ける */
+/* 文章1点。題の下に、少し間を空けて年月を添え、ごく淡い線で次の文章と分ける */
 .entry {
   display: grid;
-  gap: 0.55em;
-  padding: 16px 0;
+  gap: 0.75em;
+  padding: 18px 0;
   border-bottom: 1px solid rgb(72 64 56 / 0.16);
   color: inherit;
   text-decoration: none;
 }
 
+/* 題。展示の主役なので、壁の文字（--wall-ink）より一段濃く、日本語の字間は詰めて文章として読ませる */
 .entryTitle {
   /* 長い題は2行で切る（展示の高さをそろえる） */
   display: -webkit-box;
@@ -60,42 +70,32 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  font-size: clamp(15px, 1.1vw, 16px);
+  font-size: clamp(16px, 1.15vw, 17px);
   font-weight: 500;
-  line-height: 1.65;
-  letter-spacing: 0.06em;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: rgb(28 23 18);
   /* 語の途中（「だっ / た」など）で折り返さない（対応していないブラウザは通常の折り返し） */
   word-break: auto-phrase;
   transition: opacity 0.4s var(--ease-calm);
 }
 
+/* 年月。補助の情報なので、題より薄く小さく */
 .date {
   font-size: 11.5px;
   line-height: 1;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   color: var(--wall-ink-muted);
+  opacity: 0.85;
 }
 
-/* RSS を読めなかった媒体。文章の代わりに、View all へ誘う一文だけを置く */
+/* RSS を読めなかった媒体。文章の代わりに、媒体名のリンクへ誘う一文だけを置く */
 .empty {
   margin: 0;
-  font-size: 13px;
-  line-height: 2;
-  letter-spacing: 0.1em;
+  font-size: 14px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
   color: var(--wall-ink-muted);
-}
-
-/* すべての記事へ。展示の後ろに小さく置く */
-.viewAll {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  margin-top: 18px;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  color: var(--wall-ink-muted);
-  text-decoration: none;
-  transition: color 0.4s var(--ease-calm);
 }
 
 .arrow {
@@ -113,17 +113,17 @@
     opacity: 0.72;
   }
 
-  .viewAll:hover {
+  .sourceLink:hover {
     color: var(--wall-ink);
   }
 
-  .viewAll:hover .arrow {
+  .sourceLink:hover .arrow {
     translate: 2px -2px;
   }
 }
 
 .entry:focus-visible,
-.viewAll:focus-visible {
+.sourceLink:focus-visible {
   outline: 1px solid var(--wall-ink-muted);
   outline-offset: 4px;
 }
@@ -154,7 +154,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .arrow,
-  .viewAll:hover .arrow {
+  .sourceLink:hover .arrow {
     translate: none;
     transition: none;
   }
