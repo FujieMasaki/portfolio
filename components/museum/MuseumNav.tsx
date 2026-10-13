@@ -90,7 +90,7 @@ const MuseumNav = ({ current }: Props) => {
           Menu
         </button>
 
-        <nav aria-label="展示室">
+        <nav aria-label="館内案内">
           <ul className={styles.list} id={listId}>
             {ROOMS.map((room) => (
               <li key={room.id}>
