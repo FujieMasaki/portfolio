@@ -28,7 +28,7 @@
   overflow: clip;
   min-height: max(100svh, 680px);
   /*
-   * 文章の列は縦の中央（背の低い画面では額の下端）に置くので、上の余白を館内案内の分（--nav-clearance）まで広げなくても、
+   * 文章の列は縦の中央に置くので、上の余白を館内案内の分（--nav-clearance）まで広げなくても、
    * Menu を開いたときの項目（左上の約 200px まで）には届かない。広げると、背の低い画面で額と床が1画面に収まらない
    */
   padding: clamp(112px, 16svh, 168px) var(--gutter)
@@ -51,6 +51,38 @@
   /* 写真より少し下に置き、2つの展示の高さをずらす */
   padding-top: clamp(24px, 8svh, 96px);
   animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+/* 肩書き（WEB ENGINEER）。名前のすぐ下に、ABOUT の札と同じくらいの小ささで置く */
+.role {
+  margin: 1.1rem 0 0;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--wall-ink-muted);
+}
+
+/*
+ * 何をしている人かの短い文。日本語の字間は詰めて、文章として読ませる。
+ * /about の展示の札の本文（.lead）より、少しだけ大きく、行間は読みやすさを優先する
+ */
+.introduction {
+  display: grid;
+  gap: 1.1em;
+  margin-top: 2.2em;
+  font-size: clamp(14.5px, 1.1vw, 16px);
+  line-height: 2;
+  letter-spacing: 0.05em;
+}
+
+.introduction p {
+  margin: 0;
+}
+
+/* 幅の広い画面では、決めた位置で改行する */
+.line {
+  display: block;
 }
 
 .place {
@@ -119,12 +151,27 @@
 }
 
 /*
- * 背の低い横長の画面（1280×680 など）：文章の列を額の下端にそろえて下げ、
- * 左上の館内案内を開いたときの項目（Contact）から札（ABOUT）を十分に離す。上の余白は広げない（額と床を1画面に収めるため）
+ * 背の低い横長の画面（1280×680・1366×768 など）：文章の列を、左上の館内案内を開いたときの項目（約 200px まで）の下から始める。
+ * 本文の行間と段落の間を少し詰め、額と床の構図をできるだけ1画面に保つ（680px 前後では床が少しだけ画面の下に出る）
  */
 @media (min-width: 761px) and (max-height: 820px) {
+  .archive {
+    padding-top: 236px;
+  }
+
   .archiveText {
-    align-self: end;
+    align-self: start;
+    padding-top: 0;
+  }
+
+  .introduction {
+    gap: 0.8em;
+    margin-top: 1.7em;
+    line-height: 1.85;
+  }
+
+  .place {
+    margin-top: 2em;
   }
 }
 
@@ -145,6 +192,15 @@
 
   .archiveText {
     padding-top: 0;
+  }
+
+  /* 幅の狭い画面では決めた改行をやめ、語の切れ目で自然に折り返す */
+  .line {
+    display: inline;
+  }
+
+  .introduction p {
+    word-break: auto-phrase;
   }
 
   .portrait {
