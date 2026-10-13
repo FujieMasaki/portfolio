@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
 import { INTERESTS, type Interest } from "./content";
 import shared from "./AboutMuseum.module.css";
 import styles from "./Interests.module.css";
@@ -12,14 +12,13 @@ import styles from "./Interests.module.css";
  * 解説は展示台の下の床に小さく置き、hover / キーボードのフォーカスで静かに現れる。
  * hover の無い端末では、最初から解説を見せる（Interests.module.css の @media (hover: none)）。
  *
- * 展示を見終えて床を少し歩いた先に、次の展示室（Work）への案内を置く。ボタンにはせず、壁の札と同じ文字で示す。
+ * 展示を見終えて床を少し歩いた先に、順路の案内（左：入口へ戻る Top / 右：次の展示室 Work）を置く。
  */
 const Interests = () => {
   return (
     <section className={styles.interests} aria-labelledby="interests-title">
       <header className={shared.sectionHeader} data-reveal>
         <h2 className={shared.heading} id="interests-title">
-          <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Interests</span>
         </h2>
         <p className={shared.lead}>好きなことや、関心のあること。</p>
@@ -39,15 +38,11 @@ const Interests = () => {
         ))}
       </ul>
 
-      <nav className={styles.nextRoom} aria-label="次の展示室" data-reveal>
-        <Link href="/work" className={styles.nextLink}>
-          <span className={styles.nextLabel}>Next room</span>
-          <span className={styles.nextTitle}>Work</span>
-          <svg className={styles.nextArrow} viewBox="0 0 32 10" aria-hidden="true">
-            <path d="M0 5h31M26 1l5 4-5 4" />
-          </svg>
-        </Link>
-      </nav>
+      <MuseumRoomNavigation
+        previous={{ label: "Back to entrance", title: "Top", href: "/" }}
+        next={{ label: "Next room", title: "Work", href: "/work" }}
+        className={styles.roomNavigation}
+      />
     </section>
   );
 };

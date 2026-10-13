@@ -1,0 +1,197 @@
+/*
+ * /work の展示室。壁・文字・札・床は /about と共通（AboutMuseum.module.css）で、ここでは
+ * 部屋の札（WORK と短い文）・右上の植物と葉の影・3つの展示の並べ方・床だけを決める。
+ */
+
+.work {
+  /* 右上の植物と葉の影は、画面の右端で切る（横にスクロールさせない） */
+  overflow-x: clip;
+}
+
+/* ---- 部屋の札 ---- */
+
+.intro {
+  position: relative;
+  /* 上は、左上の館内案内を開いたときの余白（--nav-clearance）。Menu を開いても札に重ならず、本文も動かない */
+  padding: var(--nav-clearance) var(--gutter) clamp(8px, 2svh, 24px);
+}
+
+/* 文字は葉の影より手前に置く */
+.introText {
+  position: relative;
+  z-index: 1;
+  animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+/*
+ * 札の題（Writing / Projects / Explorations）。/about の Masaki Fujie と同じ大きさ（.roomTitle）で、
+ * 幅の狭い画面では区切りの「/」の後ろで折り返す
+ */
+.subjects {
+  text-wrap: balance;
+}
+
+/* 区切りの「/」。題より細く薄くし、3つの展示の名前を主にする */
+.divider {
+  margin-inline: 0.12em;
+  font-weight: 400;
+  color: var(--wall-ink-muted);
+  opacity: 0.6;
+}
+
+/* 部屋の短い文。題の下の補足として、/about の本文（.lead）と同じくらいの大きさに置く */
+.statement {
+  margin: 2rem 0 0;
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 2;
+  letter-spacing: 0.06em;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/*
+ * 窓の外の植物（右上から見切れて入る）と、その葉が壁に落とす影。
+ * 植物の画像は右 36% にだけ葉が写っているので、画像ごと右上の角に合わせて置く。
+ * 右上は植物と光のための空間で、案内（Menu）は左上にある。植物は画面の上端から見切れて入り、
+ * 画像の下端の直線は見せずに、陰の中へ溶かす。
+ */
+.canopy {
+  position: absolute;
+  top: 0;
+  right: 0;
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  width: clamp(360px, 44vw, 720px);
+  aspect-ratio: 1536 / 1024;
+  pointer-events: none;
+}
+
+.canopy img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  /* 枝は右上の角の外から伸びている。揺れはその付け根を中心にする */
+  transform-origin: 100% 0;
+}
+
+/* 屋外の光で撮られた葉を、/about の植物と同じく壁の暖かい光に寄せる */
+.leaves {
+  filter: saturate(0.7) brightness(0.94) sepia(0.1);
+}
+
+/*
+ * 葉の影。光は右上から差し込むので、葉より左下にずらし、少し大きく・ぼかして壁に落とす。
+ * 影の形は画像の透明度から作るので、植物の画像を差し替えても影がついてくる。
+ */
+.leafShadow {
+  translate: -16% 20%;
+  scale: 1.12;
+  filter: brightness(0) blur(6px);
+  opacity: 0.1;
+}
+
+/*
+ * 風。十数秒で 1° に満たないほど揺れる、少し眺めていて気づく程度の動き。
+ * 影は葉より壁から遠い光の側で揺れるので、葉より少しだけ大きく、少し遅れて揺らす。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .leaves {
+    animation: sway 13s ease-in-out infinite alternate;
+  }
+
+  .leafShadow {
+    animation: sway-shadow 13s ease-in-out -1.5s infinite alternate;
+  }
+}
+
+@keyframes sway {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 0.7deg;
+  }
+}
+
+@keyframes sway-shadow {
+  from {
+    rotate: -0.2deg;
+  }
+
+  to {
+    rotate: 1.1deg;
+  }
+}
+
+/* ---- 3つの展示に共通の並べ方（左に札、右に展示） ---- */
+
+.section {
+  position: relative;
+  display: grid;
+  /*
+   * 札の列は3つの展示で同じ幅にし、展示の左端を壁の上で縦にそろえる。
+   * いちばん長い題（Explorations）と札の文が入る幅にする
+   */
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  column-gap: clamp(32px, 5vw, 96px);
+  align-items: start;
+  padding: clamp(56px, 8svh, 96px) var(--gutter);
+}
+
+/* 展示の札（題 / 短い日本語の文）。番号も部屋の名前も付けない */
+.label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- 床と、順路の案内（← About / Contact →） ---- */
+
+/* 最後の展示の手前の床。/about の Interests と同じ床（--floor-*）を、案内の下まで敷く */
+.floor {
+  position: relative;
+  margin-top: clamp(24px, 6svh, 64px);
+}
+
+.floor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to bottom, rgb(56 42 28 / 0) 45%, rgb(56 42 28 / 0.06)),
+    var(--floor-background);
+  background-blend-mode: normal, var(--floor-blend);
+  mask-image: var(--floor-mask);
+}
+
+.roomNavigation {
+  height: clamp(240px, 32svh, 320px);
+  padding-top: clamp(32px, 6svh, 64px);
+}
+
+/* タブレットまでの幅：札の下に展示を置く（横に並べると、展示の列が狭く、実機が小さくなりすぎる） */
+@media (max-width: 1000px) {
+  .section {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(40px, 7svh, 56px);
+  }
+}
+
+/* 幅の狭い画面：植物を小さくし、札の文字にかからないようにする */
+@media (max-width: 760px) {
+  .canopy {
+    width: min(92vw, 420px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .introText {
+    animation: none;
+  }
+}

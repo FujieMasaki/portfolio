@@ -1,0 +1,161 @@
+/*
+ * WORK の Writing：媒体（Zenn・note）ごとに1列、数点の文章を壁のキャプションのように掛ける。
+ * ブログの一覧にはせず、題を主（読める大きさ）、年月を従（題の下に小さく）にして、間をゆったり取る。
+ * 列のあいだには、壁の目地のような縦線を1本だけ引く。
+ */
+
+.shelves {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* 展示の題（Writing）の上端に、媒体名の上端をそろえる */
+  padding-top: 0.6rem;
+}
+
+.source {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.source + .source {
+  padding-left: clamp(24px, 3.4vw, 56px);
+  border-left: 1px solid rgb(72 64 56 / 0.24);
+}
+
+.source:first-child {
+  padding-right: clamp(24px, 3.4vw, 56px);
+}
+
+/* 媒体名（Zenn ↗・note ↗）。ブランドの表記のまま（大文字にしない）、すべての記事へのリンクにする */
+.sourceName {
+  margin: 0 0 clamp(6px, 0.8vw, 10px);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  color: var(--wall-ink-muted);
+  text-decoration: none;
+  transition: color 0.4s var(--ease-calm);
+}
+
+.list {
+  align-self: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 文章1点。題の下に、少し間を空けて年月を添え、ごく淡い線で次の文章と分ける */
+.entry {
+  display: grid;
+  gap: 0.75em;
+  padding: 18px 0;
+  border-bottom: 1px solid rgb(72 64 56 / 0.16);
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 題。展示の主役なので、壁の文字（--wall-ink）より一段濃く、日本語の字間は詰めて文章として読ませる */
+.entryTitle {
+  /* 長い題は2行で切る（展示の高さをそろえる） */
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: clamp(16px, 1.15vw, 17px);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: rgb(28 23 18);
+  /* 語の途中（「だっ / た」など）で折り返さない（対応していないブラウザは通常の折り返し） */
+  word-break: auto-phrase;
+  transition: opacity 0.4s var(--ease-calm);
+}
+
+/* 年月。補助の情報なので、題より薄く小さく */
+.date {
+  font-size: 11.5px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--wall-ink-muted);
+  opacity: 0.85;
+}
+
+/* RSS を読めなかった媒体。文章の代わりに、媒体名のリンクへ誘う一文だけを置く */
+.empty {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  color: var(--wall-ink-muted);
+}
+
+.arrow {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  transition: translate 0.4s var(--ease-calm);
+}
+
+@media (hover: hover) {
+  .entry:hover .entryTitle {
+    opacity: 0.72;
+  }
+
+  .sourceLink:hover {
+    color: var(--wall-ink);
+  }
+
+  .sourceLink:hover .arrow {
+    translate: 2px -2px;
+  }
+}
+
+.entry:focus-visible,
+.sourceLink:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 4px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 幅の狭い画面：媒体を縦に並べ、縦線の代わりに間を空ける */
+@media (max-width: 1100px) {
+  .shelves {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(40px, 6svh, 56px);
+    padding-top: 0;
+  }
+
+  .source:first-child,
+  .source + .source {
+    padding-inline: 0;
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow,
+  .sourceLink:hover .arrow {
+    translate: none;
+    transition: none;
+  }
+}

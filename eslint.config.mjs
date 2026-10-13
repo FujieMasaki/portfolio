@@ -22,6 +22,15 @@ const eslintConfig = defineConfig([
             "FunctionExpression:not(MethodDefinition > FunctionExpression):not(Property[method=true] > FunctionExpression):not(Property[kind=/^(get|set)$/] > FunctionExpression)",
           message: "function 式ではなく、アロー関数で書く",
         },
+        {
+          // Next.js（16.2）は、fetch のキャッシュを期限切れで取り直すときに signal を外す。タイムアウトなどが再生成で効かなくなる。
+          // 検出するのは、同じオブジェクトに next（または cache: "force-cache"）と signal を並べた書き方だけ。
+          // ページの revalidate・fetchCache による暗黙のキャッシュは対象外（docs/code-review/README.md の履歴）
+          selector:
+            "ObjectExpression:has(> Property[key.name='signal']):matches(:has(> Property[key.name='next']), :has(> Property[key.name='cache'][value.value='force-cache']))",
+          message:
+            "fetch のキャッシュ（next・cache: \"force-cache\"）と signal を一緒に使わない。再生成の取り直しでは signal が外れる。cache: \"no-store\" で読み、関数ごと unstable_cache で覚える（components/work/Writing.tsx の getFeed）",
+        },
       ],
     },
   },

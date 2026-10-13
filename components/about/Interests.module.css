@@ -30,7 +30,7 @@
 
 /*
  * 床。Masaki Fujie の床と同じ作り（AboutMuseum.module.css の --floor-*）。展示台の下端が床の奥の端にそろう。
- * 次の展示室の案内（.nextRoom）の下まで続け、手前（下端）に向かってごく僅かに暗くして奥行きを出す。
+ * 順路の案内（.roomNavigation）の下まで続け、手前（下端）に向かってごく僅かに暗くして奥行きを出す。
  */
 .hall::after {
   content: "";
@@ -226,82 +226,11 @@
   }
 }
 
-/* ---- 次の展示室への案内（NEXT ROOM / Work / →）。床の中央に、細い縦線の先に置く ---- */
+/* ---- 順路の案内（文字と線は components/museum/MuseumRoomNavigation）。展示台の手前の床に置く ---- */
 
-.nextRoom {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.roomNavigation {
   height: var(--next-floor);
   padding-top: clamp(32px, 6svh, 64px);
-}
-
-.nextLink {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--wall-ink);
-  text-decoration: none;
-}
-
-/* 縦線。文字より薄く、床に引いた目地のように細く */
-.nextLink::before {
-  content: "";
-  width: 1px;
-  height: 56px;
-  margin-bottom: 18px;
-  background: rgb(72 64 56 / 0.3);
-  transition: background-color 0.4s var(--ease-calm);
-}
-
-.nextLabel {
-  font-size: 10.5px;
-  line-height: 1;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: var(--wall-ink-muted);
-}
-
-.nextTitle {
-  margin-top: 0.45em;
-  font-size: clamp(28px, 2.6vw, 38px);
-  line-height: 1.2;
-  letter-spacing: 0.04em;
-  opacity: 0.86;
-  transition: opacity 0.4s var(--ease-calm);
-}
-
-.nextArrow {
-  width: 28px;
-  height: 9px;
-  margin-top: 14px;
-  fill: none;
-  stroke: var(--wall-ink-muted);
-  stroke-width: 1;
-  transition: translate 0.4s var(--ease-calm);
-}
-
-@media (hover: hover) {
-  .nextLink:hover .nextTitle {
-    opacity: 1;
-  }
-
-  .nextLink:hover .nextArrow {
-    translate: 5px 0;
-  }
-
-  .nextLink:hover::before {
-    background-color: rgb(72 64 56 / 0.45);
-  }
-}
-
-.nextLink:focus-visible {
-  outline: 1px solid var(--wall-ink-muted);
-  outline-offset: 8px;
-}
-
-.nextLink:focus-visible .nextTitle {
-  opacity: 1;
 }
 
 /* 幅の狭い画面：2列に置き、行ごとに床の線を引く。解説は場所を取るので、hover の有無によらず最初から見せる */
@@ -361,10 +290,11 @@
     word-break: auto-phrase;
   }
 
-  /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、案内だけを中央に置く */
-  .nextRoom {
+  /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */
+  .roomNavigation {
     height: auto;
-    padding: 24px 0 112px;
+    /* 左右の余白（--gutter）は案内の側が持つので、上下だけを決める */
+    padding-block: 24px 112px;
   }
 }
 
@@ -373,9 +303,7 @@
   .exhibit .note,
   .exhibit .object img,
   .exhibit:hover .object img,
-  .exhibit:focus-visible .object img,
-  .nextLink .nextArrow,
-  .nextLink:hover .nextArrow {
+  .exhibit:focus-visible .object img {
     translate: none;
     transition: none;
   }

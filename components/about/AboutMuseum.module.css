@@ -1,6 +1,7 @@
 /*
  * /about の展示室（壁・床・展示室の札・額）。
  * 文字・額・壁・床は Masaki Fujie・Career・Interests の3つともここから使い、部屋ごとに別の体系を作らない。
+ * 同じ館の続きの部屋（/work）も、壁・札・床・現れ方をここから使う。
  */
 
 .museum {
@@ -11,6 +12,11 @@
   --wall-line: rgb(72 64 56 / 0.5);
   --gutter: clamp(24px, 7vw, 128px);
   --floor-h: clamp(96px, 14svh, 160px);
+  /*
+   * 左上の館内案内（MuseumNav）のための余白。Menu を開いたときに項目（Top〜Contact）が届く高さ（約 196px）に、
+   * 余白を足したもの。冒頭の札はここより下から始め、Menu を開いても閉じても本文の位置は動かさない。
+   */
+  --nav-clearance: 280px;
 
   /*
    * 床。別の画像は使わず、壁と同じ素材の別の場所（下寄り）を1枚だけ敷き、ほんの少しだけ暗く・暖かくする。
@@ -44,6 +50,13 @@
   background-position: center top;
   background-repeat: repeat-y;
   background-blend-mode: multiply;
+}
+
+/* 幅の狭い画面では館内案内の文字が小さく（13px）、項目は約 155px まで届く */
+@media (max-width: 700px) {
+  .museum {
+    --nav-clearance: 210px;
+  }
 }
 
 /* ---- 展示室の札（ABOUT / Masaki Fujie・Career・Interests の見出し。3つとも同じ大きさ） ---- */

@@ -1,0 +1,145 @@
+/*
+ * WORK の Explorations：壁に掛けた2枚の説明板。
+ * 板は壁より少し明るい紙のような面にして、壁からわずかに浮かせる（額ほど強い影は付けない）。
+ */
+
+.boards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 48px);
+  max-width: 880px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 番号と線画を左の細い列に、題と文を右に置く */
+.board {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(20px, 2.2vw, 32px);
+  row-gap: 1.2em;
+  padding: clamp(24px, 2.4vw, 36px) clamp(22px, 2.6vw, 40px);
+  background: rgb(250 245 237 / 0.55);
+  box-shadow:
+    0 0 0 1px rgb(72 64 56 / 0.06),
+    0 16px 26px -22px rgb(36 28 20 / 0.45);
+}
+
+.number {
+  grid-column: 1;
+  justify-self: center;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  color: var(--wall-ink-muted);
+}
+
+.icon {
+  grid-column: 1;
+  grid-row: 2;
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.body {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.16em;
+}
+
+.title::after {
+  content: "";
+  display: block;
+  width: 16px;
+  margin-top: 1.1em;
+  border-top: 1px solid var(--wall-line);
+}
+
+.description {
+  margin: 1.2em 0 0;
+  font-size: 13.5px;
+  line-height: 2;
+  letter-spacing: 0.05em;
+  word-break: auto-phrase;
+}
+
+/*
+ * まだ投稿の無い説明板。「まだ展示の照明が点いていない」パネルとして、通常の板より 2〜3 割暗いグレージュにする。
+ * 黒やチャコールのカードにはせず、無効のボタンのようにも見せない（ぼかし・hover・pointer は使わない）。
+ * 壁から浮かせる影は落とし、輪郭の細い線だけを残す。
+ */
+.board[data-preparing] {
+  /* 通常の板の色に、壁の陰の色をうっすら重ねる */
+  background:
+    linear-gradient(rgb(46 38 30 / 0.2), rgb(46 38 30 / 0.2)),
+    rgb(236 229 219 / 0.55);
+  box-shadow: 0 0 0 1px rgb(72 64 56 / 0.06);
+  /* 文字は少しだけ落とす。説明は本文なので、暗い板の上でも読める濃さ（コントラスト 4.5:1 以上）を保つ */
+  color: rgb(40 34 28 / 0.85);
+  cursor: default;
+}
+
+/* 番号・線画・題の下の線も、少しだけ落とす */
+.board[data-preparing] .number,
+.board[data-preparing] .icon,
+.board[data-preparing] .title::after {
+  opacity: 0.9;
+}
+
+/*
+ * 「準備中」の札。題の右隣に置く、美術館の展示札のような小さなステータス。
+ * 細い四角の枠（角は丸めない）・透明な背景・少し薄めの墨色で、Coming Soon のように強くは見せない。
+ * 文字は小さいので、暗い板の上でも読める濃さ（コントラスト 4.5:1 以上）を保つ
+ */
+.status {
+  display: inline-block;
+  margin-left: 0.9em;
+  padding: 0.3em 0.65em 0.25em;
+  border: 1px solid rgb(40 34 28 / 0.4);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  vertical-align: 0.2em;
+  color: rgb(40 34 28 / 0.88);
+}
+
+/* まとめたページへのリンク（content.ts の link があるときだけ） */
+.link {
+  display: inline-block;
+  margin-top: 1.2em;
+  padding-bottom: 0.2em;
+  border-bottom: 1px solid currentColor;
+  font-size: 13.5px;
+  letter-spacing: 0.1em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 4px;
+}
+
+/* 2枚を横に並べると本文の列が狭く、決めた改行の途中でさらに折り返す幅（1400px まで）は、1枚ずつ縦に並べる */
+@media (max-width: 1400px) {
+  .boards {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 480px;
+  }
+}
