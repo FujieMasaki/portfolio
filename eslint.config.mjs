@@ -23,10 +23,12 @@ const eslintConfig = defineConfig([
           message: "function 式ではなく、アロー関数で書く",
         },
         {
-          // Next.js（16.2）は、fetch のキャッシュを期限切れで取り直すときに signal を外す。タイムアウトなどが再生成で効かなくなる
-          selector: "ObjectExpression:has(> Property[key.name='next']):has(> Property[key.name='signal'])",
+          // Next.js（16.2）は、fetch のキャッシュを期限切れで取り直すときに signal を外す。タイムアウトなどが再生成で効かなくなる。
+          // 検出するのは、同じオブジェクトに next（または cache: "force-cache"）と signal を並べた書き方だけ
+          selector:
+            "ObjectExpression:has(> Property[key.name='signal']):matches(:has(> Property[key.name='next']), :has(> Property[key.name='cache'][value.value='force-cache']))",
           message:
-            "fetch の next（キャッシュ）と signal を一緒に使わない。再生成の取り直しでは signal が外れる。cache: \"no-store\" で読み、関数ごと unstable_cache で覚える（components/work/Publishing.tsx の getFeed）",
+            "fetch のキャッシュ（next・cache: \"force-cache\"）と signal を一緒に使わない。再生成の取り直しでは signal が外れる。cache: \"no-store\" で読み、関数ごと unstable_cache で覚える（components/work/Publishing.tsx の getFeed）",
         },
       ],
     },
