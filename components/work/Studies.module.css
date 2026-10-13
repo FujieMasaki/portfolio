@@ -101,13 +101,22 @@
   opacity: 0.9;
 }
 
-/* 「準備中」の札。説明の後ろに小さく置き、落とした本文より少しだけ読み取りやすい濃さにする */
-.preparing {
-  margin: 1.2em 0 0;
-  font-size: 12px;
+/*
+ * 「準備中」の札。題の右隣に置く、美術館の展示札のような小さなステータス。
+ * 細い四角の枠（角は丸めない）・透明な背景・少し薄めの墨色で、Coming Soon のように強くは見せない。
+ * 文字は小さいので、暗い板の上でも読める濃さ（コントラスト 4.5:1 以上）を保つ
+ */
+.status {
+  display: inline-block;
+  margin-left: 0.9em;
+  padding: 0.3em 0.65em 0.25em;
+  border: 1px solid rgb(40 34 28 / 0.4);
+  font-size: 10.5px;
+  font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.12em;
-  color: rgb(40 34 28 / 0.95);
+  letter-spacing: 0.2em;
+  vertical-align: 0.2em;
+  color: rgb(40 34 28 / 0.88);
 }
 
 /* まとめたページへのリンク（content.ts の link があるときだけ） */

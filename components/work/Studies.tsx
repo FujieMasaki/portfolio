@@ -7,7 +7,7 @@ import styles from "./Studies.module.css";
 /**
  * WORK の Explorations：体験から学んだことと、ふと浮かんだアイデアをまとめる場所。
  * 壁に掛けた2枚の説明板として見せる。投稿ができてリンク先（content.ts の link）があるものだけをリンクにし、
- * まだ無いものは「準備中」の札を小さく添えて、押せる見た目（リンク・hover・pointer）にしない。
+ * まだ無いものは、題の右隣に「準備中」の小さな札を添え、押せる見た目（リンク・hover・pointer）にしない。
  */
 const Studies = () => {
   return (
@@ -37,7 +37,11 @@ const Board = ({ study }: { study: Study }) => (
     <p className={styles.number}>{study.number}</p>
     <StudyIcon icon={study.icon} />
     <div className={styles.body}>
-      <h3 className={styles.title}>{study.title}</h3>
+      <h3 className={styles.title}>
+        {study.title}
+        {/* 展示はあるが、まだ公開前であることを示す小さな札。リンク先ができたら外れる */}
+        {!study.link && <span className={styles.status}>準備中</span>}
+      </h3>
       <p className={styles.description}>
         {study.description.map((line, index) => (
           <span key={line}>
@@ -46,12 +50,10 @@ const Board = ({ study }: { study: Study }) => (
           </span>
         ))}
       </p>
-      {study.link ? (
+      {study.link && (
         <Link href={study.link.href} className={styles.link}>
           {study.link.label}
         </Link>
-      ) : (
-        <p className={styles.preparing}>準備中</p>
       )}
     </div>
   </li>
