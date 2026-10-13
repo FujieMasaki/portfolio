@@ -1,5 +1,5 @@
 /*
- * 順路の案内（左：来た方向 / 右：進む方向）。床の左右の端に離して置き、中央は何も置かない。
+ * 順路の案内（左：来た方向 / 右：進む方向）。床の中央に1つの案内としてまとめ、その中で左右に離して、中央は何も置かない。
  * 床の上での高さと余白は、使う側（展示室）が className で決める。
  */
 
@@ -8,7 +8,10 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 32px;
-  padding-inline: var(--gutter);
+  /* 画面の左右の端には張り付けず、1つの順路の案内としてまとまる幅にする */
+  width: calc(100% - var(--gutter) * 2);
+  max-width: 960px;
+  margin-inline: auto;
 }
 
 .sign {
