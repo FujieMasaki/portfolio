@@ -69,7 +69,7 @@ export type Study = {
   title: string;
   icon: "flask" | "cloud";
   description: string[];
-  /** まとめたページ。無い間はリンクを出さず、説明板として見せる */
+  /** まとめたページ。無い間はリンクを出さず、「準備中」の説明板として見せる */
   link?: { label: string; href: string };
 };
 

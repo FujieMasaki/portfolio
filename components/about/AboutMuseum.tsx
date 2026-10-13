@@ -12,7 +12,7 @@ import styles from "./AboutMuseum.module.css";
  *   ABOUT / Interests     今の自分を構成しているものを見る展示（低い展示台に実物を置く）
  *
  * 部屋の名前（ABOUT）は最初の札（Masaki Fujie）にだけ書き、Career・Interests の札は題 ＋ 短い日本語の文にする。
- * 同じ決まりを /work（WORK ＋ Writing・Projects・Personal Studies）にも使う。
+ * 同じ決まりを /work（WORK ＋ Writing・Projects・Explorations）にも使う。
  *
  * 壁（about-wall.webp）は .museum に1枚だけ敷き、セクションごとに背景を変えない。床も同じ素材から作る。
  * 3つの展示はそれぞれ Personal・CareerPath・Interests にあり、ここでは壁と案内の上に順に並べるだけ。

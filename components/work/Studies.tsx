@@ -5,15 +5,16 @@ import room from "./WorkMuseum.module.css";
 import styles from "./Studies.module.css";
 
 /**
- * WORK の Personal Studies：体験から学んだことと、ふと浮かんだアイデアをまとめる場所。
- * 壁に掛けた2枚の説明板として見せる。まとめたページができるまではリンクを出さない（content.ts の link）。
+ * WORK の Explorations：体験から学んだことと、ふと浮かんだアイデアをまとめる場所。
+ * 壁に掛けた2枚の説明板として見せる。投稿ができてリンク先（content.ts の link）があるものだけをリンクにし、
+ * まだ無いものは「準備中」の札を小さく添えて、押せる見た目（リンク・hover・pointer）にしない。
  */
 const Studies = () => {
   return (
-    <section className={room.section} aria-labelledby="studies-title">
+    <section className={room.section} aria-labelledby="explorations-title">
       <header className={room.label} data-reveal>
-        <h2 className={shared.heading} id="studies-title">
-          <span className={shared.roomTitle}>Personal Studies</span>
+        <h2 className={shared.heading} id="explorations-title">
+          <span className={shared.roomTitle}>Explorations</span>
         </h2>
         <p className={shared.lead}>
           体験から学んだことや、
@@ -32,7 +33,7 @@ const Studies = () => {
 };
 
 const Board = ({ study }: { study: Study }) => (
-  <li className={styles.board}>
+  <li className={styles.board} data-preparing={study.link ? undefined : true}>
     <p className={styles.number}>{study.number}</p>
     <StudyIcon icon={study.icon} />
     <div className={styles.body}>
@@ -45,10 +46,12 @@ const Board = ({ study }: { study: Study }) => (
           </span>
         ))}
       </p>
-      {study.link && (
+      {study.link ? (
         <Link href={study.link.href} className={styles.link}>
           {study.link.label}
         </Link>
+      ) : (
+        <p className={styles.preparing}>準備中</p>
       )}
     </div>
   </li>

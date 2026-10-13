@@ -1,5 +1,5 @@
 /*
- * WORK / Personal Studies：壁に掛けた2枚の説明板。
+ * WORK の Explorations：壁に掛けた2枚の説明板。
  * 板は壁より少し明るい紙のような面にして、壁からわずかに浮かせる（額ほど強い影は付けない）。
  */
 
@@ -76,6 +76,30 @@
   line-height: 2;
   letter-spacing: 0.05em;
   word-break: auto-phrase;
+}
+
+/*
+ * まだ投稿の無い説明板。押せない展示パネルとして、板と文字のトーンを少しだけ落とす（ぼかしや無効のボタンの見た目にはしない）
+ */
+.board[data-preparing] {
+  background: rgb(250 245 237 / 0.4);
+  box-shadow:
+    0 0 0 1px rgb(72 64 56 / 0.05),
+    0 14px 24px -22px rgb(36 28 20 / 0.35);
+}
+
+.board[data-preparing] .body,
+.board[data-preparing] .icon {
+  opacity: 0.82;
+}
+
+/* 「準備中」の札。説明の後ろに小さく置く */
+.preparing {
+  margin: 1.2em 0 0;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--wall-ink-muted);
 }
 
 /* まとめたページへのリンク（content.ts の link があるときだけ） */
