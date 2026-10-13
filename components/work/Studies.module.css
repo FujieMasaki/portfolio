@@ -89,15 +89,16 @@
     linear-gradient(rgb(46 38 30 / 0.2), rgb(46 38 30 / 0.2)),
     rgb(236 229 219 / 0.55);
   box-shadow: 0 0 0 1px rgb(72 64 56 / 0.06);
-  color: rgb(40 34 28 / 0.6);
+  /* 文字は少しだけ落とす。説明は本文なので、暗い板の上でも読める濃さ（コントラスト 4.5:1 以上）を保つ */
+  color: rgb(40 34 28 / 0.85);
   cursor: default;
 }
 
-/* 番号・線画・題の下の線も、文字と同じだけ落とす */
+/* 番号・線画・題の下の線も、少しだけ落とす */
 .board[data-preparing] .number,
 .board[data-preparing] .icon,
 .board[data-preparing] .title::after {
-  opacity: 0.7;
+  opacity: 0.9;
 }
 
 /* 「準備中」の札。説明の後ろに小さく置き、落とした本文より少しだけ読み取りやすい濃さにする */
@@ -106,7 +107,7 @@
   font-size: 12px;
   line-height: 1;
   letter-spacing: 0.12em;
-  color: rgb(40 34 28 / 0.8);
+  color: rgb(40 34 28 / 0.95);
 }
 
 /* まとめたページへのリンク（content.ts の link があるときだけ） */
