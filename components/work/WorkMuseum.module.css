@@ -134,8 +134,11 @@
 .section {
   position: relative;
   display: grid;
-  /* 札の列は、いちばん長い題（Explorations）より狭くしない */
-  grid-template-columns: minmax(max-content, 0.75fr) minmax(0, 2.6fr);
+  /*
+   * 札の列は3つの展示で同じ幅にし、展示の左端を壁の上で縦にそろえる。
+   * いちばん長い題（Explorations）と札の文が入る幅にする
+   */
+  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
   column-gap: clamp(32px, 5vw, 96px);
   align-items: start;
   padding: clamp(56px, 8svh, 96px) var(--gutter);
@@ -172,15 +175,18 @@
   padding-top: clamp(32px, 6svh, 64px);
 }
 
-/* 幅の狭い画面：札の下に展示を置く。植物は小さくし、札の文字にかからない高さにする */
-@media (max-width: 760px) {
-  .canopy {
-    width: min(92vw, 420px);
-  }
-
+/* 幅の狭い画面：植物を小さくし、札の文字にかからないようにする */
+/* タブレットまでの幅：札の下に展示を置く（横に並べると、展示の列が狭く、実機が小さくなりすぎる） */
+@media (max-width: 1000px) {
   .section {
     grid-template-columns: minmax(0, 1fr);
     row-gap: clamp(40px, 7svh, 56px);
+  }
+}
+
+@media (max-width: 760px) {
+  .canopy {
+    width: min(92vw, 420px);
   }
 }
 
