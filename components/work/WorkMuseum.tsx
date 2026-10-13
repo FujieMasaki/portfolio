@@ -34,8 +34,14 @@ const WorkMuseum = () => {
               <span className={`${shared.roomTitle} ${styles.subjects}`}>
                 {/* 区切りの前は改行させない空白にし、折り返すときは「/」の後ろで切る */}
                 Writing{"\u00a0"}
-                <span className={styles.divider}>/</span> Projects{"\u00a0"}
-                <span className={styles.divider}>/</span> Explorations
+                <span className={styles.divider} aria-hidden="true">
+                  /
+                </span>{" "}
+                Projects{"\u00a0"}
+                <span className={styles.divider} aria-hidden="true">
+                  /
+                </span>{" "}
+                Explorations
               </span>
             </h1>
             <p className={styles.statement}>

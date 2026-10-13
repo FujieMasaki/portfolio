@@ -229,8 +229,11 @@
   filter: saturate(0.7) brightness(0.94) sepia(0.1);
 }
 
-/* 幅の広くない画面（ノートパソコンの画面まで）：解説の下に、棚とこれからを並べる。3列では棚が狭く、実機が小さくなるため */
-@media (max-width: 1600px) {
+/*
+ * 幅の広くない画面（1900px まで）：解説の下に、棚とこれからを並べる。
+ * 3列では、展示の列から解説の列（420px 以上）と Next を引いた残りが棚になり、実機が小さくなりすぎるため
+ */
+@media (max-width: 1900px) {
   .project {
     grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
     row-gap: clamp(40px, 6svh, 56px);
