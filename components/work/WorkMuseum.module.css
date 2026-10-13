@@ -23,20 +23,27 @@
   animation: arrive 1.6s var(--ease-calm) 0.2s both;
 }
 
-/* 展示室の札（WORK）。/about の「ABOUT」と同じ文字（AboutMuseum.module.css の .eyebrow）で、見出しの既定の余白だけを外す */
-.roomName {
-  margin: 0;
-  font-weight: 500;
+/*
+ * 札の題（Writing / Projects / Explorations）。/about の Masaki Fujie と同じ大きさ（.roomTitle）で、
+ * 幅の狭い画面では区切りの「/」の後ろで折り返す
+ */
+.subjects {
+  text-wrap: balance;
 }
 
-/*
- * 部屋の短い文。/about の札の題（Masaki Fujie）と本文（lead）の間の大きさにし、
- * 展示の題（Writing など）より目立たせず、LP の見出しのようにはしない。
- */
+/* 区切りの「/」。題より細く薄くし、3つの展示の名前を主にする */
+.divider {
+  margin-inline: 0.12em;
+  font-weight: 400;
+  color: var(--wall-ink-muted);
+  opacity: 0.6;
+}
+
+/* 部屋の短い文。題の下の補足として、/about の本文（.lead）と同じくらいの大きさに置く */
 .statement {
-  margin: 1.6rem 0 0;
-  font-size: clamp(20px, 1.8vw, 26px);
-  line-height: 1.85;
+  margin: 2rem 0 0;
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 2;
   letter-spacing: 0.06em;
 }
 
@@ -127,7 +134,8 @@
 .section {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 2.6fr);
+  /* 札の列は、いちばん長い題（Explorations）より狭くしない */
+  grid-template-columns: minmax(max-content, 0.75fr) minmax(0, 2.6fr);
   column-gap: clamp(32px, 5vw, 96px);
   align-items: start;
   padding: clamp(56px, 8svh, 96px) var(--gutter);

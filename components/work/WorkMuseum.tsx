@@ -10,12 +10,13 @@ import styles from "./WorkMuseum.module.css";
 /**
  * /work の展示室。ABOUT の Interests の先の床を歩いて入る、同じ壁が続く部屋。
  *
- *   WORK              部屋の札（部屋の名前と短い文）。右上から、窓の外の植物が見切れて入り、壁に淡い葉の影を落とす
+ *   WORK              部屋の札（部屋の名前・3つの展示の名前・短い文）。右上から、窓の外の植物が見切れて入り、壁に淡い葉の影を落とす
  *   Writing           書いてきたもの（Zenn・note の文章を、壁のキャプションのように数点ずつ掛ける）
  *   Projects          今つくっているもの（壁から張り出した薄い石の棚に実機を置く）
- *   Personal Studies  体験と空想をまとめる場所（壁に掛けた2枚の説明板）
+ *   Explorations      体験と空想をまとめる場所（壁に掛けた2枚の説明板。投稿ができるまでは準備中）
  *
  * 部屋の名前（WORK）は最初の札にだけ書き、展示の題（Writing など）には番号も部屋の名前も付けない（/about と同じ決まり）。
+ * 最初の札の題は、/about の Masaki Fujie にあたるもので、この部屋で見る3つの展示の名前を並べる。
  * 壁・文字・札・床・現れ方（[data-reveal]）は /about と同じもの（AboutMuseum.module.css）を使い、部屋ごとに別の体系を作らない。
  * 動くのは右上の植物と葉の影だけで、風に揺れるくらいのごく遅い動きにする（prefers-reduced-motion では止める）。
  */
@@ -27,9 +28,15 @@ const WorkMuseum = () => {
       <main>
         <section className={styles.intro} aria-labelledby="work-title">
           <div className={styles.introText}>
-            {/* /about の「ABOUT」と同じ小さな展示室の札。この部屋には人物の名前のような題が無いので、短い文を札の主にする */}
-            <h1 className={`${shared.eyebrow} ${styles.roomName}`} id="work-title">
-              Work
+            {/* /about の「ABOUT / Masaki Fujie」と同じ骨格。部屋の名前（WORK）の下に、この部屋で見るもの（3つの展示）を題として置く */}
+            <h1 className={shared.heading} id="work-title">
+              <span className={shared.eyebrow}>Work</span>
+              <span className={`${shared.roomTitle} ${styles.subjects}`}>
+                {/* 区切りの前は改行させない空白にし、折り返すときは「/」の後ろで切る */}
+                Writing{"\u00a0"}
+                <span className={styles.divider}>/</span> Projects{"\u00a0"}
+                <span className={styles.divider}>/</span> Explorations
+              </span>
             </h1>
             <p className={styles.statement}>
               つくったもの、
