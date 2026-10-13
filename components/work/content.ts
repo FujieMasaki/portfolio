@@ -53,7 +53,7 @@ export const PROJECT: Project = {
     alt: "Focus on Dot の画面を開いたノートパソコン。青くにじむ点と「00:12」の表示、「いまの自分に、少し深く呼吸をしよう」の一文",
     width: 1774,
     height: 887,
-    box: { x: 266, y: 114, width: 1180, height: 693 },
+    box: { x: 304, y: 118, width: 1166, height: 669 },
   },
   mobile: {
     src: "/images/work/focus-on-dot-mobile.png",
