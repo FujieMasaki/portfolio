@@ -24,7 +24,8 @@ const eslintConfig = defineConfig([
         },
         {
           // Next.js（16.2）は、fetch のキャッシュを期限切れで取り直すときに signal を外す。タイムアウトなどが再生成で効かなくなる。
-          // 検出するのは、同じオブジェクトに next（または cache: "force-cache"）と signal を並べた書き方だけ
+          // 検出するのは、同じオブジェクトに next（または cache: "force-cache"）と signal を並べた書き方だけ。
+          // ページの revalidate・fetchCache による暗黙のキャッシュは対象外（docs/code-review/README.md の履歴）
           selector:
             "ObjectExpression:has(> Property[key.name='signal']):matches(:has(> Property[key.name='next']), :has(> Property[key.name='cache'][value.value='force-cache']))",
           message:

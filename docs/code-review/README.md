@@ -79,5 +79,6 @@
 - 2026-10-12: 同じPRで、Careerの末尾に最後の展示を中央に置く余白を足したあと、線の上の光の位置を「スクロールした量の割合」で決めていたため、中央の展示と光の区画が合わなくなっていた（人間が見つけた）。§3の「ドラッグ・pointerの操作」に、位置を示す表示が実際に見ている展示と一致するかを足した。
 - 2026-10-13: /workのPR（#24）のCodexの最終チェックで、fetchの`next.revalidate`と`AbortSignal.timeout()`を一緒に使うと、
   Next.js（16.2）が期限切れの取り直しで`signal`を外し、再生成でタイムアウトが効かないことが見つかった。処理系の挙動で
-  レビューでは見落としやすいため、`eslint.config.mjs`の`no-restricted-syntax`で、`next`と`signal`を同じオブジェクトに
-  書くことを禁止した。
+  レビューでは見落としやすいため、`eslint.config.mjs`の`no-restricted-syntax`で、`next`または`cache: "force-cache"`と
+  `signal`を同じオブジェクトに書くことを禁止した。捕まえるのは明示的に書いた形だけで、ページの`revalidate`・`fetchCache`
+  による暗黙のキャッシュや、`new Request()`に渡した`signal`は対象外なので、`signal`を使うfetchはレビューでも確かめる。
