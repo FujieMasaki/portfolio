@@ -1,0 +1,182 @@
+/*
+ * /work の展示室。壁・文字・札・床は /about と共通（AboutMuseum.module.css）で、ここでは
+ * 部屋の札（WORK）・右上の植物と葉の影・3つの展示の並べ方・床だけを決める。
+ */
+
+.work {
+  /* 右上の植物と葉の影は、画面の右端で切る（横にスクロールさせない） */
+  overflow-x: clip;
+}
+
+/* ---- 部屋の札 ---- */
+
+.intro {
+  position: relative;
+  padding: clamp(136px, 22svh, 220px) var(--gutter) clamp(8px, 2svh, 24px);
+}
+
+/* 文字は葉の影より手前に置く */
+.introText {
+  position: relative;
+  z-index: 1;
+  animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+/* 部屋の名前。展示の題（Publishing など）より一段大きくする */
+.introTitle {
+  font-size: clamp(44px, 4.6vw, 68px);
+}
+
+/* 題の下の短い線。展示の題（01 Publishing など）にも同じ線を引く */
+.ruled::after {
+  content: "";
+  width: 24px;
+  margin-top: 0.4rem;
+  border-top: 1px solid var(--wall-line);
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/*
+ * 窓の外の植物（右上から見切れて入る）と、その葉が壁に落とす影。
+ * 植物の画像は右 36% にだけ葉が写っているので、画像ごと右上の角に合わせて置く。
+ * 右上の角には案内（Menu）があるので、植物は案内の下から始める。画像の上下の端の直線は見せず、光と陰の中へ溶かす。
+ */
+.canopy {
+  position: absolute;
+  top: clamp(56px, 7vw, 104px);
+  right: 0;
+  mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 70%, transparent);
+  width: clamp(360px, 44vw, 720px);
+  aspect-ratio: 1536 / 1024;
+  pointer-events: none;
+}
+
+.canopy img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  /* 枝は右上の角の外から伸びている。揺れはその付け根を中心にする */
+  transform-origin: 100% 0;
+}
+
+/* 屋外の光で撮られた葉を、/about の植物と同じく壁の暖かい光に寄せる */
+.leaves {
+  filter: saturate(0.7) brightness(0.94) sepia(0.1);
+}
+
+/*
+ * 葉の影。光は右上から差し込むので、葉より左下にずらし、少し大きく・ぼかして壁に落とす。
+ * 影の形は画像の透明度から作るので、植物の画像を差し替えても影がついてくる。
+ */
+.leafShadow {
+  translate: -16% 20%;
+  scale: 1.12;
+  filter: brightness(0) blur(6px);
+  opacity: 0.1;
+}
+
+/*
+ * 風。十数秒で 1° に満たないほど揺れる、少し眺めていて気づく程度の動き。
+ * 影は葉より壁から遠い光の側で揺れるので、葉より少しだけ大きく、少し遅れて揺らす。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .leaves {
+    animation: sway 13s ease-in-out infinite alternate;
+  }
+
+  .leafShadow {
+    animation: sway-shadow 13s ease-in-out -1.5s infinite alternate;
+  }
+}
+
+@keyframes sway {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 0.7deg;
+  }
+}
+
+@keyframes sway-shadow {
+  from {
+    rotate: -0.2deg;
+  }
+
+  to {
+    rotate: 1.1deg;
+  }
+}
+
+/* ---- 3つの展示に共通の並べ方（左に札、右に展示） ---- */
+
+.section {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 2.6fr);
+  column-gap: clamp(32px, 5vw, 96px);
+  align-items: start;
+  padding: clamp(56px, 8svh, 96px) var(--gutter);
+}
+
+/* 展示の札（番号 / 題 / 短い日本語の文）。番号は ABOUT の札のカテゴリと同じ文字にする */
+.label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- 床と、次の展示室（Contact）への案内 ---- */
+
+/* 最後の展示の手前の床。/about の Interests と同じ床（--floor-*）を、案内の下まで敷く */
+.floor {
+  position: relative;
+  margin-top: clamp(24px, 6svh, 64px);
+}
+
+.floor::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to bottom, rgb(56 42 28 / 0) 45%, rgb(56 42 28 / 0.06)),
+    var(--floor-background);
+  background-blend-mode: normal, var(--floor-blend);
+  mask-image: var(--floor-mask);
+}
+
+.nextRoom {
+  height: clamp(240px, 32svh, 320px);
+  padding-top: clamp(32px, 6svh, 64px);
+}
+
+/* 幅の狭い画面：札の下に展示を置く。植物は小さくし、札の文字にかからない高さにする */
+@media (max-width: 760px) {
+  .intro {
+    padding-top: clamp(120px, 20svh, 168px);
+  }
+
+  .canopy {
+    top: 48px;
+    width: min(92vw, 420px);
+  }
+
+  .section {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(40px, 7svh, 56px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .introText {
+    animation: none;
+  }
+}

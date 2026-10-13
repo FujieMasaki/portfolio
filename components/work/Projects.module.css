@@ -1,0 +1,242 @@
+/*
+ * WORK / Projects：壁の解説と、低い石の棚に置いた実機。
+ * 棚は /about の展示台と同じく、壁と同じ素材を少し濃くして作る（画像にしない）。
+ */
+
+.projects {
+  /* 左下の植物の葉が、札の文字にかからない分だけ下を空ける */
+  padding-bottom: clamp(120px, 14vw, 200px);
+}
+
+/* 解説 | 棚 | これから、の3列。解説の列の左に、札との境の細い縦線を引く */
+.project {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  /* 解説の列は、いちばん長い行（ジャーナリングサービスを企画・開発しています。）が折り返さない幅にする */
+  grid-template-columns: minmax(420px, 1fr) minmax(0, 1.2fr) max-content;
+  column-gap: clamp(24px, 3vw, 56px);
+  align-items: end;
+}
+
+.caption {
+  align-self: start;
+  padding-left: clamp(24px, 3vw, 48px);
+  border-left: 1px solid var(--wall-line);
+}
+
+/* 種類と進み具合の札。種類だけを細い枠で囲む */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6em 1.4em;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.16em;
+}
+
+.kind {
+  padding: 0.55em 1.1em;
+  border: 1px solid var(--wall-line);
+  border-radius: 999px;
+}
+
+.status {
+  text-transform: uppercase;
+  color: var(--wall-ink-muted);
+}
+
+.title {
+  margin: 1.2em 0 0;
+  font-size: clamp(24px, 2.2vw, 32px);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.description {
+  margin: 1.3em 0 0;
+  font-size: clamp(13px, 0.98vw, 14.5px);
+  line-height: 2.1;
+  letter-spacing: 0.1em;
+  word-break: auto-phrase;
+}
+
+/* 公開したページへのリンク（content.ts の url があるときだけ） */
+.view {
+  display: inline-block;
+  margin-top: 1.6em;
+  padding-bottom: 0.2em;
+  border-bottom: 1px solid currentColor;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.view:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 4px;
+}
+
+/* ---- 棚と実機 ---- */
+
+.display {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  padding-inline: 4%;
+}
+
+.devices {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.device {
+  position: relative;
+  /* 天板の奥に少し沈めて、載っているように見せる */
+  margin-bottom: -2px;
+}
+
+.device img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  /* 機器の真下に落ちる、ごく弱い接地の影 */
+  filter: drop-shadow(0 6px 5px rgb(30 22 14 / 0.2));
+}
+
+.laptop {
+  width: 80%;
+}
+
+/* スマートフォンはノートパソコンの画面の半分ほどの高さで、右端に少し重ねて立てる */
+.mobile {
+  width: 16%;
+  margin-left: -3%;
+}
+
+/* 低い石の棚。天板だけがわずかに光を受ける */
+.shelf {
+  position: relative;
+  height: clamp(18px, 1.6vw, 26px);
+  margin-inline: -4%;
+  background-color: #ddd6cc;
+  background-image: url("/images/about/about-wall.webp");
+  background-size: 900px auto;
+  background-blend-mode: multiply;
+  box-shadow: 0 22px 30px -24px rgb(30 22 14 / 0.45);
+}
+
+.shelf::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: rgb(255 250 242 / 0.3);
+  border-bottom: 1px solid rgb(60 50 40 / 0.12);
+}
+
+/* ---- これからやること（リンクではなく、壁に書いた予定） ---- */
+
+.next {
+  align-self: center;
+  padding-left: clamp(20px, 2vw, 32px);
+  border-left: 1px solid var(--wall-line);
+}
+
+.nextLabel {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--wall-ink-muted);
+}
+
+.nextLabel::after {
+  content: "";
+  display: block;
+  width: 16px;
+  margin-top: 1em;
+  border-top: 1px solid var(--wall-line);
+}
+
+.nextList {
+  display: grid;
+  gap: 1.1em;
+  margin: 1.4em 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * 植物。左下の角から、葉の先だけが展示室に入る。
+ * 画像の左下 半分ほどにだけ葉が写っているので、画像ごと左下の角に合わせて置く。
+ * 壁の途中で画像の下端が直線に切れて見えないよう、下端を壁の陰へ溶かす。
+ */
+.plant {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: clamp(240px, 28vw, 460px);
+  pointer-events: none;
+  mask-image: linear-gradient(to top, transparent, #000 28%);
+}
+
+.plant img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: saturate(0.7) brightness(0.94) sepia(0.1);
+}
+
+/* 幅の広くない画面（ノートパソコンの画面まで）：解説の下に、棚とこれからを並べる。3列では棚が狭く、実機が小さくなるため */
+@media (max-width: 1600px) {
+  .project {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    row-gap: clamp(40px, 6svh, 56px);
+  }
+
+  .caption {
+    grid-column: 1 / -1;
+  }
+}
+
+/* 幅の狭い画面：解説・棚・これからを縦に並べる */
+@media (max-width: 760px) {
+  .projects {
+    padding-bottom: clamp(140px, 40vw, 220px);
+  }
+
+  .project {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .caption {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .plant {
+    width: min(56vw, 280px);
+  }
+}
