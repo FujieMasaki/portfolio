@@ -2,8 +2,8 @@
  * WORK / Publishing の記事一覧。Zenn・note の RSS をサーバーで読み、新しい順に数件だけ取り出す。
  *
  * 取得はビルド時と、1日ごとの再生成のときだけ。訪問者のブラウザからは外部へ通信しない。
- * 1日のキャッシュは Publishing.tsx の unstable_cache が持ち、ここの fetch はキャッシュしない（理由は fetchFeed）。
- * 取得や解析に失敗したら null を返し、一覧を出さずに「Zenn ↗ / note ↗」の札だけを見せる（Publishing.tsx）。
+ * 1日のキャッシュは Publishing.tsx の unstable_cache が持ち、ここの fetch はキャッシュしない（理由は readFeed）。
+ * 取得や解析に失敗したら、一覧を出さずに「Zenn ↗ / note ↗」の札だけを見せる（Publishing.tsx）。
  *
  * scripts/work-feeds.test.mjs から Node で直接読むので、ほかのファイルを import せず、型の注釈以外の TypeScript の構文を使わない。
  */
@@ -68,22 +68,21 @@ export const formatMonth = (iso: string) => {
 };
 
 /**
- * RSS を読んで記事を返す。読めない・1件もないときは null（一覧を出さない）。
+ * RSS を読んで記事を返す。読めない・1件もないときは例外を投げる。
  *
- * fetch の next.revalidate でキャッシュすると、Next.js は期限切れの取り直しで signal を外すので（16.2 の patch-fetch）、
- * 再生成のときにタイムアウトが効かない。そのため fetch はキャッシュせず、呼ぶ側で関数ごとキャッシュする。
+ * 呼ぶ側（Publishing.tsx）は、この関数を unstable_cache に包んで1日覚えておき、例外は null（一覧を出さない）にする。
+ * - 失敗を例外にするのは、unstable_cache が例外を覚えないため。null を返すと、一時的な失敗が1日（デプロイをまたいでも）残る。
+ * - fetch 自体はキャッシュしない。fetch の next.revalidate でキャッシュすると、Next.js は期限切れの取り直しで signal を外すので
+ *   （16.2 の patch-fetch）、再生成のときにタイムアウトが効かない。
  */
-export const fetchFeed = async (feedUrl: string, site: string, limit: number) => {
-  try {
-    const response = await fetch(feedUrl, {
-      cache: "no-store",
-      // 相手が応答しないときに、ビルドや再生成を止めない
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!response.ok) return null;
-    const entries = parseFeed(await response.text(), site, limit);
-    return entries.length > 0 ? entries : null;
-  } catch {
-    return null;
-  }
+export const readFeed = async (feedUrl: string, site: string, limit: number) => {
+  const response = await fetch(feedUrl, {
+    cache: "no-store",
+    // 相手が応答しないときに、ビルドや再生成を止めない
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!response.ok) throw new Error(`RSS を読めなかった（${response.status}）: ${feedUrl}`);
+  const entries = parseFeed(await response.text(), site, limit);
+  if (entries.length === 0) throw new Error(`RSS に記事が無かった: ${feedUrl}`);
+  return entries;
 };

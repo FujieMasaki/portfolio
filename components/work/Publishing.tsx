@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache";
 import shared from "@/components/about/AboutMuseum.module.css";
 import { PUBLISHING } from "./content";
-import { FEED_REVALIDATE, fetchFeed, formatMonth, type FeedEntry } from "./feeds";
+import { FEED_REVALIDATE, formatMonth, readFeed, type FeedEntry } from "./feeds";
 import room from "./WorkMuseum.module.css";
 import styles from "./Publishing.module.css";
 
@@ -9,10 +9,15 @@ import styles from "./Publishing.module.css";
 const ENTRIES_PER_SOURCE = 4;
 
 /**
- * 記事を1日だけ覚えておく。期限が切れたら、次の再生成のときに fetchFeed をそのまま呼び直す（タイムアウトも効く）。
+ * 記事を1日だけ覚えておく。期限が切れたら、次の再生成のときに readFeed をそのまま呼び直す（タイムアウトも効く）。
  * キャッシュの key は、この key と引数（RSS の URL・媒体のページ・件数）から作られる。
+ * 読めなかったとき（例外）は覚えないので、次に作り直すときにまた読みに行く。
  */
-const getFeed = unstable_cache(fetchFeed, ["work-publishing-feed"], { revalidate: FEED_REVALIDATE });
+const getFeed = unstable_cache(readFeed, ["work-publishing-feed"], { revalidate: FEED_REVALIDATE });
+
+/** 読めなかった媒体は null（一覧を出さない） */
+const loadFeed = (feed: string, site: string) =>
+  getFeed(feed, site, ENTRIES_PER_SOURCE).catch(() => null);
 
 /**
  * WORK / Publishing：Zenn・note に書いてきた記事を、壁に書いた目録のように並べる展示。
@@ -20,7 +25,7 @@ const getFeed = unstable_cache(fetchFeed, ["work-publishing-feed"], { revalidate
  */
 const Publishing = async () => {
   const feeds = await Promise.all(
-    PUBLISHING.map((source) => getFeed(source.feed, source.site, ENTRIES_PER_SOURCE)),
+    PUBLISHING.map((source) => loadFeed(source.feed, source.site)),
   );
 
   return (
