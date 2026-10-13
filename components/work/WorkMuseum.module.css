@@ -49,13 +49,14 @@
 /*
  * 窓の外の植物（右上から見切れて入る）と、その葉が壁に落とす影。
  * 植物の画像は右 36% にだけ葉が写っているので、画像ごと右上の角に合わせて置く。
- * 右上の角には案内（Menu）があるので、植物は案内の下から始める。画像の上下の端の直線は見せず、光と陰の中へ溶かす。
+ * 右上は植物と光のための空間で、案内（Menu）は左上にある。植物は画面の上端から見切れて入り、
+ * 画像の下端の直線は見せずに、陰の中へ溶かす。
  */
 .canopy {
   position: absolute;
-  top: clamp(56px, 7vw, 104px);
+  top: 0;
   right: 0;
-  mask-image: linear-gradient(to bottom, transparent, #000 24%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
   width: clamp(360px, 44vw, 720px);
   aspect-ratio: 1536 / 1024;
   pointer-events: none;
@@ -169,7 +170,6 @@
   }
 
   .canopy {
-    top: 48px;
     width: min(92vw, 420px);
   }
 

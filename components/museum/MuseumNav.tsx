@@ -6,7 +6,9 @@ import styles from "./MuseumNav.module.css";
 
 type RoomId = "about" | "work" | "contact";
 
-const ROOMS: { id: RoomId; href: string; label: string }[] = [
+/** 館内案内の行き先。入口（Top）と、3つの展示室 */
+const ROOMS: { id: RoomId | "top"; href: string; label: string }[] = [
+  { id: "top", href: "/", label: "Top" },
   { id: "about", href: "/about", label: "About" },
   { id: "work", href: "/work", label: "Work" },
   { id: "contact", href: "/contact", label: "Contact" },
@@ -18,7 +20,8 @@ type Props = {
 };
 
 /**
- * 館内（/about など）の最小限の案内。左上に入口へ戻る道、右上に Menu だけを置く。
+ * 館内（/about など）の案内。左上に Menu だけを置き、入口（Top）とどの展示室へも自由に移れるようにする。
+ * 右上は植物や光のための空間として空けておく。展示の順路に沿った前後の移動は、ページ末尾の MuseumRoomNavigation が受け持つ。
  *
  * Menu は、マウスでは hover で一時的に開き（"hover"）、クリック・タップ・キーボードではボタンで開閉する（"pinned"）。
  * どちらの開き方も同じ state で持つので、aria-expanded が表示と一致し、Escape でいつでも閉じられる。
@@ -55,13 +58,6 @@ const MuseumNav = ({ current }: Props) => {
 
   return (
     <header className={styles.bar}>
-      <Link href="/" className={styles.back}>
-        <span className={styles.arrow} aria-hidden="true">
-          ←
-        </span>
-        Back to Home
-      </Link>
-
       <div
         ref={rootRef}
         className={styles.menu}
