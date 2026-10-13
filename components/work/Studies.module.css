@@ -136,7 +136,8 @@
   outline-offset: 4px;
 }
 
-@media (max-width: 1100px) {
+/* 2枚を横に並べると本文の列が狭く、決めた改行の途中でさらに折り返す幅（1400px まで）は、1枚ずつ縦に並べる */
+@media (max-width: 1400px) {
   .boards {
     grid-template-columns: minmax(0, 1fr);
     max-width: 480px;

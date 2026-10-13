@@ -56,10 +56,10 @@ const Projects = () => {
             <Device
               image={project.laptop}
               className={styles.laptop}
-              // 見える範囲（box）は画像の幅の 2/3 ほどなので、その分大きい画像を読む。1600px までは棚が広い2段の配置
-              sizes="(max-width: 760px) 110vw, (max-width: 1600px) 48vw, 34vw"
+              // 見える範囲（box）は画像の幅の 2/3 ほどなので、その分大きい画像を読む。1900px までは棚が広い2段の配置
+              sizes="(max-width: 760px) 110vw, (max-width: 1900px) 48vw, 34vw"
             />
-            <Device image={project.mobile} className={styles.mobile} sizes="(max-width: 760px) 50vw, (max-width: 1600px) 30vw, 22vw" />
+            <Device image={project.mobile} className={styles.mobile} sizes="(max-width: 760px) 50vw, (max-width: 1900px) 30vw, 22vw" />
           </div>
           <div className={styles.shelf} />
         </div>
