@@ -1,6 +1,6 @@
 import Image from "next/image";
 import MuseumNav from "@/components/museum/MuseumNav";
-import NextRoom from "@/components/museum/NextRoom";
+import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
 import shared from "@/components/about/AboutMuseum.module.css";
 import Projects from "./Projects";
 import Studies from "./Studies";
@@ -68,7 +68,11 @@ const WorkMuseum = () => {
         <Studies />
 
         <div className={styles.floor}>
-          <NextRoom href="/contact" title="Contact" className={styles.nextRoom} />
+          <MuseumRoomNavigation
+            previous={{ label: "Previous room", title: "About", href: "/about" }}
+            next={{ label: "Next room", title: "Contact", href: "/contact" }}
+            className={styles.roomNavigation}
+          />
         </div>
       </main>
     </div>

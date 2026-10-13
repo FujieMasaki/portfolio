@@ -30,7 +30,7 @@
 
 /*
  * 床。Masaki Fujie の床と同じ作り（AboutMuseum.module.css の --floor-*）。展示台の下端が床の奥の端にそろう。
- * 次の展示室の案内（.nextRoom）の下まで続け、手前（下端）に向かってごく僅かに暗くして奥行きを出す。
+ * 順路の案内（.roomNavigation）の下まで続け、手前（下端）に向かってごく僅かに暗くして奥行きを出す。
  */
 .hall::after {
   content: "";
@@ -226,9 +226,9 @@
   }
 }
 
-/* ---- 次の展示室への案内（文字と線は components/museum/NextRoom）。展示台の手前の床に置く ---- */
+/* ---- 順路の案内（文字と線は components/museum/MuseumRoomNavigation）。展示台の手前の床に置く ---- */
 
-.nextRoom {
+.roomNavigation {
   height: var(--next-floor);
   padding-top: clamp(32px, 6svh, 64px);
 }
@@ -290,10 +290,11 @@
     word-break: auto-phrase;
   }
 
-  /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、案内だけを中央に置く */
-  .nextRoom {
+  /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */
+  .roomNavigation {
     height: auto;
-    padding: 24px 0 112px;
+    /* 左右の余白（--gutter）は案内の側が持つので、上下だけを決める */
+    padding-block: 24px 112px;
   }
 }
 

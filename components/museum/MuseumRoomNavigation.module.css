@@ -1,33 +1,34 @@
 /*
- * 次の展示室への案内（NEXT ROOM / 部屋名 / →）。床の中央に、細い縦線の先に置く。
+ * 順路の案内（左：来た方向 / 右：進む方向）。床の左右の端に離して置き、中央は何も置かない。
  * 床の上での高さと余白は、使う側（展示室）が className で決める。
  */
 
-.nextRoom {
+.route {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: flex-start;
+  gap: 32px;
+  padding-inline: var(--gutter);
 }
 
-.nextLink {
+.sign {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0.9em;
   color: var(--wall-ink);
   text-decoration: none;
 }
 
-/* 縦線。文字より薄く、床に引いた目地のように細く */
-.nextLink::before {
-  content: "";
-  width: 1px;
-  height: 56px;
-  margin-bottom: 18px;
-  background: rgb(72 64 56 / 0.3);
-  transition: background-color 0.4s var(--ease-calm);
+.next {
+  align-items: flex-end;
+  text-align: right;
 }
 
-.nextLabel {
+/* 札の文字（BACK TO ENTRANCE など）。上に、床に引いた目地のような短い線を置く */
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   font-size: 10.5px;
   line-height: 1;
   letter-spacing: 0.34em;
@@ -35,19 +36,32 @@
   color: var(--wall-ink-muted);
 }
 
-.nextTitle {
-  margin-top: 0.45em;
-  font-size: clamp(28px, 2.6vw, 38px);
+.label::before {
+  content: "";
+  width: 40px;
+  border-top: 1px solid rgb(72 64 56 / 0.3);
+  transition: border-color 0.4s var(--ease-calm);
+}
+
+.next .label::before {
+  align-self: flex-end;
+}
+
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: clamp(24px, 2.2vw, 32px);
   line-height: 1.2;
   letter-spacing: 0.04em;
   opacity: 0.86;
   transition: opacity 0.4s var(--ease-calm);
 }
 
-.nextArrow {
+.arrow {
+  flex: none;
   width: 28px;
   height: 9px;
-  margin-top: 14px;
   fill: none;
   stroke: var(--wall-ink-muted);
   stroke-width: 1;
@@ -55,31 +69,58 @@
 }
 
 @media (hover: hover) {
-  .nextLink:hover .nextTitle {
+  .sign:hover .title {
     opacity: 1;
   }
 
-  .nextLink:hover .nextArrow {
-    translate: 5px 0;
+  .sign:hover .label::before {
+    border-color: rgb(72 64 56 / 0.5);
   }
 
-  .nextLink:hover::before {
-    background-color: rgb(72 64 56 / 0.45);
+  /* 矢印は、進む向きへ少しだけ動く */
+  .previous:hover .arrow {
+    translate: -5px 0;
+  }
+
+  .next:hover .arrow {
+    translate: 5px 0;
   }
 }
 
-.nextLink:focus-visible {
+.sign:focus-visible {
   outline: 1px solid var(--wall-ink-muted);
   outline-offset: 8px;
 }
 
-.nextLink:focus-visible .nextTitle {
+.sign:focus-visible .title {
   opacity: 1;
 }
 
+/* 幅の狭い画面：札の文字は読み上げにだけ残し、「← About」「Contact →」の左右の向きだけを見せる */
+@media (max-width: 760px) {
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sign {
+    position: relative;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+}
+
+/* 動きを止める（hover 時の指定より強くする） */
 @media (prefers-reduced-motion: reduce) {
-  .nextLink .nextArrow,
-  .nextLink:hover .nextArrow {
+  .arrow,
+  .previous:hover .arrow,
+  .next:hover .arrow {
     translate: none;
     transition: none;
   }

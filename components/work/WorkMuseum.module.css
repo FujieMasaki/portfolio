@@ -138,7 +138,7 @@
   z-index: 1;
 }
 
-/* ---- 床と、次の展示室（Contact）への案内 ---- */
+/* ---- 床と、順路の案内（← About / Contact →） ---- */
 
 /* 最後の展示の手前の床。/about の Interests と同じ床（--floor-*）を、案内の下まで敷く */
 .floor {
@@ -158,7 +158,7 @@
   mask-image: var(--floor-mask);
 }
 
-.nextRoom {
+.roomNavigation {
   height: clamp(240px, 32svh, 320px);
   padding-top: clamp(32px, 6svh, 64px);
 }

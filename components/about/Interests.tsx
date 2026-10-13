@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import NextRoom from "@/components/museum/NextRoom";
+import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
 import { INTERESTS, type Interest } from "./content";
 import shared from "./AboutMuseum.module.css";
 import styles from "./Interests.module.css";
@@ -12,7 +12,7 @@ import styles from "./Interests.module.css";
  * 解説は展示台の下の床に小さく置き、hover / キーボードのフォーカスで静かに現れる。
  * hover の無い端末では、最初から解説を見せる（Interests.module.css の @media (hover: none)）。
  *
- * 展示を見終えて床を少し歩いた先に、次の展示室（Work）への案内（NextRoom）を置く。
+ * 展示を見終えて床を少し歩いた先に、順路の案内（左：入口へ戻る Top / 右：次の展示室 Work）を置く。
  */
 const Interests = () => {
   return (
@@ -38,7 +38,11 @@ const Interests = () => {
         ))}
       </ul>
 
-      <NextRoom href="/work" title="Work" className={styles.nextRoom} />
+      <MuseumRoomNavigation
+        previous={{ label: "Back to entrance", title: "Top", href: "/" }}
+        next={{ label: "Next room", title: "Work", href: "/work" }}
+        className={styles.roomNavigation}
+      />
     </section>
   );
 };
