@@ -28,8 +28,9 @@
   overflow: clip;
   min-height: max(100svh, 680px);
   /*
-   * 文章の列は縦の中央に置くので、上の余白を館内案内の分（--nav-clearance）まで広げなくても、
-   * Menu を開いたときの項目（左上の約 200px まで）には届かない。広げると、背の低い画面で額と床が1画面に収まらない
+   * 背の高い画面では文章の列を縦の中央に置くので、上の余白を館内案内の分（--nav-clearance）まで広げなくても、
+   * Menu を開いたときの項目（左上の約 200px まで）には届かない。広げると額と床が1画面に収まらないので広げない。
+   * 背の低い横長の画面は、下の media query で文章の列だけを下げる
    */
   padding: clamp(112px, 16svh, 168px) var(--gutter)
     calc(var(--floor-h) + clamp(48px, 8svh, 96px));
@@ -53,14 +54,14 @@
   animation: arrive 1.6s var(--ease-calm) 0.2s both;
 }
 
-/* 肩書き（WEB ENGINEER）。名前のすぐ下に、ABOUT の札と同じくらいの小ささで置く */
+/* 肩書き（WEB ENGINEER）。名前のすぐ下に、ABOUT の札と同じくらいの小ささで置き、色だけ少し濃くして札より少しだけ強くする */
 .role {
   margin: 1.1rem 0 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--wall-ink-muted);
+  color: var(--wall-ink);
 }
 
 /*
@@ -151,27 +152,27 @@
 }
 
 /*
- * 背の低い横長の画面（1280×680・1366×768 など）：文章の列を、左上の館内案内を開いたときの項目（約 200px まで）の下から始める。
- * 本文の行間と段落の間を少し詰め、額と床の構図をできるだけ1画面に保つ（680px 前後では床が少しだけ画面の下に出る）
+ * 背の低い横長の画面（1280×680・1366×768 など）：文章の列だけを、左上の館内案内を開いたときの項目（約 200px まで）の下（220px）から始める。
+ * 額と植物の位置はそのままにし、床の上の余白と本文の行間を少し詰めて、壁・額・床に置いた植物を1画面に収める
  */
 @media (min-width: 761px) and (max-height: 820px) {
   .archive {
-    padding-top: 236px;
+    padding-bottom: calc(var(--floor-h) + 16px);
   }
 
   .archiveText {
     align-self: start;
-    padding-top: 0;
+    padding-top: calc(220px - clamp(112px, 16svh, 168px));
   }
 
   .introduction {
-    gap: 0.8em;
-    margin-top: 1.7em;
-    line-height: 1.85;
+    gap: 0.7em;
+    margin-top: 1.6em;
+    line-height: 1.75;
   }
 
   .place {
-    margin-top: 2em;
+    margin-top: 1.8em;
   }
 }
 
