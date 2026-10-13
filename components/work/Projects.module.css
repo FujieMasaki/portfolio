@@ -1,5 +1,5 @@
 /*
- * WORK / Projects：壁の解説と、低い石の棚に置いた実機。
+ * WORK の Projects：壁の解説と、壁から張り出した薄い石の棚に置いた実機。
  * 棚は /about の展示台と同じく、壁と同じ素材を少し濃くして作る（画像にしない）。
  */
 
@@ -84,23 +84,28 @@
 
 /* ---- 棚と実機 ---- */
 
+/*
+ * 棚の幅は、実機（ノートパソコン ＋ スマートフォン）の幅より 12% ほど広いだけにする。
+ * 実機の列（.devices）を棚の幅の 89% にし、その中でノートパソコンとスマートフォンを 100% に収める。
+ */
 .display {
   position: relative;
   width: 100%;
-  max-width: 600px;
-  padding-inline: 4%;
+  max-width: 560px;
 }
 
 .devices {
+  position: relative;
+  /* 天板（.shelf::before）より手前に描き、機器の底を天板に載せる */
+  z-index: 1;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
+  width: 89%;
+  margin: 0 auto -3px;
 }
 
 .device {
   position: relative;
-  /* 天板の奥に少し沈めて、載っているように見せる */
-  margin-bottom: -2px;
 }
 
 .device img {
@@ -110,38 +115,51 @@
   /* 画像の透明な余白は box の外へはみ出し、隣の解説や Next に重なる。そこでクリックや文字の選択を奪わない */
   pointer-events: none;
   /* 機器の真下に落ちる、ごく弱い接地の影 */
-  filter: drop-shadow(0 6px 5px rgb(30 22 14 / 0.2));
+  filter: drop-shadow(0 5px 4px rgb(30 22 14 / 0.2));
 }
 
 .laptop {
-  width: 80%;
+  width: 84%;
 }
 
 /* スマートフォンはノートパソコンの画面の半分ほどの高さで、右端に少し重ねて立てる */
 .mobile {
-  width: 16%;
-  margin-left: -3%;
+  width: 17%;
+  margin-left: -1%;
 }
 
-/* 低い石の棚。天板だけがわずかに光を受ける */
+/*
+ * 壁から少し張り出した、薄いコンクリート / 琉球石灰岩の棚。
+ * 前面（この要素）は壁と同じ素材を少し濃く・暗くし、上面（::before）は光を受けてわずかに明るくする。
+ * 壁から出ている分だけ、真下の壁にごく薄い陰を落とす。強い影や立体の演出はしない。
+ */
 .shelf {
   position: relative;
-  height: clamp(18px, 1.6vw, 26px);
-  margin-inline: -4%;
-  background-color: #ddd6cc;
-  background-image: url("/images/about/about-wall.webp");
-  background-size: 900px auto;
-  background-blend-mode: multiply;
-  box-shadow: 0 22px 30px -24px rgb(30 22 14 / 0.45);
+  height: clamp(10px, 0.85vw, 14px);
+  background-color: #cfc6b9;
+  background-image:
+    linear-gradient(to bottom, rgb(40 30 20 / 0.04), rgb(40 30 20 / 0.12)),
+    url("/images/about/about-wall.webp");
+  background-size: auto, 700px auto;
+  background-blend-mode: normal, multiply;
+  box-shadow:
+    0 1px 0 rgb(60 50 40 / 0.1),
+    0 12px 16px -12px rgb(30 22 14 / 0.38);
 }
 
+/* 上面。奥行きは数 px だけ見せ、手前の縁（前面との境）にだけ細い線を引く */
 .shelf::before {
   content: "";
   position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: rgb(255 250 242 / 0.3);
-  border-bottom: 1px solid rgb(60 50 40 / 0.12);
+  inset: auto 0 100%;
+  height: 5px;
+  background-color: #e6dfd4;
+  background-image:
+    linear-gradient(to bottom, rgb(255 251 244 / 0.15), rgb(255 251 244 / 0.5)),
+    url("/images/about/about-wall.webp");
+  background-size: auto, 700px auto;
+  background-blend-mode: normal, multiply;
+  border-bottom: 1px solid rgb(255 250 242 / 0.6);
 }
 
 /* ---- これからやること（リンクではなく、壁に書いた予定） ---- */
