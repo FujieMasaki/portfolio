@@ -177,7 +177,7 @@ export const INTERESTS: Interest[] = [
     title: "Space",
     note: ["居心地のいい場所や、", "空間の工夫を見るのが好きです。"],
     image: {
-      src: "/images/about/interented-space.png",
+      src: "/images/about/interest-space.png",
       alt: "3つのアーチを持つこの美術館の建物を、小さくした建築模型",
       width: 1536,
       height: 1024,
