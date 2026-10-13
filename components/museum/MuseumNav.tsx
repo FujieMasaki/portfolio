@@ -88,7 +88,6 @@ const MuseumNav = ({ current }: Props) => {
           onClick={() => setMode((value) => (value === "pinned" ? "closed" : "pinned"))}
         >
           Menu
-          <span className={styles.lines} aria-hidden="true" />
         </button>
 
         <nav aria-label="展示室">

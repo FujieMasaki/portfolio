@@ -1,6 +1,7 @@
 /*
  * 館内案内（左上の Menu）。
- * 壁に小さく書かれた案内表示として、背景・枠・影を持たせず、文字と細線だけで置く。
+ * 壁に小さく書かれた案内表示として、背景・枠・影・アイコンを持たせず、文字（といまの部屋の下線）だけで置く。
+ * 開いた項目が届く高さは、展示室側の --nav-clearance（AboutMuseum.module.css）がよけておく。項目の大きさや間を変えたら、そちらも見直す。
  * 色は展示室側の --wall-ink を引き継ぎ、無ければ TOP の部屋名プレートと同じ色にする。
  */
 
@@ -15,8 +16,8 @@
   justify-content: flex-start;
   padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 64px) 0;
   font-family: var(--font-heading), serif;
-  /* 壁の質感に埋もれない大きさ。太さではなく大きさで読みやすくする */
-  font-size: 16.5px;
+  /* 壁に小さく書かれた館内案内の大きさ。壁の質感に埋もれないよう、太さではなく濃さ（--wall-ink）で読ませる */
+  font-size: 15px;
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0.12em;
@@ -38,7 +39,6 @@
 .toggle {
   display: inline-flex;
   align-items: center;
-  gap: 1.1em;
   margin: 0;
   padding: 0.5em 0;
   border: 0;
@@ -47,14 +47,6 @@
   letter-spacing: inherit;
   color: inherit;
   cursor: pointer;
-}
-
-/* 細い1本線（Menu ─）。ハンバーガーの記号にはしない */
-.lines {
-  position: relative;
-  width: 24px;
-  border-top: 1px solid currentColor;
-  opacity: 0.8;
 }
 
 /*
@@ -66,9 +58,9 @@
   top: 100%;
   left: 0;
   display: grid;
-  gap: 0.95em;
+  gap: 0.7em;
   margin: 0;
-  padding: 1.3em 0 0;
+  padding: 1.1em 0 0;
   list-style: none;
   white-space: nowrap;
   opacity: 0;

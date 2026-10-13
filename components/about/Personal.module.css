@@ -27,7 +27,8 @@
   align-items: center;
   overflow: clip;
   min-height: max(100svh, 680px);
-  padding: clamp(112px, 16svh, 168px) var(--gutter)
+  /* 上は、左上の館内案内を開いたときの余白（--nav-clearance）より狭くしない */
+  padding: max(clamp(112px, 16svh, 168px), var(--nav-clearance)) var(--gutter)
     calc(var(--floor-h) + clamp(48px, 8svh, 96px));
 }
 
@@ -123,7 +124,7 @@
     grid-template-columns: minmax(0, 1fr);
     row-gap: clamp(48px, 9svh, 72px);
     min-height: auto;
-    padding-top: clamp(104px, 16svh, 132px);
+    padding-top: max(clamp(104px, 16svh, 132px), var(--nav-clearance));
     /* 植物の葉が写真に重ならないよう、写真の下に植物の高さ（幅の約 1.19 倍）と床の分の余白を取る */
     padding-bottom: calc(var(--plant-w) * 1.19 + var(--floor-h) * 0.3 + 24px);
   }

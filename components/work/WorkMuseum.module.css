@@ -12,7 +12,8 @@
 
 .intro {
   position: relative;
-  padding: clamp(136px, 22svh, 220px) var(--gutter) clamp(8px, 2svh, 24px);
+  /* 上は、左上の館内案内を開いたときの余白（--nav-clearance）。Menu を開いても札に重ならず、本文も動かない */
+  padding: var(--nav-clearance) var(--gutter) clamp(8px, 2svh, 24px);
 }
 
 /* 文字は葉の影より手前に置く */
@@ -165,10 +166,6 @@
 
 /* 幅の狭い画面：札の下に展示を置く。植物は小さくし、札の文字にかからない高さにする */
 @media (max-width: 760px) {
-  .intro {
-    padding-top: clamp(120px, 20svh, 168px);
-  }
-
   .canopy {
     width: min(92vw, 420px);
   }
