@@ -10,12 +10,12 @@ const item = ({ title, link, pubDate }) =>
 test("Zenn の形（CDATA の題）と note の形（文字参照の題）の両方を読む", () => {
   const xml = `<rss><channel><title>feed</title>
     ${item({ title: "<![CDATA[AI と <Rails>]]>", link: `${SITE}/articles/a`, pubDate: "Sat, 19 Sep 2026 02:58:05 GMT" })}
-    ${item({ title: "体験 &amp; 設計 &#x2F; &#12354;", link: `${SITE}/articles/b`, pubDate: "Thu, 10 Sep 2026 11:34:44 +0900" })}
+    ${item({ title: "体験 &amp; 設計 &#x2F; &#12354;&nbsp;Day1 &unknown;", link: `${SITE}/articles/b`, pubDate: "Thu, 10 Sep 2026 11:34:44 +0900" })}
   </channel></rss>`;
 
   assert.deepEqual(parseFeed(xml, SITE, 4), [
     { title: "AI と <Rails>", url: `${SITE}/articles/a`, publishedAt: "2026-09-19T02:58:05.000Z" },
-    { title: "体験 & 設計 / あ", url: `${SITE}/articles/b`, publishedAt: "2026-09-10T02:34:44.000Z" },
+    { title: "体験 & 設計 / あ\u00a0Day1 &unknown;", url: `${SITE}/articles/b`, publishedAt: "2026-09-10T02:34:44.000Z" },
   ]);
 });
 
