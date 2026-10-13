@@ -1,7 +1,8 @@
 /**
  * WORK / Publishing の記事一覧。Zenn・note の RSS をサーバーで読み、新しい順に数件だけ取り出す。
  *
- * 取得はビルド時と、1日ごとの再生成のときだけ（app/work/page.tsx の revalidate）。訪問者のブラウザからは外部へ通信しない。
+ * 取得はビルド時と、1日ごとの再生成のときだけ。訪問者のブラウザからは外部へ通信しない。
+ * 1日のキャッシュは Publishing.tsx の unstable_cache が持ち、ここの fetch はキャッシュしない（理由は fetchFeed）。
  * 取得や解析に失敗したら null を返し、一覧を出さずに「Zenn ↗ / note ↗」の札だけを見せる（Publishing.tsx）。
  *
  * scripts/work-feeds.test.mjs から Node で直接読むので、ほかのファイルを import せず、型の注釈以外の TypeScript の構文を使わない。
@@ -14,8 +15,8 @@ export type FeedEntry = {
   publishedAt: string;
 };
 
-/** 1日（秒）。app/work/page.tsx の revalidate と同じ値 */
-const ONE_DAY = 86400;
+/** 記事を読み直す間隔（1日・秒）。app/work/page.tsx の revalidate と同じ値 */
+export const FEED_REVALIDATE = 86400;
 
 const ENTITIES = new Map([
   ["amp", "&"],
@@ -66,11 +67,16 @@ export const formatMonth = (iso: string) => {
   return `${date.getUTCFullYear()}.${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
 };
 
-/** RSS を読んで記事を返す。読めない・1件もないときは null（一覧を出さない） */
+/**
+ * RSS を読んで記事を返す。読めない・1件もないときは null（一覧を出さない）。
+ *
+ * fetch の next.revalidate でキャッシュすると、Next.js は期限切れの取り直しで signal を外すので（16.2 の patch-fetch）、
+ * 再生成のときにタイムアウトが効かない。そのため fetch はキャッシュせず、呼ぶ側で関数ごとキャッシュする。
+ */
 export const fetchFeed = async (feedUrl: string, site: string, limit: number) => {
   try {
     const response = await fetch(feedUrl, {
-      next: { revalidate: ONE_DAY },
+      cache: "no-store",
       // 相手が応答しないときに、ビルドや再生成を止めない
       signal: AbortSignal.timeout(8000),
     });

@@ -8,9 +8,8 @@ export const metadata: Metadata = {
 };
 
 /*
- * Publishing の記事（Zenn・note の RSS）を1日ごとに読み直す。
- * RSS の取得に失敗したときも、翌日には読み直す（fetch の revalidate だけだと、失敗したまま固定される）。
- * 値は components/work/feeds.ts の ONE_DAY と同じにする（ここは静的に解析されるので、式や定数を書けない）。
+ * Publishing の記事（Zenn・note の RSS）を1日ごとに読み直すため、ページも1日ごとに作り直す。
+ * 値は components/work/feeds.ts の FEED_REVALIDATE と同じにする（ここは静的に解析されるので、式や定数を書けない）。
  */
 export const revalidate = 86400;
 
