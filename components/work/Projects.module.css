@@ -107,6 +107,8 @@
   position: absolute;
   max-width: none;
   height: auto;
+  /* 画像の透明な余白は box の外へはみ出し、隣の解説や Next に重なる。そこでクリックや文字の選択を奪わない */
+  pointer-events: none;
   /* 機器の真下に落ちる、ごく弱い接地の影 */
   filter: drop-shadow(0 6px 5px rgb(30 22 14 / 0.2));
 }

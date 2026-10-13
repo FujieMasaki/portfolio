@@ -32,10 +32,11 @@ const Publishing = async () => {
 
       <div className={styles.shelves} data-reveal>
         {PUBLISHING.map((source, index) => (
+          // 領域の名前は媒体名だけにする（リンクの「新しいタブで開く」を含めない）
           <section key={source.name} className={styles.source} aria-labelledby={`publishing-${source.name}`}>
-            <h3 className={styles.sourceName} id={`publishing-${source.name}`}>
+            <h3 className={styles.sourceName}>
               <ExternalLink href={source.site} className={styles.sourceLink}>
-                {source.name}
+                <span id={`publishing-${source.name}`}>{source.name}</span>
                 <svg className={styles.arrow} viewBox="0 0 10 10" aria-hidden="true">
                   <path d="M1 9 9 1M3 1h6v6" />
                 </svg>
