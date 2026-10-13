@@ -191,12 +191,12 @@ export const INTERESTS: Interest[] = [
     title: "Alone Time",
     note: ["一人で考えを整理する時間や、", "サウナやお風呂で", "ぼーっと過ごす時間が好きです。"],
     image: {
-      src: "/images/about/interested-book.png",
+      src: "/images/about/interest-book.png",
       // 読書ではなく、一人で静かに過ごす時間の象徴として置く
       alt: "一冊の本",
-      width: 1295,
-      height: 1214,
-      box: { x: 280, y: 98, width: 806, height: 1034 },
+      width: 1229,
+      height: 1280,
+      box: { x: 171, y: 45, width: 886, height: 1177 },
     },
     plinth: { height: 0.8, width: 0.85 },
     objectWidth: 48,
