@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import NextRoom from "@/components/museum/NextRoom";
 import { INTERESTS, type Interest } from "./content";
 import shared from "./AboutMuseum.module.css";
 import styles from "./Interests.module.css";
@@ -12,7 +12,7 @@ import styles from "./Interests.module.css";
  * 解説は展示台の下の床に小さく置き、hover / キーボードのフォーカスで静かに現れる。
  * hover の無い端末では、最初から解説を見せる（Interests.module.css の @media (hover: none)）。
  *
- * 展示を見終えて床を少し歩いた先に、次の展示室（Work）への案内を置く。ボタンにはせず、壁の札と同じ文字で示す。
+ * 展示を見終えて床を少し歩いた先に、次の展示室（Work）への案内（NextRoom）を置く。
  */
 const Interests = () => {
   return (
@@ -39,15 +39,7 @@ const Interests = () => {
         ))}
       </ul>
 
-      <nav className={styles.nextRoom} aria-label="次の展示室" data-reveal>
-        <Link href="/work" className={styles.nextLink}>
-          <span className={styles.nextLabel}>Next room</span>
-          <span className={styles.nextTitle}>Work</span>
-          <svg className={styles.nextArrow} viewBox="0 0 32 10" aria-hidden="true">
-            <path d="M0 5h31M26 1l5 4-5 4" />
-          </svg>
-        </Link>
-      </nav>
+      <NextRoom href="/work" title="Work" className={styles.nextRoom} />
     </section>
   );
 };
