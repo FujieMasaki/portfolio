@@ -42,8 +42,9 @@ const Writing = async () => {
 
       <div className={styles.shelves} data-reveal>
         {WRITING.map((source, index) => (
-          <section key={source.name} className={styles.source} aria-labelledby={`writing-${source.name}`}>
-            <h3 className={styles.sourceName} id={`writing-${source.name}`}>
+          // 媒体ごとの枠はランドマークにせず、h3 の見出しだけで区切る
+          <div key={source.name} className={styles.source}>
+            <h3 className={styles.sourceName}>
               {source.name}
             </h3>
             {feeds[index] ? (
@@ -58,7 +59,7 @@ const Writing = async () => {
               </svg>
               <span className={styles.visuallyHidden}>（{source.name}・新しいタブで開く）</span>
             </ExternalLink>
-          </section>
+          </div>
         ))}
       </div>
     </section>
