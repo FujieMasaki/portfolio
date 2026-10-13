@@ -24,10 +24,6 @@
   pointer-events: none;
 }
 
-.menu {
-  pointer-events: auto;
-}
-
 .toggle:focus-visible,
 .item:focus-visible {
   outline: 1px solid currentColor;
@@ -36,6 +32,7 @@
 
 .menu {
   position: relative;
+  pointer-events: auto;
 }
 
 .toggle {

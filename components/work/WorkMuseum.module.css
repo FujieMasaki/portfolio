@@ -132,7 +132,7 @@
   padding: clamp(56px, 8svh, 96px) var(--gutter);
 }
 
-/* 展示の札（番号 / 題 / 短い日本語の文）。番号は ABOUT の札のカテゴリと同じ文字にする */
+/* 展示の札（題 / 短い日本語の文）。番号も部屋の名前も付けない */
 .label {
   position: relative;
   z-index: 1;
