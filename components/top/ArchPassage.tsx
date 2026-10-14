@@ -174,6 +174,13 @@ const ArchPassage = () => {
       timer = window.setTimeout(clear, CLEAR_MS);
     };
 
+    // 通り抜けている途中で「動きを減らす」に変わったら、動きをその場で終わらせ、遷移はそのまま続ける
+    // （cancel すると finished が reject され、遷移まで止まるので finish する）
+    const onMotionChange = () => {
+      if (reducedMotion.matches) animations.forEach((animation) => animation.finish());
+    };
+    reducedMotion.addEventListener("change", onMotionChange);
+
     hero.addEventListener("pointerover", onIntent);
     hero.addEventListener("focusin", onIntent);
     hero.addEventListener("pointerdown", onIntent);
@@ -183,6 +190,7 @@ const ArchPassage = () => {
       hero.removeEventListener("focusin", onIntent);
       hero.removeEventListener("pointerdown", onIntent);
       hero.removeEventListener("click", onClick);
+      reducedMotion.removeEventListener("change", onMotionChange);
       // cancel すると playState が戻るので、広がりきったかどうかは先に取っておく
       const finished = animations.length > 0 && animations.every((animation) => animation.playState === "finished");
       animations.forEach((animation) => animation.cancel());
@@ -190,8 +198,9 @@ const ArchPassage = () => {
       stage.style.transformOrigin = "";
       // 次の部屋に替わった。陰は画面全体を覆ったまま、元の色へ静かに戻す。
       // 広がりきる前に（戻る操作などで）離れたときは、元のページを暗くしないよう、すぐ外す
-      if (shade && !finished) shade.remove();
-      if (shade && finished) {
+      // 「動きを減らす」のときも、フェードせずにすぐ外す
+      if (shade && (!finished || reducedMotion.matches)) shade.remove();
+      if (shade && finished && !reducedMotion.matches) {
         const leaving = shade;
         leaving.style.clipPath = "none";
         leaving

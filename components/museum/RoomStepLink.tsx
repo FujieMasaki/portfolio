@@ -42,15 +42,23 @@ type Props = ComponentProps<typeof Link> & {
 const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
   const router = useRouter();
 
-  // 退いている途中にブラウザの戻る操作などでページを離れたら、退く動きを取り消し、後から遷移させない
-  useEffect(
-    () => () => {
+  // 退いている途中で
+  //   ・「動きを減らす」に変わったら、退く動きをその場で終わらせ、遷移はそのまま続ける
+  //     （cancel すると finished が reject され、遷移まで止まるので finish する）
+  //   ・ブラウザの戻る操作などでページを離れたら、退く動きを取り消し、後から遷移させない
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onMotionChange = () => {
+      if (reducedMotion.matches) leaving?.finish();
+    };
+    reducedMotion.addEventListener("change", onMotionChange);
+    return () => {
+      reducedMotion.removeEventListener("change", onMotionChange);
       leaving?.cancel();
       leaving = null;
       stepping = false;
-    },
-    [],
-  );
+    };
+  }, []);
 
   const step = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
