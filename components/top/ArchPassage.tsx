@@ -87,7 +87,7 @@ const ArchPassage = () => {
       const opening = stage.querySelector<HTMLElement>(`.${styles.arch}[data-arch="${arch.id}"]`);
       if (!opening) return;
 
-      // Link より先に呼ばれる（React のイベントは document で受ける）ので、ここで止めれば Link は遷移しない
+      // Link より先に呼ばれる（React のイベントは hero より外側の root で受ける）ので、ここで止めれば Link は遷移しない
       event.preventDefault();
       passing = true;
       overlay.dataset.to = arch.id;
