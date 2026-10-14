@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ComponentProps, type MouseEvent } from "react";
+import { useEffect, type ComponentProps, type MouseEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +12,11 @@ const STEP_PX = 12;
 const CLEAR_MS = 4000;
 /** サイト共通の easing（--ease-calm と同じ値） */
 const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+
+/**
+ * いま退いている展示の動き。前後の札（別々のインスタンス）で共有し、どちらを押し直しても退く動きと遷移を重ねない
+ */
+let leaving: Animation | null = null;
 
 type Props = ComponentProps<typeof Link> & {
   href: string;
@@ -31,8 +36,15 @@ type Props = ComponentProps<typeof Link> & {
  */
 const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
   const router = useRouter();
-  // 退いている途中にもう一度押されても、退く動きと遷移を重ねない
-  const leaving = useRef(false);
+
+  // 退いている途中にブラウザの戻る操作などでページを離れたら、退く動きを取り消し、後から遷移させない
+  useEffect(
+    () => () => {
+      leaving?.cancel();
+      leaving = null;
+    },
+    [],
+  );
 
   const step = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
@@ -43,8 +55,7 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
     if (!main || typeof main.animate !== "function") return;
 
     event.preventDefault();
-    if (leaving.current) return;
-    leaving.current = true;
+    if (leaving) return;
     const root = document.documentElement;
     const sign = direction === "next" ? -1 : 1;
 
@@ -60,17 +71,20 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
       if (end.target !== main && end.animationName.includes("room-step")) clear();
     };
 
-    main
-      .animate(
-        { opacity: [1, 0], translate: ["0 0", `${sign * STEP_PX}px 0`] },
-        { duration: EXIT_MS, easing: EASE, fill: "forwards" },
-      )
-      .finished.then(() => {
+    leaving = main.animate(
+      { opacity: [1, 0], translate: ["0 0", `${sign * STEP_PX}px 0`] },
+      { duration: EXIT_MS, easing: EASE, fill: "forwards" },
+    );
+    leaving.finished
+      .then(() => {
+        leaving = null;
+        if (!main.isConnected) return;
         root.dataset.roomStep = direction;
         document.addEventListener("animationend", onEnd);
         timer = window.setTimeout(clear, CLEAR_MS);
         router.push(href);
       })
+      // 取り消された（ページを離れた）ときは遷移しない
       .catch(() => undefined);
   };
 
