@@ -54,7 +54,8 @@
 
 /*
  * TOP のアーチを通り抜けて来たとき（ArchPassage）は、景色はこれまでどおり暗がりから現れ、
- * Menu だけを静かに現す（AboutMuseum.module.css と同じ印と動きの名前）
+ * Menu だけを静かに現す（印は AboutMuseum.module.css と同じ。ArchPassage が名前に passage-arrive を含む動きの終わりで印を外すので、
+ * 動きは薄く現すだけでもこの名前にする）
  */
 @media (prefers-reduced-motion: no-preference) {
   :global(:root[data-arrival="passage"]) .contact > header {

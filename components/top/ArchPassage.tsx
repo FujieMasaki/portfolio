@@ -35,7 +35,8 @@ const CLEAR_MS = 4000;
  *      窓の中は行き先の壁（/about・/work）か、館の外の暗がり（/contact）で、遷移先の最初の地と同じにする
  *      広がっている間は、窓と同じ形の陰（shade）を重ねて、次の部屋の地を少しだけ暗く見せる
  *   4. 広がり終えたら router.push で遷移する。<html data-arrival="passage"> を付けておき、
- *      遷移先の展示と Menu は、ズームの続きのように少しだけ広がりながら現れる（AboutMuseum / ContactMuseum の passage-arrive）
+ *      /about・/work の展示はズームの続きのように少しだけ広がりながら、Menu と /contact は静かに薄く現れる
+ *      （AboutMuseum / ContactMuseum の passage-arrive・passage-fade）
  *   5. 次の部屋に替わって TOP が外れたら（この effect の後片付け）、陰を静かに消して元の色に戻す。
  *      陰は遷移の後も残るよう、React の外（body の直下）に置き、TOP の CSS が外れても困らないよう style を直に書く
  *
