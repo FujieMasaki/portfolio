@@ -113,6 +113,8 @@
 /*
  * 3. 植物・琉球石灰岩：素材は舞台と同寸。花の赤が強く出すぎないよう、TOP の植物と同じ程度に彩度と明るさを落とす。
  * 左上の木の梢だけを .canopy の写しで切り出して揺らすので、下の .plants からはその範囲を抜いておく。
+ * 境目で2枚を半透明どうしで重ねると、葉が透けて奥の空が見えるので、下は 80% で切り替え、
+ * 上の写しはその外側（下が不透明な範囲）でだけ薄くする。
  */
 .plants,
 .canopy {
@@ -122,12 +124,12 @@
 }
 
 .plants {
-  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, transparent 72%, #000 100%);
+  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, transparent 80%, #000 80%);
 }
 
 /* 梢：根元より上だけを、14 秒かけて 1.5px ほど横へ往復させる（岩や低木は動かさない） */
 .canopy {
-  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 86%, transparent 100%);
   animation: canopy-sway 14s ease-in-out infinite alternate;
 }
 
@@ -181,7 +183,6 @@
   font-size: max(1.06cqw, 14px);
   line-height: 1.6;
   letter-spacing: 0.04em;
-  white-space: nowrap;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.4em;
