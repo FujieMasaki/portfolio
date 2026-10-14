@@ -64,6 +64,8 @@ const ContactMuseum = () => {
           </div>
 
           <div className={styles.stage}>
+            {/* 建物の画像が読めなかったときだけ見える、案内の下地（読めれば壁がすべて覆う） */}
+            <div className={styles.wallFallback} aria-hidden="true" />
             <div className={styles.building} aria-hidden="true">
               <Image
                 src="/images/contact/contact-building-back.png"
