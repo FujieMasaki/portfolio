@@ -5,14 +5,16 @@ import ParallaxStage from "@/components/top/ParallaxStage";
 import shared from "@/components/about/AboutMuseum.module.css";
 import styles from "./ContactMuseum.module.css";
 
-const EMAIL_USER = "masakifujie.work";
-const EMAIL_DOMAIN = "gmail.com";
-const EMAIL = `${EMAIL_USER}@${EMAIL_DOMAIN}`;
+const EMAIL = "masakifujie.work@gmail.com";
 
-/** 外の世界への案内。GitHub は旧 Footer・PlacesToKnowMe と同じ URL。X とメールアドレスは /contact を作るときに指定されたもの */
+/**
+ * 外の世界への案内。GitHub は旧 Footer・PlacesToKnowMe と同じ URL。X とメールアドレスは /contact を作るときに指定されたもの。
+ * メールアドレスは文字では出さず、ほかと同じく名前だけのリンクにする（読み上げにはアドレスを添える）
+ */
 const LINKS = [
-  { label: "GitHub", href: "https://github.com/FujieMasaki" },
-  { label: "X", href: "https://x.com/Maski23421424" },
+  { label: "Mail", href: `mailto:${EMAIL}`, hint: `（${EMAIL}）` },
+  { label: "GitHub", href: "https://github.com/FujieMasaki", hint: "（新しいタブで開く）", newTab: true },
+  { label: "X", href: "https://x.com/Maski23421424", hint: "（新しいタブで開く）", newTab: true },
 ];
 
 /** TOP の Sky.tsx と同じ指定にし、TOP から来たときに同じ大きさの画像を使い回せるようにする */
@@ -34,7 +36,7 @@ const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
  *   1. sky      TOP と同じ海と空（top-bg-sea-sky.png）を左右反転して、館の反対側から見ていることにする
  *   2. building 美術館の背面とアーチ（植物の影は画像に含まれる。固定）
  *   3. plants   植物・琉球石灰岩（1枚の PNG。左上の木の梢だけを写しで切り出し、ごく弱く揺らす）
- *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / メール / 外部リンク）
+ *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / Mail・GitHub・X）
  *
  * 建物・植物・案内は、完成イメージと同じ 1672:941 の舞台（.stage）に % で置く。素材の PNG もこの寸法で作られている。
  * 海と空は舞台の外に置く（揺らす写しや反転を舞台と分けるため）。水平線はどの画面でも舞台の上から約 58%（アーチの開口部の中）に合わせ、
@@ -107,26 +109,19 @@ const ContactMuseum = () => {
                 <span className={styles.title}>Email &amp; Links</span>
               </h1>
 
-              {/* 1行に収める前提だが、文字を大きくする設定などで収まらないときは @ の前で折り返す */}
-              <a className={styles.email} href={`mailto:${EMAIL}`}>
-                {EMAIL_USER}
-                <wbr />@{EMAIL_DOMAIN}
-              </a>
-
               <ul className={styles.links}>
                 {LINKS.map((link) => (
                   <li key={link.label}>
                     <a
                       className={styles.link}
                       href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      {...(link.newTab && { target: "_blank", rel: "noopener noreferrer" })}
                     >
                       {link.label}
                       <svg className={styles.external} viewBox="0 0 10 10" aria-hidden="true">
                         <path d="M2 8 8 2M3.5 2H8v4.5" />
                       </svg>
-                      <span className={styles.visuallyHidden}>（新しいタブで開く）</span>
+                      <span className={styles.visuallyHidden}>{link.hint}</span>
                     </a>
                   </li>
                 ))}
