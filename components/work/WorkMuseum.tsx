@@ -1,6 +1,7 @@
 import Image from "next/image";
 import MuseumNav from "@/components/museum/MuseumNav";
 import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
+import RevealOnce from "@/components/museum/RevealOnce";
 import shared from "@/components/about/AboutMuseum.module.css";
 import Projects from "./Projects";
 import Studies from "./Studies";
@@ -88,6 +89,8 @@ const WorkMuseum = () => {
           />
         </div>
       </main>
+
+      <RevealOnce />
     </div>
   );
 };

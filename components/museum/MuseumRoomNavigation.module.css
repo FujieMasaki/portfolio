@@ -51,6 +51,28 @@
   align-self: flex-end;
 }
 
+/*
+ * 順路の案内が初めて視界に入ったとき（RevealOnce が data-reveal を pending → shown にする）に、
+ * 札の上の短い線を一度だけ引く。来た方向は左から、進む方向は右から引き、館内の案内が置かれたように見せる。
+ * 入った時点で見えている案内（/contact など）は、最初から引かれている
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .label::before {
+    transform-origin: left;
+    transition:
+      border-color 0.4s var(--ease-calm),
+      scale 0.65s var(--ease-calm) 0.5s;
+  }
+
+  .next .label::before {
+    transform-origin: right;
+  }
+
+  .route[data-reveal="pending"] .label::before {
+    scale: 0 1;
+  }
+}
+
 .title {
   display: inline-flex;
   align-items: center;

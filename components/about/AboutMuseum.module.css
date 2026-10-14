@@ -131,32 +131,19 @@
 /* ---- 現れ方 ---- */
 
 /*
- * Career / Interests の展示は、画面に入るときに静かに現れる（スクロール位置に応じて進む CSS アニメーション）。
- * 画面の下へ戻すとまた薄くなるが、移動量は 10px なので往復しても目立たない。
- * 対応していないブラウザと prefers-reduced-motion では、何もせず最初から見える。
+ * Career / Interests の展示は、最初に視界へ入ったときに一度だけ静かに現れる。
+ * 画面の下にある展示に RevealOnce.tsx が "pending" を付け、画面に入ったら "shown" に替える。
+ * スクロールを戻しても、また薄くはならない。
+ * JS が動かない環境と prefers-reduced-motion では "pending" が付かず、最初から見える。
  */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .museum [data-reveal] {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 5% entry 65%;
-    }
-
-    /*
-     * 幅の狭い画面では、Career の列（5点を縦に並べる）や Interests の2段が画面より高くなる。
-     * 割合で決めると、上端が画面の上の方に来るまで薄いままになるので、入ってから 200px で現れ終える。
-     */
-    @media (max-width: 760px) {
-      .museum [data-reveal] {
-        animation-range: entry 0% entry 200px;
-      }
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .museum [data-reveal] {
+    transition:
+      opacity 1.6s var(--ease-calm),
+      translate 1.6s var(--ease-calm);
   }
-}
 
-@keyframes reveal {
-  from {
+  .museum [data-reveal="pending"] {
     opacity: 0;
     translate: 0 10px;
   }

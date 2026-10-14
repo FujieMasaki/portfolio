@@ -20,7 +20,24 @@
 .introText {
   position: relative;
   z-index: 1;
-  animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+/* 札は WORK → 展示の名前 → 短い文 の順に、/about の札と同じ時間差で現れる */
+.introText h1 > *,
+.statement {
+  animation: arrive 1.6s var(--ease-calm) both;
+}
+
+.introText h1 > :first-child {
+  animation-delay: 0.2s;
+}
+
+.introText h1 > :nth-child(2) {
+  animation-delay: 0.29s;
+}
+
+.statement {
+  animation-delay: 0.41s;
 }
 
 /*
@@ -212,7 +229,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .introText {
+  .introText h1 > *,
+  .statement {
     animation: none;
   }
 }

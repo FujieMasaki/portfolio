@@ -11,6 +11,13 @@
   }
 }
 
+/* 札の細線を、左から引く */
+@keyframes line-draw {
+  from {
+    scale: 0 1;
+  }
+}
+
 /*
  * 構図：文章は左、額（主展示）は文章の近く、植物は右端の床に鉢ごと置く。
  * 文章と写真が1つの展示に見える距離に置き、額の右に植物のための余白を広めに残した非対称の壁にする。
@@ -51,7 +58,37 @@
 .archiveText {
   /* 写真より少し下に置き、2つの展示の高さをずらす */
   padding-top: clamp(24px, 8svh, 96px);
-  animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+/*
+ * 札は、ABOUT → Masaki Fujie → WEB ENGINEER → 本文 → 所在地 の順に、ごく短い時間差で現れる。
+ * 間は 90 → 120 → 150ms と少しずつ広げ、読む順に視線が降りていく速さにする。一文字ずつは出さない
+ */
+.archiveText h1 > *,
+.role,
+.introduction,
+.place {
+  animation: arrive 1.6s var(--ease-calm) both;
+}
+
+.archiveText h1 > :first-child {
+  animation-delay: 0.2s;
+}
+
+.archiveText h1 > :nth-child(2) {
+  animation-delay: 0.29s;
+}
+
+.role {
+  animation-delay: 0.41s;
+}
+
+.introduction {
+  animation-delay: 0.56s;
+}
+
+.place {
+  animation-delay: 0.71s;
 }
 
 /* 肩書き（WEB ENGINEER）。名前のすぐ下に、ABOUT の札と同じくらいの小ささで置き、色だけ少し濃くして札より少しだけ強くする */
@@ -96,10 +133,13 @@
   color: var(--wall-ink-muted);
 }
 
+/* 所在地の横の細線。札が現れ終わるころに、館内の案内が置かれたように一度だけ引かれる */
 .place::after {
   content: "";
   width: 56px;
   border-top: 1px solid var(--wall-line);
+  transform-origin: left;
+  animation: line-draw 0.65s var(--ease-calm) 1.5s both;
 }
 
 /* 額は壁の中ほどの高さに掛け、この部屋の主展示にする */
@@ -211,7 +251,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .archiveText,
+  .archiveText h1 > *,
+  .role,
+  .introduction,
+  .place,
+  .place::after,
   .portrait,
   .plant {
     animation: none;
