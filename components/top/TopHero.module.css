@@ -23,7 +23,11 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
+  /*
+   * 画面より 1% だけ大きく敷き、上下左右に 0.5% ずつの見えない余白を作る。
+   * 植物をパララックスで最大 0.45% ずらしても、画面の端に奥の空や背景色がのぞかない
+   */
+  width: max(101vw, calc(max(100svh, 560px) * 1.01 * 1672 / 941));
   aspect-ratio: 1672 / 941;
   translate: -50% -50%;
   container-type: inline-size;
@@ -56,6 +60,17 @@
 }
 
 /*
+ * パララックス（ParallaxStage.tsx が流すポインタ位置 --px / --py は -1〜1）。
+ * 建物（とその開口部にあるアーチ・部屋名）を支点にして動かさず、奥の空と手前の植物を逆の向きにずらす。
+ * 手前ほど大きく動かすが、どれも舞台の幅の 1% に満たない。レイヤーが横にずれていると分かる量にはしない。
+ *
+ *   sky        -0.3%   奥。ポインタと逆の向き
+ *   building    0      支点（arches・archSigns も同じ）
+ *   plants     +0.45%  植物（建物の奥の木立も手前の茂みも1枚の PNG なので同じ量にする）
+ *   sway       +0.6%   前景で揺らす枝・葉
+ */
+
+/*
  * 1. 海と空：ごく弱いパララックス。動いても端が見えないよう少し大きく敷く。
  * 雲・海・霞の動きはどれも「気づかなくてもよい」程度に留め、建築より目立たせない。
  */
@@ -64,7 +79,7 @@
   --horizon: 42.2%;
 
   inset: -2%;
-  transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
+  transform: translate3d(calc(var(--px) * -0.3%), calc(var(--py) * -0.2%), 0);
   transition: transform 1.6s var(--ease-calm);
 }
 
@@ -134,6 +149,16 @@
 .plantsFront,
 .building {
   pointer-events: none;
+}
+
+/*
+ * 植物のパララックスは、マスクを持つ箱ではなく中の画像だけをずらす。
+ * マスク（＝建物の輪郭）は建物と一緒に止まったままなので、奥の木立が建物の手前へはみ出さない
+ */
+.plantsBack img,
+.plantsFront img {
+  translate: calc(var(--px) * 0.45%) calc(var(--py) * 0.3%);
+  transition: translate 1.6s var(--ease-calm);
 }
 
 .plantsFront {
@@ -581,13 +606,22 @@
     translate: -50% 0;
   }
 
-  /* 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ */
+  /*
+   * 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ。
+   * 空の上端と舞台の下端は画面の端にそろえているので、パララックスは横にだけ動かす（縦に動かすと端に背景色が出る）
+   */
   .sky {
     --horizon: 44.9%;
 
     top: calc(-1 * var(--sky-above));
     bottom: auto;
     height: calc((var(--sky-above) + 0.423 * var(--stage-h)) / 0.449);
+    transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
+  }
+
+  .plantsBack img,
+  .plantsFront img {
+    translate: calc(var(--px) * 0.45%) 0;
   }
 
   .sky img {
@@ -655,7 +689,10 @@
   }
 
   /* 案内とスモークの切り替えは残し、パララックスだけ止める */
-  .sky {
+  .sky,
+  .plantsBack img,
+  .plantsFront img,
+  .sway {
     transition: none;
   }
 }
