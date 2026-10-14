@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentProps, MouseEvent } from "react";
+import { useRef, type ComponentProps, type MouseEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -31,6 +31,8 @@ type Props = ComponentProps<typeof Link> & {
  */
 const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
   const router = useRouter();
+  // 退いている途中にもう一度押されても、退く動きと遷移を重ねない
+  const leaving = useRef(false);
 
   const step = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);
@@ -41,6 +43,8 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
     if (!main || typeof main.animate !== "function") return;
 
     event.preventDefault();
+    if (leaving.current) return;
+    leaving.current = true;
     const root = document.documentElement;
     const sign = direction === "next" ? -1 : 1;
 

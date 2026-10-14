@@ -167,6 +167,8 @@ const ArchPassage = () => {
       const onEnd = (end: AnimationEvent) => {
         if (end.animationName.includes("passage-arrive")) clear();
       };
+      // 順路の案内で TOP へ戻った直後なら、その印（RoomStepLink）が残っているので外し、着地の動きを1つにする
+      delete root.dataset.roomStep;
       root.dataset.arrival = "passage";
       document.addEventListener("animationend", onEnd);
       timer = window.setTimeout(clear, CLEAR_MS);
