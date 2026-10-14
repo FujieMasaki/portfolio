@@ -15,6 +15,15 @@ const LINKS = [
   { label: "X", href: "https://x.com/Maski23421424" },
 ];
 
+/** TOP の Sky.tsx と同じ指定にし、TOP から来たときに同じ大きさの画像を使い回せるようにする */
+const SKY_SIZES =
+  "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 110vw";
+/** 舞台の幅（縦長・狭い画面は最大 240vw、4:3 付近は約 133vw、それ以外は 100vw）に合わせる。建物は舞台の 68% */
+const PLANTS_SIZES =
+  "(max-aspect-ratio: 6/7) 240vw, (max-width: 700px) 240vw, (max-aspect-ratio: 4/3) 140vw, 100vw";
+const BUILDING_SIZES =
+  "(max-aspect-ratio: 6/7) 165vw, (max-width: 700px) 165vw, (max-aspect-ratio: 4/3) 96vw, 68vw";
+
 const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
 
 /**
@@ -47,7 +56,7 @@ const ContactMuseum = () => {
                 fill
                 loading="eager"
                 fetchPriority="high"
-                sizes="(max-aspect-ratio: 6/7) 220vw, 110vw"
+                sizes={SKY_SIZES}
                 style={{ filter: SKY_FILTER }}
               />
             </div>
@@ -61,7 +70,7 @@ const ContactMuseum = () => {
                 fill
                 loading="eager"
                 fetchPriority="high"
-                sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, 72vw"
+                sizes={BUILDING_SIZES}
               />
             </div>
 
@@ -73,7 +82,7 @@ const ContactMuseum = () => {
                 fill
                 loading="eager"
                 fetchPriority="high"
-                sizes="(max-aspect-ratio: 6/7) 290vw, (max-width: 700px) 290vw, 100vw"
+                sizes={PLANTS_SIZES}
               />
             </div>
             <div className={styles.canopy} aria-hidden="true">
@@ -82,7 +91,7 @@ const ContactMuseum = () => {
                 alt=""
                 fill
                 loading="eager"
-                sizes="(max-aspect-ratio: 6/7) 290vw, (max-width: 700px) 290vw, 100vw"
+                sizes={PLANTS_SIZES}
               />
             </div>
 
