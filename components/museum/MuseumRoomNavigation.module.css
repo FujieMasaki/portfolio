@@ -42,7 +42,8 @@
 .label::before {
   content: "";
   width: 40px;
-  border-top: 1px solid rgb(72 64 56 / 0.3);
+  /* 線の色は、壁ではなく植物の上に置く部屋（/contact）だけ --route-line で明るくする */
+  border-top: 1px solid var(--route-line, rgb(72 64 56 / 0.3));
   transition: border-color 0.4s var(--ease-calm);
 }
 
@@ -77,7 +78,7 @@
   }
 
   .sign:hover .label::before {
-    border-color: rgb(72 64 56 / 0.5);
+    border-color: var(--route-line-hover, rgb(72 64 56 / 0.5));
   }
 
   /* 矢印は、進む向きへ少しだけ動く */
