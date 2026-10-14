@@ -203,10 +203,18 @@ const ArchPassage = () => {
       if (shade && finished && !reducedMotion.matches) {
         const leaving = shade;
         leaving.style.clipPath = "none";
-        leaving
-          .animate({ opacity: [1, 0] }, { duration: LIFT_MS, easing: EASE, fill: "forwards" })
-          .finished.catch(() => undefined)
-          .then(() => leaving.remove());
+        const lift = leaving.animate({ opacity: [1, 0] }, { duration: LIFT_MS, easing: EASE, fill: "forwards" });
+        // 陰が晴れていく間に「動きを減らす」に変わったら、フェードをやめてすぐ外す（この effect の購読はもう外れている）
+        const onLiftMotionChange = () => {
+          if (reducedMotion.matches) lift.cancel();
+        };
+        reducedMotion.addEventListener("change", onLiftMotionChange);
+        lift.finished
+          .catch(() => undefined)
+          .then(() => {
+            reducedMotion.removeEventListener("change", onLiftMotionChange);
+            leaving.remove();
+          });
       }
     };
   }, [router]);
