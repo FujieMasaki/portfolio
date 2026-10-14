@@ -77,6 +77,8 @@ const ContactMuseum = () => {
               />
             </div>
 
+            <div className={styles.ground} aria-hidden="true" />
+
             {/* 同じ画像を2枚重ね、下はそのまま、上は梢だけの写し（揺らす）にする。取得は1回で済む */}
             <div className={styles.plants} aria-hidden="true">
               <Image
