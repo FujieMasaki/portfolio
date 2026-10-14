@@ -18,11 +18,11 @@ const LINKS = [
 /** TOP の Sky.tsx と同じ指定にし、TOP から来たときに同じ大きさの画像を使い回せるようにする */
 const SKY_SIZES =
   "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 110vw";
-/** 舞台の幅（縦長・狭い画面は最大 240vw、4:3 付近は約 133vw、それ以外は 100vw）に合わせる。建物は舞台の 68% */
+/** 舞台の幅（縦長・狭い画面は最大 240vw、正方形に近い窓は約 207vw まで、16:9 に近い窓は約 133vw まで）に合わせる。建物は舞台の 68% */
 const PLANTS_SIZES =
-  "(max-aspect-ratio: 6/7) 240vw, (max-width: 700px) 240vw, (max-aspect-ratio: 4/3) 140vw, 100vw";
+  "(max-aspect-ratio: 6/7) 240vw, (max-width: 700px) 240vw, (max-aspect-ratio: 4/3) 210vw, 135vw";
 const BUILDING_SIZES =
-  "(max-aspect-ratio: 6/7) 165vw, (max-width: 700px) 165vw, (max-aspect-ratio: 4/3) 96vw, 68vw";
+  "(max-aspect-ratio: 6/7) 165vw, (max-width: 700px) 165vw, (max-aspect-ratio: 4/3) 143vw, 92vw";
 
 const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
 
@@ -37,7 +37,8 @@ const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
  *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / メール / 外部リンク）
  *
  * 建物・植物・案内は、完成イメージと同じ 1672:941 の舞台（.stage）に % で置く。素材の PNG もこの寸法で作られている。
- * 海と空だけは舞台の外で画面全体に敷き、縦長の画面でも上まで空が続くようにする。
+ * 海と空は舞台の外に置く（揺らす写しや反転を舞台と分けるため）。水平線はどの画面でも舞台の上から約 58%（アーチの開口部の中）に合わせ、
+ * 縦長の画面では画面の上端まで空を伸ばす。
  * ポインタに合わせたごく弱いパララックスと、画像がそろってからのフェードインは TOP の ParallaxStage を使う。
  */
 const ContactMuseum = () => {

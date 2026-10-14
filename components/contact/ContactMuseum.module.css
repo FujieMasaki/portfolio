@@ -11,6 +11,8 @@
   --wall-ink: #f4f1ec;
   --wall-ink-muted: rgb(244 241 236 / 0.84);
   --gutter: clamp(24px, 7vw, 128px);
+  /* 舞台（.stage）の幅。完成イメージと同じ 1672:941 の箱を、画面に対して cover で置く */
+  --stage-w: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
 
   position: relative;
   height: 100svh;
@@ -59,10 +61,15 @@
 /*
  * 1. 海と空：TOP と同じ画像を左右反転する。反転は .skyFlip にだけかけ、
  * パララックスの移動（.sky）と画像の切り取り（object-fit / object-position）とは分けておく。
+ * 空の箱は画面ではなく舞台に合わせ（動いても端が見えないよう 4% 大きく）、どの縦横比でも水平線と建物の位置関係を変えない。
  */
 .sky {
   position: absolute;
-  inset: -2%;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--stage-w) * 1.04);
+  aspect-ratio: 1672 / 941;
+  translate: -50% -50%;
   transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
   transition: transform 1.6s var(--ease-calm);
 }
@@ -85,7 +92,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
+  width: var(--stage-w);
   aspect-ratio: 1672 / 941;
   translate: -50% -50%;
   container-type: inline-size;
@@ -112,9 +119,8 @@
 
 /*
  * 3. 植物・琉球石灰岩：素材は舞台と同寸。花の赤が強く出すぎないよう、TOP の植物と同じ程度に彩度と明るさを落とす。
- * 左上の木の梢だけを .canopy の写しで切り出して揺らすので、下の .plants からはその範囲を抜いておく。
- * 境目で2枚を半透明どうしで重ねると、葉が透けて奥の空が見えるので、下は 80% で切り替え、
- * 上の写しはその外側（下が不透明な範囲）でだけ薄くする。
+ * 左上の木の梢だけを .canopy の写しで切り出して揺らす。下の .plants は抜かずにそのまま敷き、
+ * 写しが動いても隙間や半透明の境目が出ないようにする（ずれは 1px 未満なので、二重には見えない）。
  */
 .plants,
 .canopy {
@@ -123,13 +129,9 @@
   pointer-events: none;
 }
 
-.plants {
-  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, transparent 80%, #000 80%);
-}
-
 /* 梢：根元より上だけを、14 秒かけて 1.5px ほど横へ往復させる（岩や低木は動かさない） */
 .canopy {
-  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 86%, transparent 100%);
+  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 72%, transparent 100%);
   animation: canopy-sway 14s ease-in-out infinite alternate;
 }
 
@@ -275,9 +277,12 @@
  * 舞台の高さは画面の高さを超えない（タブレットの縦向きで建物の上が切れないように）。
  */
 @media (max-aspect-ratio: 6/7), (max-width: 700px) {
-  .stage {
+  .contact {
     --stage-w: min(240vw, calc(max(100svh, 560px) * 1672 / 941));
+    --stage-h: calc(var(--stage-w) * 941 / 1672);
+  }
 
+  .stage {
     top: auto;
     bottom: 0;
     left: calc(var(--stage-w) * -375 / 1672);
@@ -312,8 +317,21 @@
     display: none;
   }
 
+  /*
+   * 空は画面の上端から敷き、水平線（画像の上から 44.9%）を、広い画面と同じく舞台の上から約 58% に合わせる。
+   * 舞台の上端は「画面の高さ − 舞台の高さ」、水平線はそこから 0.58 × 舞台の高さ。箱は縦長なので画像は高さで合う
+   */
+  .sky {
+    top: 0;
+    left: -2%;
+    width: 104%;
+    height: calc((max(100svh, 560px) - 0.42 * var(--stage-h)) / 0.449);
+    aspect-ratio: auto;
+    translate: none;
+  }
+
   .skyFlip img {
-    object-position: 40% 50%;
+    object-position: 40% 0%;
   }
 
   /* 空の明るい上半分で Menu が埋もれないよう、上も少しだけ沈める */
