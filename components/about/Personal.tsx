@@ -2,8 +2,16 @@ import Image from "next/image";
 import shared from "./AboutMuseum.module.css";
 import styles from "./Personal.module.css";
 
+/** 札の本文。段落ごとに、幅の広い画面での改行位置で行を分ける（幅の狭い画面では行をつなげ、語の切れ目で折り返す） */
+const INTRODUCTION = [
+  ["沖縄で暮らしながら、", "フロントエンドを中心に", "プロダクトづくりをしています。"],
+  ["実装だけでなく、", "使う人にとって何が必要かを考え、", "仕様やUIの改善にも関わっています。"],
+];
+
 /**
  * ABOUT / Masaki Fujie：人物そのものを見る展示。壁に文章、文章の近くに額装した写真、右端の床に鉢ごと置いた植物だけを置く。
+ * 札は、部屋の名前（ABOUT）・この展示の主題（名前）・肩書き・何をしている人かの短い文・所在地の順に並べる。
+ * これまでのこと（Career）と、好きなこと（Interests）は次の展示に任せ、ここでは説明しすぎない。
  * 入った直後に見える展示なので、スクロールではなく読み込み時に一度だけ現れる（Personal.module.css の arrive）。
  */
 const Personal = () => {
@@ -14,13 +22,19 @@ const Personal = () => {
           <span className={shared.eyebrow}>About</span>
           <span className={shared.roomTitle}>Masaki Fujie</span>
         </h1>
-        <p className={shared.lead}>
-          沖縄で暮らしながら、
-          <br />
-          つくること、考えること、
-          <br />
-          感じることを大切にしています。
-        </p>
+        {/* 名前のすぐ下の小さな肩書き。見出しにはせず、名前よりかなり小さく置く */}
+        <p className={styles.role}>Web Engineer</p>
+        <div className={styles.introduction}>
+          {INTRODUCTION.map((lines) => (
+            <p key={lines[0]}>
+              {lines.map((line) => (
+                <span key={line} className={styles.line}>
+                  {line}
+                </span>
+              ))}
+            </p>
+          ))}
+        </div>
         <p className={styles.place}>Okinawa, Japan</p>
       </div>
 
