@@ -183,11 +183,15 @@ const ArchPassage = () => {
       hero.removeEventListener("focusin", onIntent);
       hero.removeEventListener("pointerdown", onIntent);
       hero.removeEventListener("click", onClick);
+      // cancel すると playState が戻るので、広がりきったかどうかは先に取っておく
+      const finished = animations.length > 0 && animations.every((animation) => animation.playState === "finished");
       animations.forEach((animation) => animation.cancel());
       delete hero.dataset.passage;
       stage.style.transformOrigin = "";
-      // 次の部屋に替わった。陰は画面全体を覆ったまま、元の色へ静かに戻す
-      if (shade) {
+      // 次の部屋に替わった。陰は画面全体を覆ったまま、元の色へ静かに戻す。
+      // 広がりきる前に（戻る操作などで）離れたときは、元のページを暗くしないよう、すぐ外す
+      if (shade && !finished) shade.remove();
+      if (shade && finished) {
         const leaving = shade;
         leaving.style.clipPath = "none";
         leaving
