@@ -19,14 +19,24 @@ const RevealOnce = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          (entry.target as HTMLElement).dataset.reveal = "shown";
-          observer.unobserve(entry.target);
+          if (entry.isIntersecting) show(entry.target);
         }
       },
       // 画面の下端から少し入ったところで現す（下端に触れた瞬間では、ほとんど見えないうちに終わる）
       { rootMargin: "0px 0px -12% 0px" },
     );
+
+    const show = (target: Element) => {
+      (target as HTMLElement).dataset.reveal = "shown";
+      observer.unobserve(target);
+    };
+
+    // Tab でフォーカスが隠れた展示の中へ入ったら、画面に入りきる前でもすぐ現す（見えない場所にフォーカスを置かない）
+    const onFocusIn = (event: FocusEvent) => {
+      const target = (event.target as Element | null)?.closest?.('[data-reveal="pending"]');
+      if (target) show(target);
+    };
+    document.addEventListener("focusin", onFocusIn);
 
     const targets = document.querySelectorAll<HTMLElement>("main [data-reveal]");
     for (const target of targets) {
@@ -38,6 +48,7 @@ const RevealOnce = () => {
 
     return () => {
       observer.disconnect();
+      document.removeEventListener("focusin", onFocusIn);
       for (const target of targets) {
         if (target.dataset.reveal === "pending") target.dataset.reveal = "";
       }
