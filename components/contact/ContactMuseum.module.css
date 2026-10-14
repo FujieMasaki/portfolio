@@ -105,10 +105,14 @@
 .stage {
   position: absolute;
   top: 50%;
-  left: 50%;
+  /*
+   * 横は中央に寄せる。ただし正方形に近い窓では中央に寄せるとアーチが左端で切れるので、
+   * 舞台の座標で x = 375（アーチの外形のすぐ左）より右を画面から外に出さない（縦長の構図と同じ基準）
+   */
+  left: max(calc(50% - var(--stage-w) / 2), calc(var(--stage-w) * -375 / 1672));
   width: var(--stage-w);
   aspect-ratio: 1672 / 941;
-  translate: -50% -50%;
+  translate: 0 -50%;
   container-type: inline-size;
 }
 
