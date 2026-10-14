@@ -328,6 +328,8 @@
     height: calc((max(100svh, 560px) - 0.42 * var(--stage-h)) / 0.449);
     aspect-ratio: auto;
     translate: none;
+    /* 上に余白がないので、パララックス（ポインタのある窓だけ）は横にだけ動かす。縦に動かすと上端に背景色が出る */
+    transform: translate3d(calc(var(--px) * -0.35%), 0, 0);
   }
 
   .skyFlip img {
