@@ -27,6 +27,54 @@
   text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
 }
 
+/*
+ * 景色と順路の案内は、.contact の大きさの main の中に置く。
+ * 順路の案内から来たときに main ごとずらすため、main を .contact と同じ大きさの箱にしておく
+ * （main 自体には高さが無いので、ずらすと中の absolute の景色がつぶれる）
+ */
+.contact > main {
+  position: absolute;
+  inset: 0;
+}
+
+/* 順路の案内（RoomStepLink）から来たときだけ、進んだ向きの 12px 先から着地する（AboutMuseum.module.css と同じ動き） */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step="next"]) .contact > main {
+    --room-step: 12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+
+  :global(:root[data-room-step="previous"]) .contact > main {
+    --room-step: -12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+}
+
+/*
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）は、景色はこれまでどおり暗がりから現れ、
+ * Menu だけを静かに現す（AboutMuseum.module.css と同じ印と動きの名前）
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-arrival="passage"]) .contact > header {
+    animation: passage-arrive 1.3s var(--ease-calm) both;
+  }
+}
+
+@keyframes passage-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes room-step {
+  from {
+    opacity: 0;
+    translate: var(--room-step) 0;
+  }
+}
+
 /* ---- 景色（海と空・建物・植物・案内）。画像がそろってから一度にフェードインする ---- */
 
 .scene {

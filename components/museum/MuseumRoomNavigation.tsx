@@ -1,4 +1,4 @@
-import Link from "next/link";
+import RoomStepLink from "./RoomStepLink";
 import styles from "./MuseumRoomNavigation.module.css";
 
 /** 順路の先の1か所。label は館内案内の札の文字（BACK TO ENTRANCE・PREVIOUS ROOM・NEXT ROOM） */
@@ -26,6 +26,7 @@ type Props = {
  *   CONTACT  PREVIOUS ROOM ← Work       /  BACK TO ENTRANCE Top →
  *
  * ページ送りのボタンには見せず、壁の札と同じ文字と細い線だけで示す。
+ * 選ぶと、いまの展示が数 px 退いて、次の部屋が反対側から静かに現れる（RoomStepLink）。
  */
 const MuseumRoomNavigation = ({ previous, next, className }: Props) => {
   return (
@@ -37,14 +38,14 @@ const MuseumRoomNavigation = ({ previous, next, className }: Props) => {
 };
 
 const RoomSign = ({ room, direction }: { room: RoomLink; direction: "previous" | "next" }) => (
-  <Link href={room.href} className={`${styles.sign} ${styles[direction]}`}>
+  <RoomStepLink href={room.href} direction={direction} className={`${styles.sign} ${styles[direction]}`}>
     <span className={styles.label}>{room.label}</span>
     <span className={styles.title}>
       {direction === "previous" && <Arrow direction={direction} />}
       {room.title}
       {direction === "next" && <Arrow direction={direction} />}
     </span>
-  </Link>
+  </RoomStepLink>
 );
 
 const Arrow = ({ direction }: { direction: "previous" | "next" }) => (

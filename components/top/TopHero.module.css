@@ -404,7 +404,8 @@
   pointer-events: auto;
   transition:
     color 0.5s var(--ease-calm),
-    border-color 0.5s var(--ease-calm);
+    border-color 0.5s var(--ease-calm),
+    opacity 0.5s var(--ease-calm);
 }
 
 /* hover の無い端末では、プレートだけで入口だと分かるよう少し濃くする */
@@ -480,6 +481,55 @@
       rgb(16 18 14 / 0.38) 100%
     ),
     linear-gradient(to bottom, rgb(40 36 52 / 0.12), transparent 30%);
+}
+
+/*
+ * アーチを通り抜ける遷移（ArchPassage.tsx）。
+ * 選んだ入口の開口部と同じアーチの形の窓を、clip-path で画面いっぱいまで広げる。
+ * 窓の中は遷移先の最初の地と同じにし、遷移が終わったときに地が切り替わって見えないようにする。
+ */
+.passage {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* /about・/work の壁（AboutMuseum.module.css の .museum と同じ素材・敷き方） */
+.passage[data-to="about"],
+.passage[data-to="work"] {
+  background: url("/images/about/about-wall.webp") center top / max(100%, 1280px) auto repeat-y
+    #faf4ec;
+  background-blend-mode: multiply;
+}
+
+/* /contact は館の外。景色が現れる前の地（ContactMuseum.module.css の .contact）と同じ色 */
+.passage[data-to="contact"] {
+  background: #1c211b;
+}
+
+/* 通り抜けている間は、ほかの入口に反応させない */
+.hero[data-passage] .stage {
+  pointer-events: none;
+}
+
+/* 選んだ入口以外を少しだけ落ち着かせる。暗くしすぎず、選んだアーチへ視線が残る程度 */
+.hero[data-passage="about"] .arch:not([data-arch="about"]) .archScene,
+.hero[data-passage="work"] .arch:not([data-arch="work"]) .archScene,
+.hero[data-passage="contact"] .arch:not([data-arch="contact"]) .archScene {
+  filter: contrast(0.94) brightness(0.9);
+}
+
+.hero[data-passage="about"] .archSign:not([data-arch="about"]) .archPlate,
+.hero[data-passage="work"] .archSign:not([data-arch="work"]) .archPlate,
+.hero[data-passage="contact"] .archSign:not([data-arch="contact"]) .archPlate {
+  opacity: 0.55;
+}
+
+.hero[data-passage] .plaque {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-calm);
 }
 
 /* 館名のプレート */

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import ArchEntrance from "./ArchEntrance";
+import ArchPassage from "./ArchPassage";
 import ArchSigns from "./ArchSigns";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
@@ -32,6 +33,8 @@ type Props = {
  *      sway       風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY。初期実装では空）
  *   6. atmosphere 周辺減光と夕方の光
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
+ *
+ * 舞台の上に、アーチを通り抜ける遷移の窓（ArchPassage）を重ねる。
  */
 const TopHero = ({ ambient = "evening" }: Props) => {
   const { background, backgroundFilter, buildingFilter, sceneFilter } =
@@ -130,6 +133,9 @@ const TopHero = ({ ambient = "evening" }: Props) => {
 
         <ArchSigns />
       </ParallaxStage>
+
+      {/* アーチを選んだときに、開口部が画面いっぱいに広がって次の部屋へ通り抜ける */}
+      <ArchPassage />
 
       {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}
       <noscript>

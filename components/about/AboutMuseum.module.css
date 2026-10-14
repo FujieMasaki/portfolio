@@ -148,3 +148,58 @@
     translate: 0 10px;
   }
 }
+
+/*
+ * 順路の案内（RoomStepLink）から来たときだけ、展示（main）が進んだ向きの 12px 先から静かに着地する。
+ * 壁（.museum の背景）は動かさない。印（<html data-room-step>）は、この動きが終わると RoomStepLink が外す。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step="next"]) .museum > main {
+    --room-step: 12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+
+  :global(:root[data-room-step="previous"]) .museum > main {
+    --room-step: -12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+}
+
+/*
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）だけ、展示はズームの続きのように少しだけ広がりながら、
+ * Menu は静かに現れる。壁は通り抜けの窓と同じなので動かさない。
+ * 印（<html data-arrival>）は、この動きが終わると ArchPassage が外す。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-arrival="passage"]) .museum > main {
+    transform-origin: 50% 50svh;
+    animation: passage-arrive 1.3s var(--ease-calm) both;
+  }
+
+  :global(:root[data-arrival="passage"]) .museum > header {
+    animation: passage-fade 1.3s var(--ease-calm) both;
+  }
+}
+
+@keyframes passage-arrive {
+  from {
+    opacity: 0;
+    scale: 0.985;
+  }
+}
+
+@keyframes passage-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes room-step {
+  from {
+    opacity: 0;
+    translate: var(--room-step) 0;
+  }
+}
+
