@@ -117,6 +117,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
                 transformOrigin: layer.origin,
                 "--sway-angle": `${layer.angle}deg`,
                 "--sway-duration": `${layer.duration}s`,
+                "--sway-delay": `${layer.delay ?? 0}s`,
               } as CSSProperties
             }
             aria-hidden="true"

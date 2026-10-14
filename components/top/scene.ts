@@ -121,8 +121,13 @@ export type SwayLayer = {
   origin: string;
   /** 片側への最大傾き（deg）。0.3〜0.8 程度で十分 */
   angle: number;
-  /** 1往復の秒数。8〜14 秒程度のゆっくりした周期 */
+  /**
+   * 一周の秒数。8〜14 秒程度のゆっくりした周期で、レイヤーごとに 9.8 / 12.4 / 13.7 のように少しずつ変える
+   * （同じ周期にすると、すべての枝が同じ向きへ同時に動く）
+   */
   duration: number;
+  /** 揺れ始めの遅れ（秒）。負の値にすると、周期の途中から始まる */
+  delay?: number;
 };
 
 export const FOLIAGE_SWAY: SwayLayer[] = [];

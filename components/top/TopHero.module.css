@@ -456,10 +456,17 @@
   animation: swallow-flap var(--flap-duration, 1.15s) ease-in-out infinite;
 }
 
-/* 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される） */
+/*
+ * 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される）。
+ * 周期と遅れはレイヤーごとに変え、すべての枝が同じ向きへ同時に動かないようにする。
+ * 往復の折り返しは、keyframe ごとの ease-in-out でゆっくり止まってから戻す（等速の振り子にしない）
+ */
 .sway {
   pointer-events: none;
-  animation: foliage-sway var(--sway-duration) ease-in-out infinite alternate;
+  translate: calc(var(--px) * 0.6%) calc(var(--py) * 0.4%);
+  transition: translate 1.6s var(--ease-calm);
+  animation: foliage-sway var(--sway-duration) cubic-bezier(0.45, 0, 0.55, 1)
+    var(--sway-delay, 0s) infinite;
 }
 
 /* 6. 周辺減光と夕方の光 */
@@ -570,12 +577,20 @@
   }
 }
 
+/* 一度大きく傾いて戻りかけ、もう一度少し押されてから戻る。一周の中で強さを変え、等速の往復に見せない */
 @keyframes foliage-sway {
-  from {
-    rotate: calc(-1 * var(--sway-angle));
+  0%,
+  100% {
+    rotate: calc(-0.4 * var(--sway-angle));
   }
-  to {
+  27% {
     rotate: var(--sway-angle);
+  }
+  46% {
+    rotate: calc(0.35 * var(--sway-angle));
+  }
+  71% {
+    rotate: calc(0.8 * var(--sway-angle));
   }
 }
 

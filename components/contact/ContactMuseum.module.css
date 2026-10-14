@@ -174,10 +174,13 @@
   pointer-events: none;
 }
 
-/* 梢：根元より上だけを、14 秒かけて 1.5px ほど横へ往復させる（岩や低木は動かさない） */
+/*
+ * 梢：根元より上だけを、13.7 秒の周期で 1.5px ほど横へ揺らす（岩や低木は動かさない）。
+ * 周期は /work の葉（12.4 秒）とそろえず、一周の中で押される強さを変えて、等速の往復にしない
+ */
 .canopy {
   mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 72%, transparent 100%);
-  animation: canopy-sway 14s ease-in-out infinite alternate;
+  animation: canopy-sway 13.7s cubic-bezier(0.45, 0, 0.55, 1) -5s infinite;
 }
 
 /* 夕方の空気。足元（順路の案内）と左上（Menu）を少しだけ沈め、明るい文字を読ませる */
@@ -387,11 +390,18 @@
 }
 
 @keyframes canopy-sway {
-  from {
+  0%,
+  100% {
     translate: -0.75px 0;
   }
-  to {
+  30% {
     translate: 0.75px 0.5px;
+  }
+  52% {
+    translate: -0.1px 0.15px;
+  }
+  76% {
+    translate: 0.45px 0.35px;
   }
 }
 
