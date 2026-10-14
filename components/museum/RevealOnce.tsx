@@ -30,8 +30,8 @@ const RevealOnce = () => {
 
     const targets = document.querySelectorAll<HTMLElement>("main [data-reveal]");
     for (const target of targets) {
-      // すでに画面に入っている展示は、隠さずそのまま見せる
-      if (target.getBoundingClientRect().top < window.innerHeight * 0.88) continue;
+      // 少しでも画面に入っている展示は、隠さずそのまま見せる（見えている部分を一度薄くしない）
+      if (target.getBoundingClientRect().top < window.innerHeight) continue;
       target.dataset.reveal = "pending";
       observer.observe(target);
     }
