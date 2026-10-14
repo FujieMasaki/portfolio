@@ -14,9 +14,14 @@ const CLEAR_MS = 4000;
 const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
 
 /**
- * いま退いている展示の動き。前後の札（別々のインスタンス）で共有し、どちらを押し直しても退く動きと遷移を重ねない
+ * 前後の札（別々のインスタンス）で共有する状態。
+ *   stepping  押してから、この部屋を離れる（unmount する）まで true。退き終えて遷移を待つ間に押し直しても、動きと遷移を重ねない
+ *   leaving   いま退いている展示の動き。途中でページを離れたら取り消す
+ *   clearMark 前に付けた印（data-room-step）・listener・タイマーの片付け。新しく付け直す前に呼び、古いタイマーが新しい印を消さないようにする
  */
+let stepping = false;
 let leaving: Animation | null = null;
+let clearMark: (() => void) | null = null;
 
 type Props = ComponentProps<typeof Link> & {
   href: string;
@@ -42,6 +47,7 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
     () => () => {
       leaving?.cancel();
       leaving = null;
+      stepping = false;
     },
     [],
   );
@@ -55,20 +61,31 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
     if (!main || typeof main.animate !== "function") return;
 
     event.preventDefault();
-    if (leaving) return;
+    if (stepping) return;
+    stepping = true;
     const root = document.documentElement;
     const sign = direction === "next" ? -1 : 1;
 
-    // 次の部屋が現れ終えたら印を外す（Menu で移ったときや再読み込みでは、この動きをしない）
-    let timer = 0;
-    const clear = () => {
-      delete root.dataset.roomStep;
-      document.removeEventListener("animationend", onEnd);
-      window.clearTimeout(timer);
-    };
-    // 印を付けてから遷移するまでの間は、退いたこの部屋の main にも着地の動きがかかる（見えない）ので、それの終わりは数えない
-    const onEnd = (end: AnimationEvent) => {
-      if (end.target !== main && end.animationName.includes("room-step")) clear();
+    // 次の部屋に印を残す。現れ終えたら外す（Menu で移ったときや再読み込みでは、この動きをしない）。
+    // 入口（TOP）には着地の動きが無いので、印を残さない
+    const mark = () => {
+      clearMark?.();
+      if (href === "/") return;
+      let timer = 0;
+      const clear = () => {
+        delete root.dataset.roomStep;
+        document.removeEventListener("animationend", onEnd);
+        window.clearTimeout(timer);
+        if (clearMark === clear) clearMark = null;
+      };
+      // 印を付けてから遷移するまでの間は、退いたこの部屋の main にも着地の動きがかかる（見えない）ので、それの終わりは数えない
+      const onEnd = (end: AnimationEvent) => {
+        if (end.target !== main && end.animationName.includes("room-step")) clear();
+      };
+      root.dataset.roomStep = direction;
+      document.addEventListener("animationend", onEnd);
+      timer = window.setTimeout(clear, CLEAR_MS);
+      clearMark = clear;
     };
 
     leaving = main.animate(
@@ -79,9 +96,7 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
       .then(() => {
         leaving = null;
         if (!main.isConnected) return;
-        root.dataset.roomStep = direction;
-        document.addEventListener("animationend", onEnd);
-        timer = window.setTimeout(clear, CLEAR_MS);
+        mark();
         router.push(href);
       })
       // 取り消された（ページを離れた）ときは遷移しない
