@@ -132,13 +132,13 @@
   margin-top: 0.9em;
 }
 
-/* 最後の展示（Experience）は文字だけで段落が多いので、行と段落の間を少し広げ、窮屈に見せない */
+/* 最後の展示（Experience）は文字だけで段落が多いので、行と段落の間を少し広げ、窮屈に見せない（段落の間は、題との間 1.3em より少しだけ詰める） */
 .exhibit[data-text-only] .note {
   line-height: 2.05;
 }
 
 .exhibit[data-text-only] .note + .note {
-  margin-top: 1.3em;
+  margin-top: 1.15em;
 }
 
 .frame {
