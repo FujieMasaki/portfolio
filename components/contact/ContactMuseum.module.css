@@ -1,0 +1,378 @@
+/*
+ * /contact（美術館の海側・裏側）。
+ * 舞台（.stage）は素材と同じ 1672:941 の箱で、建物・植物・案内はこの箱の中に「素材の px / 1672（または 941）」の % で置く。
+ * 画面に対しては TOP と同じく object-fit: cover の考え方で舞台を拡大・中央寄せする。
+ * 文字・札の体系は /about（AboutMuseum.module.css）と同じものを使い、ここでは屋外の置き方だけを決める。
+ */
+
+.contact {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* 館の外は植物と夕方の空の上なので、Menu と順路の案内は TOP の館名と同じ明るい文字にする */
+  --wall-ink: #f4f1ec;
+  --wall-ink-muted: rgb(244 241 236 / 0.84);
+  --gutter: clamp(24px, 7vw, 128px);
+
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1c211b;
+  font-family:
+    var(--font-heading), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+  font-weight: 500;
+  /* 植物や空の上でも Menu・順路の案内が読めるよう、TOP の館名と同じ淡い影を敷く（壁の案内では消す） */
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
+}
+
+/* ---- 景色（海と空・建物・植物・案内）。画像がそろってから一度にフェードインする ---- */
+
+.scene {
+  --px: 0;
+  --py: 0;
+
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.scene[data-ready] {
+  animation: scene-arrive 2.4s var(--ease-calm) both;
+}
+
+/* CSS の保険で表示された後に ready になった場合は、フェードインをやり直さない */
+.scene[data-ready="late"] {
+  opacity: 1;
+  animation: none;
+}
+
+/*
+ * 保険：JS の読み込みや hydration に失敗して data-ready が付かなくても、6 秒たったら CSS だけで表示する。
+ * 表示されるまでは、見えない案内のリンクに Tab でフォーカスが入らないようにする。
+ * 6s は ParallaxStage.tsx の JS_FALLBACK_MS（5 秒）より長くしておく
+ */
+.scene:not([data-ready]) {
+  visibility: hidden;
+  animation: scene-fallback 0.8s var(--ease-calm) 6s forwards;
+}
+
+/*
+ * 1. 海と空：TOP と同じ画像を左右反転する。反転は .skyFlip にだけかけ、
+ * パララックスの移動（.sky）と画像の切り取り（object-fit / object-position）とは分けておく。
+ */
+.sky {
+  position: absolute;
+  inset: -2%;
+  transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
+  transition: transform 1.6s var(--ease-calm);
+}
+
+.skyFlip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: scaleX(-1);
+}
+
+.skyFlip img {
+  object-fit: cover;
+  /* 水平線を、舞台の上から約 58% に置く（建物の足元より上、アーチの開口部の中ほど） */
+  object-position: 50% 8%;
+}
+
+/* 2〜4. 建物・植物・案内の舞台 */
+.stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
+  aspect-ratio: 1672 / 941;
+  translate: -50% -50%;
+  container-type: inline-size;
+}
+
+.stage > * {
+  position: absolute;
+}
+
+/*
+ * 2. 建物：素材（1672 x 941）を 0.68 倍にして、左寄りに置く。
+ * 参考画像より少し大きくし、海より建築と壁の余白を主にする。足元は植物が隠す。固定で、動かさない。
+ */
+.building {
+  left: calc(60 / 1672 * 100%);
+  /* 足元（素材の下端の直線）は、手前の植物の切れ込みより下に沈めて見せない */
+  top: calc(200 / 941 * 100%);
+  width: 68%;
+  height: 68%;
+  /* 夕方の光の橙を落ち着かせ、TOP の建物（ライトグレーのコンクリート）に寄せる */
+  filter: saturate(0.62) brightness(0.97);
+  pointer-events: none;
+}
+
+/*
+ * 3. 植物・琉球石灰岩：素材は舞台と同寸。花の赤が強く出すぎないよう、TOP の植物と同じ程度に彩度と明るさを落とす。
+ * 左上の木の梢だけを .canopy の写しで切り出して揺らすので、下の .plants からはその範囲を抜いておく。
+ */
+.plants,
+.canopy {
+  inset: 0;
+  filter: saturate(0.72) brightness(0.84);
+  pointer-events: none;
+}
+
+.plants {
+  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, transparent 72%, #000 100%);
+}
+
+/* 梢：根元より上だけを、14 秒かけて 1.5px ほど横へ往復させる（岩や低木は動かさない） */
+.canopy {
+  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 72%, transparent 100%);
+  animation: canopy-sway 14s ease-in-out infinite alternate;
+}
+
+/* 夕方の空気。足元（順路の案内）と左上（Menu）を少しだけ沈め、明るい文字を読ませる */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 24%),
+    radial-gradient(ellipse 30% 26% at 0% 0%, rgb(16 18 14 / 0.3), transparent 100%),
+    linear-gradient(to bottom, rgb(40 36 52 / 0.1), transparent 30%);
+}
+
+/* ---- 4. 壁の案内 ---- */
+
+/*
+ * 通り抜けてきたアーチの右、植物の影が薄いあたりの壁に置く。背景・枠・カードは持たせず、文字と細い線だけ。
+ * 大きさは舞台の幅（cqw）に合わせ、どの画面でも壁の同じ場所に同じ割合で収まるようにする。
+ */
+.sign {
+  left: calc(706 / 1672 * 100%);
+  top: calc(410 / 941 * 100%);
+  width: calc(330 / 1672 * 100%);
+  /* コンクリートの上に直接書いた文字。TOP の部屋名プレート、/about の壁の文字と同じ色 */
+  --wall-ink: rgb(40 34 28);
+  --wall-ink-muted: rgb(58 51 44);
+  --wall-line: rgb(72 64 56 / 0.5);
+
+  color: var(--wall-ink);
+  text-shadow: none;
+}
+
+/* CONTACT の札（/about の .eyebrow と同じ字間。大きさだけ舞台に合わせる） */
+.sign .eyebrow {
+  font-size: max(0.82cqw, 11px);
+}
+
+.title {
+  font-size: max(2.05cqw, 22px);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+}
+
+/* 題とメールの間に、壁に引いた目地のような短い線 */
+.email {
+  display: inline-block;
+  margin-top: max(2.4cqw, 22px);
+  padding-top: max(1.5cqw, 14px);
+  border-top: 1px solid var(--wall-line);
+  font-size: max(1.06cqw, 14px);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.4em;
+  text-decoration-color: rgb(72 64 56 / 0.35);
+  transition: text-decoration-color 0.4s var(--ease-calm);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 2em;
+  margin: max(1.1cqw, 12px) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: max(0.94cqw, 13px);
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  opacity: 0.92;
+  transition: opacity 0.4s var(--ease-calm);
+}
+
+.external {
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  fill: none;
+  stroke: var(--wall-ink-muted);
+  stroke-width: 1;
+  transition: translate 0.4s var(--ease-calm);
+}
+
+@media (hover: hover) {
+  .email:hover {
+    text-decoration-color: rgb(72 64 56 / 0.75);
+  }
+
+  .link:hover {
+    opacity: 1;
+  }
+
+  /* 矢印は、開く向きへ少しだけ動く */
+  .link:hover .external {
+    translate: 1.5px -1.5px;
+  }
+}
+
+.email:focus-visible,
+.link:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 6px;
+}
+
+.link:focus-visible {
+  opacity: 1;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- 順路の案内（文字と線は components/museum/MuseumRoomNavigation）。手前の植物の上、画面の下端に置く ---- */
+
+.roomNavigation {
+  /* 共通の札の線は壁の上の濃さなので、植物の上では明るい線にする */
+  --route-line: rgb(244 241 236 / 0.4);
+  --route-line-hover: rgb(244 241 236 / 0.7);
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(20px, 4svh, 44px);
+  z-index: 1;
+  animation: route-arrive 1.6s var(--ease-calm) 1.2s both;
+}
+
+/*
+ * 縦長・幅の狭い画面：舞台を画面の下に置き、アーチの外形から右の壁の案内までが画面の幅に入る大きさにする。
+ * 舞台の左から 375px（アーチの外形のすぐ左）を画面の左端に合わせる。上に余る分は、画面全体に敷いた空が埋める。
+ * 舞台の高さは画面の高さを超えない（タブレットの縦向きで建物の上が切れないように）。
+ */
+@media (max-aspect-ratio: 6/7), (max-width: 700px) {
+  .stage {
+    --stage-w: min(240vw, calc(max(100svh, 560px) * 1672 / 941));
+
+    top: auto;
+    bottom: 0;
+    left: calc(var(--stage-w) * -375 / 1672);
+    width: var(--stage-w);
+    translate: none;
+  }
+
+  /* アーチの右の柱のすぐ横から、画面の右端の手前までを使う */
+  .sign {
+    left: calc(690 / 1672 * 100%);
+    width: calc(370 / 1672 * 100%);
+  }
+
+  /* メールアドレスを1行に収める（390px 幅で約 200px。それより狭い画面では文字ごと縮める） */
+  .email {
+    font-size: min(13.5px, 3.4vw);
+    letter-spacing: 0.02em;
+  }
+
+  /*
+   * 舞台の上に空が続くので、左上の木の梢は幹から離れて宙に浮いて見える。
+   * 梢は外し、植物は建物の足元の茂みと岩だけにする（揺らす写しも出さない）
+   */
+  .plants {
+    mask-image: linear-gradient(to bottom, transparent 34%, #000 50%);
+  }
+
+  .canopy {
+    display: none;
+  }
+
+  .skyFlip img {
+    object-position: 40% 50%;
+  }
+
+  /* 空の明るい上半分で Menu が埋もれないよう、上も少しだけ沈める */
+  .atmosphere {
+    background:
+      linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 20%),
+      linear-gradient(to bottom, rgb(40 36 52 / 0.22), transparent 30%);
+  }
+}
+
+@keyframes scene-arrive {
+  from {
+    opacity: 0;
+    scale: 1.015;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes scene-fallback {
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes route-arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@keyframes canopy-sway {
+  from {
+    translate: -0.75px 0;
+  }
+  to {
+    translate: 0.75px 0.5px;
+  }
+}
+
+/* 動きを止める（フェードインもしない）。リンクの hover の矢印も動かさない */
+@media (prefers-reduced-motion: reduce) {
+  .scene[data-ready] {
+    opacity: 1;
+  }
+
+  .scene[data-ready],
+  .canopy,
+  .roomNavigation {
+    animation: none;
+  }
+
+  .sky {
+    transition: none;
+  }
+
+  .external,
+  .link:hover .external {
+    translate: none;
+    transition: none;
+  }
+}
