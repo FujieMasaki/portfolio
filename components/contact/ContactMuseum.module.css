@@ -59,6 +59,20 @@
 }
 
 /*
+ * ただし壁の案内（h1・メール・外部リンク）はこのページの本文なので、画像を待つ間も読み上げと Tab の順には残す。
+ * キーボードでフォーカスが入ったら、景色の到着を待たずにすぐ見せる（見えない場所にフォーカスが残らないように）。
+ */
+.scene:not([data-ready]) .sign {
+  visibility: visible;
+}
+
+.scene:not([data-ready]):has(:focus-visible) {
+  opacity: 1;
+  visibility: visible;
+  animation: none;
+}
+
+/*
  * 1. 海と空：TOP と同じ画像を左右反転する。反転は .skyFlip にだけかけ、
  * パララックスの移動（.sky）と画像の切り取り（object-fit / object-position）とは分けておく。
  * 空の箱は画面ではなく舞台に合わせ（動いても端が見えないよう 4% 大きく）、どの縦横比でも水平線と建物の位置関係を変えない。
