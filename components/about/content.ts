@@ -99,7 +99,7 @@ export const CAREER: CareerExhibit[] = [
     number: "05",
     period: "Next",
     title: "Experience",
-    // Career の締め：これまでの経験 → 大切にしていること → これから → Focus on Dot（次の展示室 WORK の Projects へつなぐ）
+    // Career の締め：これまでの経験 → 大切にするようになったこと → これからつくりたい体験
     paragraphs: [
       ["ホテルやコミュニティ運営、", "Web開発を経験する中で、", "リアルな場所とデジタルの両方に", "関心を持つようになりました。"],
       [
@@ -108,8 +108,6 @@ export const CAREER: CareerExhibit[] = [
         "日々の時間が少し豊かになるような",
         "体験をつくっていきたいと考えています。",
       ],
-      // サービス名の途中で折り返さないよう、語の間を改行しない空白（\u00a0）にする
-      ["現在は個人で、", "音声ジャーナリングサービス", "「Focus\u00a0on\u00a0Dot」を企画・開発しています。"],
     ],
   },
 ];
