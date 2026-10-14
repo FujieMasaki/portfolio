@@ -132,6 +132,15 @@
   margin-top: 0.9em;
 }
 
+/* 最後の展示（Experience）は文字だけで段落が多いので、行と段落の間を少し広げ、窮屈に見せない */
+.exhibit[data-text-only] .note {
+  line-height: 2.05;
+}
+
+.exhibit[data-text-only] .note + .note {
+  margin-top: 1.3em;
+}
+
 .frame {
   --frame: 13px;
 
@@ -325,6 +334,15 @@
 
   .note {
     order: 4;
+  }
+
+  /* 文字だけの展示は、決めた改行をやめて語の切れ目で折り返し、1行が長くなりすぎない幅にする */
+  .exhibit[data-text-only] .note {
+    max-width: 30em;
+  }
+
+  .exhibit[data-text-only] .note br {
+    display: none;
   }
 
   .period {
