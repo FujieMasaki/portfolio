@@ -5,9 +5,11 @@ import ParallaxStage from "@/components/top/ParallaxStage";
 import shared from "@/components/about/AboutMuseum.module.css";
 import styles from "./ContactMuseum.module.css";
 
-const EMAIL = "masakifujie.work@gmail.com";
+const EMAIL_USER = "masakifujie.work";
+const EMAIL_DOMAIN = "gmail.com";
+const EMAIL = `${EMAIL_USER}@${EMAIL_DOMAIN}`;
 
-/** 外の世界への案内。URL は旧 Footer / PlacesToKnowMe と同じもの */
+/** 外の世界への案内。GitHub は旧 Footer・PlacesToKnowMe と同じ URL。X とメールアドレスは /contact を作るときに指定されたもの */
 const LINKS = [
   { label: "GitHub", href: "https://github.com/FujieMasaki" },
   { label: "X", href: "https://x.com/Maski23421424" },
@@ -91,8 +93,10 @@ const ContactMuseum = () => {
                 <span className={styles.title}>Email &amp; Links</span>
               </h1>
 
+              {/* 1行に収める前提だが、文字を大きくする設定などで収まらないときは @ の前で折り返す */}
               <a className={styles.email} href={`mailto:${EMAIL}`}>
-                {EMAIL}
+                {EMAIL_USER}
+                <wbr />@{EMAIL_DOMAIN}
               </a>
 
               <ul className={styles.links}>
