@@ -18,44 +18,62 @@ type Flight = {
   reverse: boolean;
   /** 軌道のうねりを毎回変えるための乱数 */
   seed: number[];
+  /** コウモリが途中で向きを直す位置（進んだ割合）と、上下にずれる量（アーチの高さに対する割合） */
+  turns: { at: number; dy: number }[];
 };
 
 /**
- * 飛び方の違い。コウモリは上下にひらひらと揺れながら進む（羽ばたきの違いは wingbeat.ts）。
- * duration は [最小, 最大] 秒、swell は上下の揺れの大きさ（アーチの高さに対する割合）
+ * 飛び方の違い（羽ばたきの違いは wingbeat.ts）。duration は [最小, 最大] 秒。
+ * 燕は大きな弧を描いてなめらかに横切り、コウモリは小さく上下しながら、途中で 2〜3 回だけ向きを直す
  */
-const FLIGHT_STYLE: Record<Flyer, { duration: [number, number]; swell: number }> = {
-  swallow: { duration: [4, 6.5], swell: 0.022 },
-  bat: { duration: [5, 7.5], swell: 0.045 },
+const FLIGHT_STYLE: Record<Flyer, { duration: [number, number] }> = {
+  swallow: { duration: [4, 6.5] },
+  bat: { duration: [5, 7.5] },
 };
 
 /** 関節を支点に回す翼の1片。origin は viewBox 上の関節の位置 */
 type WingPart = { path: string; origin: [number, number] };
+/** 翼1枚。inner は肩から先（腕）、outer は手首から先（コウモリだけ） */
+type Wing = { inner: WingPart; outer?: WingPart };
 
 /**
- * viewBox 48 x 24 の、下から見上げたシルエット。胴体は動かさず、翼だけを関節で回す。
- * 翼は右側だけを描き、左側は同じ形を左右に映して置く（羽ばたきのための変形ではなく、常に同じ鏡像）。
- * 翼の端から端までは、燕が viewBox の幅の約 7 割、コウモリがほぼいっぱい（大きさは TopHero.module.css）。
+ * viewBox 48 x 24 の、真横から見たシルエット（右へ進む向き）。右から左へ飛ぶときは、全体を常に左右に映して置く。
+ * 胴体は動かさず、翼だけを関節で回す。手前の翼（near）が主で、奥の翼（far）は少し小さく、胴体の後ろに隠れる。
+ * 形は滑空の姿勢（翼を後ろへ広げた形）で描き、羽ばたきは wingbeat.ts の角度で肩・手首を回して作る。
  */
-const SILHOUETTE: Record<Flyer, { body: string; inner: WingPart; outer?: WingPart }> = {
-  // 細い胴と、深く切れ込んだ燕尾。翼は細長く、先が後ろへ反る
+const SILHOUETTE: Record<Flyer, { body: string; near: Wing; far: Wing }> = {
+  // 丸い小さな頭と短いくちばし、細長い胴、後ろへ長く伸びる二又の尾。翼は細長い鎌形で、先が後ろへ反る
   swallow: {
-    body: "M24 6C25 6 25.6 6.8 25.7 7.8L26.1 11L26.4 13.6L28.6 19.4L25.6 15.8L24 17L22.4 15.8L19.4 19.4L21.6 13.6L21.9 11L22.3 7.8C22.4 6.8 23 6 24 6Z",
-    inner: {
-      path: "M25.4 8.8C30.4 7.8 36 8.4 41.5 12.4C36.2 11.6 31 12 25.6 12.8Z",
-      origin: [25.4, 10.6],
+    body: "M40.6 12.5L38.9 11.2C38.2 10.1 36.6 9.7 35.2 10.2C32 11.2 27.5 11.8 23.5 12.6L9 14.6L22.8 14.4L11 18L24.6 15.6C28.6 16 33 15.4 36.2 14.4C37.8 13.9 38.9 13.3 40.6 12.5Z",
+    near: {
+      inner: { path: "M31.8 11C27 8.6 19 6.6 9.6 6.2C16 8.4 22 11 28.6 13Z", origin: [31, 11.8] },
+    },
+    far: {
+      inner: {
+        path: "M32.52 10.38C28.78 8.5 22.54 6.94 15.21 6.63C20.2 8.35 24.88 10.38 30.03 11.94Z",
+        origin: [31.9, 11],
+      },
     },
   },
-  // 耳の立った小さな胴。翼は腕（肩〜手首）と手（手首〜指先）に分け、後縁は指の間の膜で波打つ
+  // 尖った耳の小さな頭、横長の胴。翼は腕（肩〜手首）と手（手首〜指先）の広い膜に分け、後縁は指の間で深く波打つ
   bat: {
-    body: "M22.9 7.6L23.3 5.6L23.9 7.2L24.1 7.2L24.7 5.6L25.1 7.6C25.9 8.1 26.3 9.1 26.3 10.2C26.3 12.6 25.4 14.8 24 15.8C22.6 14.8 21.7 12.6 21.7 10.2C21.7 9.1 22.1 8.1 22.9 7.6Z",
-    inner: {
-      path: "M25.4 8.6L34.2 6.2L34.8 7.6Q32.6 10.4 30.4 11.6Q28.2 11.2 25.8 13Z",
-      origin: [25.4, 10],
+    body: "M39.6 11.2C39.2 10.2 38.4 9.6 37.6 9.4L37.8 7.2L36.4 9.2C34 9 30.6 9.6 28.2 10.6C26.6 11.2 25.6 12.2 25.4 13C27.6 13.8 31.4 13.8 34.4 13C36.8 12.4 38.8 11.9 39.6 11.2Z",
+    near: {
+      inner: { path: "M31.2 10.4L21.4 5L20.4 6.8Q21.8 10.4 24.4 12.6Q27.4 13.6 30 13.4Z", origin: [30.8, 11.4] },
+      outer: {
+        path: "M21.6 5Q13.6 3.6 4.8 5.8Q7 7.4 7.6 10Q10.4 8.6 12.6 11.2Q14.8 9.4 17.6 12Q19.4 10 20.6 7.6Z",
+        origin: [21, 5.9],
+      },
     },
-    outer: {
-      path: "M34 6Q39.6 5.2 46.8 8.6Q44.4 8.6 42.8 11Q40.8 9.6 38.6 11.4Q36.6 9.8 34.6 11.8Q33.6 10.2 33.4 8.8Z",
-      origin: [34.2, 7],
+    far: {
+      inner: {
+        path: "M32.12 9.7L24.28 5.38L23.48 6.82Q24.6 9.7 26.68 11.46Q29.08 12.26 31.16 12.1Z",
+        origin: [31.8, 10.5],
+      },
+      outer: {
+        path: "M24.44 5.38Q18.04 4.26 11 6.02Q12.76 7.3 13.24 9.38Q15.48 8.26 17.24 10.34Q19 8.9 21.24 10.98Q22.68 9.38 23.64 7.46Z",
+        origin: [23.96, 6.1],
+      },
     },
   },
 };
@@ -67,27 +85,53 @@ const randomBetween = (min: number, max: number) => min + Math.random() * (max -
 /** 軌道を分割する点の数。多いほど滑らか */
 const STEPS = 24;
 
+/** コウモリが途中で向きを直す 2〜3 か所。飛ぶ区間にほぼ均等に散らし、上下どちらかへ少しだけずれる */
+const planTurns = () => {
+  const count = Math.random() < 0.5 ? 2 : 3;
+  return Array.from({ length: count }, (_, i) => ({
+    at: (i + 1) / (count + 1) + randomBetween(-0.06, 0.06),
+    dy: randomBetween(0.015, 0.035) * (Math.random() < 0.5 ? -1 : 1),
+  }));
+};
+
+/** 0 → 1 へなめらかに移る（向きの修正を、折れ線ではなく緩やかな曲がりにする） */
+const smoothstep = (t: number) => {
+  const x = Math.max(0, Math.min(1, t));
+  return x * x * (3 - 2 * x);
+};
+
 /**
  * 1回分の飛行軌道を、Web Animations のキーフレームとして作る。
  * - 横：ほぼ一定に進むが、速さがごくわずかに揺らぐ（後戻りはしない）
- * - 縦：入る高さから抜ける高さへゆるやかに移りつつ、ゆっくりした波と小さな波を重ねる
- * - 向き：軌道の傾きに合わせてわずかに機体を傾ける（小さな波の分だけ時々向きが変わる）
+ * - 縦：入る高さから抜ける高さへゆるやかに移る。燕はその上に大きな弧を1つだけ重ね、
+ *   コウモリは小さな上下に、途中 2〜3 回の向きの修正を重ねる（ジグザグにはしない）
+ * - 向き：軌道の傾きに合わせて、機首をわずかに上げ下げする
  */
 const buildFlightPath = (flight: Flight, width: number, height: number, birdWidth: number) => {
   const [phaseA, phaseB, phaseSpeed, waves] = flight.seed;
   const startX = -birdWidth * 1.4;
   const endX = width + birdWidth * 0.4;
-  const swell = height * FLIGHT_STYLE[flight.flyer].swell;
+
+  const offsetY = (u: number) => {
+    if (flight.flyer === "swallow") {
+      // 上か下へふくらむ、弱く大きな弧
+      const arc = height * 0.045 * waves * (phaseA < Math.PI ? -1 : 1);
+      return arc * Math.sin(Math.PI * u);
+    }
+    const flutter = height * 0.012 * Math.sin(2 * Math.PI * waves * 2 * u + phaseB);
+    const turns = flight.turns.reduce(
+      (sum, turn) => sum + height * turn.dy * smoothstep((u - turn.at) / 0.12 + 0.5),
+      0,
+    );
+    return flutter + turns;
+  };
 
   const pointAt = (t: number) => {
     // 速さのごく小さな揺らぎ（±12% 程度。0.015 * 2π * 1.3 < 1 なので後戻りしない）
     const u = t + 0.015 * Math.sin(2 * Math.PI * 1.3 * t + phaseSpeed);
     const progress = flight.reverse ? 1 - u : u;
     const x = startX + (endX - startX) * progress;
-    const y =
-      height * (flight.enterY + (flight.exitY - flight.enterY) * u) +
-      swell * Math.sin(2 * Math.PI * waves * u + phaseA) +
-      swell * 0.35 * Math.sin(2 * Math.PI * (waves * 2.7) * u + phaseB);
+    const y = height * (flight.enterY + (flight.exitY - flight.enterY) * u) + offsetY(u);
     return { x, y };
   };
 
@@ -98,7 +142,7 @@ const buildFlightPath = (flight: Flight, width: number, height: number, birdWidt
     const ahead = pointAt(Math.min(1, t + 0.02));
     const behind = pointAt(Math.max(0, t - 0.02));
     const slope = Math.atan2(ahead.y - behind.y, Math.abs(ahead.x - behind.x) || 1);
-    const bank = Math.max(-8, Math.min(8, (slope * 180) / Math.PI * 0.6));
+    const bank = Math.max(-10, Math.min(10, (slope * 180) / Math.PI * 0.8));
     frames.push({
       offset: t,
       transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${(flight.reverse ? -bank : bank).toFixed(2)}deg)`,
@@ -109,7 +153,8 @@ const buildFlightPath = (flight: Flight, width: number, height: number, birdWidt
 
 /**
  * Contact のアーチ越しに、少し奥の海の上をリュウキュウツバメが横切る。夜（時間帯が night）はコウモリになる。
- * 環境の気配だが、黒い点ではなく、見た瞬間に燕・コウモリと分かる大きさにする（大きさは TopHero.module.css）。
+ * 主役ではなく「見ていたら、たまたま横切った」程度の気配だが、黒い点やアイコンではなく、
+ * 真横から見た姿で、静止していても燕・コウモリと分かるようにする（大きさは TopHero.module.css）。
  * 同じ軌道の繰り返しに見えないよう、飛ぶたびに高さ・うねり・速さ・向きを変えて1羽だけ通す。
  * prefers-reduced-motion では飛ばさない（閲覧の途中で有効にしたときも、飛んでいる燕を止める）。
  */
@@ -150,6 +195,7 @@ const ArchFlyby = () => {
         exitY: randomBetween(0.12, 0.4),
         duration: randomBetween(...duration),
         reverse: Math.random() < 0.4,
+        turns: flyer === "bat" ? planTurns() : [],
         seed: [
           randomBetween(0, Math.PI * 2),
           randomBetween(0, Math.PI * 2),
@@ -174,11 +220,13 @@ const ArchFlyby = () => {
       fill: "both",
     };
     const animation = bird.animate(buildFlightPath(flight, width, height, bird.offsetWidth), timing);
-    // 翼は左右とも同じ角度で回す（左は鏡像の中にあるので、そのまま左右対称に動く）
+    // 手前と奥の翼を、それぞれ腕（inner）と手首から先（outer）のキーフレームで回す
     const wings = buildWingKeyframes(flight.flyer, flight.duration);
-    const wingAnimations = Array.from(bird.querySelectorAll<SVGGElement>("[data-wing]")).map((wing) =>
-      wing.animate(wing.dataset.wing === "outer" && wings.outer ? wings.outer : wings.inner, timing),
-    );
+    const wingAnimations = Array.from(bird.querySelectorAll<SVGGElement>("[data-wing]")).flatMap((element) => {
+      const [side, part] = (element.dataset.wing ?? "").split("-") as ["near" | "far", "inner" | "outer"];
+      const frames = wings[side]?.[part];
+      return frames ? [element.animate(frames, timing)] : [];
+    });
     animation.onfinish = () => setFlight(null);
     return () => {
       animation.cancel();
@@ -189,12 +237,12 @@ const ArchFlyby = () => {
   // 動きを減らす設定の間は、飛んでいる途中の燕も描かない（次の燕も予約しない）
   if (!flight || reducedMotion) return null;
 
-  const { body, inner, outer } = SILHOUETTE[flight.flyer];
-  const wing = (
-    <g data-wing="inner" className={styles.wing} style={wingOrigin(inner)}>
+  const { body, near, far } = SILHOUETTE[flight.flyer];
+  const wing = (side: "near" | "far", { inner, outer }: Wing) => (
+    <g data-wing={`${side}-inner`} className={styles.wing} style={wingOrigin(inner)}>
       <path d={inner.path} />
       {outer && (
-        <g data-wing="outer" className={styles.wing} style={wingOrigin(outer)}>
+        <g data-wing={`${side}-outer`} className={styles.wing} style={wingOrigin(outer)}>
           <path d={outer.path} />
         </g>
       )}
@@ -203,10 +251,16 @@ const ArchFlyby = () => {
 
   return (
     <span key={flight.id} ref={birdRef} className={styles[flight.flyer]} aria-hidden="true">
-      <svg viewBox="0 0 48 24" fill="currentColor" focusable="false">
-        {wing}
-        <g transform="matrix(-1 0 0 1 48 0)">{wing}</g>
+      {/* 右から左へ飛ぶときは、全体を常に左右に映す（羽ばたきのための変形ではない） */}
+      <svg
+        viewBox="0 0 48 24"
+        fill="currentColor"
+        focusable="false"
+        className={flight.reverse ? styles.flyLeft : undefined}
+      >
+        <g className={styles.farWing}>{wing("far", far)}</g>
         <path d={body} />
+        {wing("near", near)}
       </svg>
     </span>
   );
