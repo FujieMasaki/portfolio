@@ -7,6 +7,10 @@
  * ここを基準にすると完成イメージとレイヤーがずれない。
  */
 
+import type { AmbientId } from "@/components/museum/ambient";
+import type { AmbientVariables } from "@/components/museum/AmbientRoot";
+import { seaSkyVariables } from "@/components/museum/seaSky";
+
 export const CANVAS = { width: 1672, height: 941 } as const;
 
 type Rect = { x: number; y: number; width: number; height: number };
@@ -63,7 +67,7 @@ export type Arch = {
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
   interior?: ImageInterior | ViewInterior;
-  /** アーチの奥を、時折リュウキュウツバメが横切る */
+  /** アーチの奥を、時折リュウキュウツバメ（夜はコウモリ）が横切る（ArchFlyby） */
   flyby?: boolean;
 };
 
@@ -102,6 +106,8 @@ export const ARCHES: Arch[] = [
     body: { x: 1023, y: 340, width: 307, height: 300 },
     // 海の切り取りは一旦外している。戻すときは次を指定する:
     // interior: { kind: "view", objectPosition: "60% 30%" },
+    // そのときは、周りの空と同じ時間帯の色になるよう、.archScene にも components/museum の .glaze を重ね、
+    // .archScene 側で --horizon（その箱の中での水平線の高さ）も指定する（.sky の値は引き継がれない）
     flyby: true,
   },
 ];
@@ -128,31 +134,80 @@ export type SwayLayer = {
 export const FOLIAGE_SWAY: SwayLayer[] = [];
 
 /**
- * 時間帯ごとの空気感。
+ * TOP の時間帯ごとの光と空気（時間帯は components/museum/ambient.ts が訪問者のローカル時刻で決める）。
  *
- * 今後「時間帯で背景が切り替わる」演出を足すときはここを拡張する:
- *   1. 時間帯ごとに背景画像・色調フィルタ・光のトーンを追加する
- *   2. TopHero で現在時刻（または明示指定）から AmbientId を決めて渡す
- *   3. 切り替えは背景レイヤー（.sky）と光レイヤー（.atmosphere）のクロスフェードで行い、
- *      建物・植物・アーチ内は共通のまま、filter で色だけ寄せる
+ * 同じ美術館に時間が流れて見えるよう、建物の形・植物・アーチ・展示は共通のまま、
+ * 光の量・色温度・霞・室内灯だけを変える。夕方が基準のビジュアルで、
+ * 海と空の光と、景色にかかる空気の色は /contact と共有する（components/museum/seaSky.ts。夕方は足す色を透明にする）。
+ * 部屋名プレートの文字だけは、暗いコンクリートの上でも読めるよう夜に明るくする
+ * （hover などの状態ごとに色が分かれるので、TopHero.module.css の [data-ambient="night"] に置く）。
+ *
+ * filter は時間帯の間で滑らかに移るよう、どの時間帯も同じ関数を同じ順に並べる
+ * （順番や数が違うと、CSS の transition が補間せずに一度に切り替わる）。
  */
-export type AmbientId = "evening";
-
-export type Ambient = {
-  background: string;
-  /** 背景を完成イメージの静かな夕方に寄せるための色調補正 */
-  backgroundFilter: string;
-  /** 昼光で撮られた建物を夕方の光に寄せる */
+export type TopAmbient = {
+  /** 水平線の霞の濃さ（夕方 = 1） */
+  haze: number;
+  /** 昼光で撮られた建物を、その時間の光に寄せる。sepia → brightness → contrast */
   buildingFilter: string;
-  /** 植物を同じ光の中に置くための色調補正 */
+  /** 植物を同じ光の中に置く。saturate → brightness */
   sceneFilter: string;
+  /** About / Work の室内灯。brightness → saturate */
+  interiorFilter: string;
+  /**
+   * 周辺減光の強さ（夕方 = 1）。左下の館名は植物の上で読ませているので、朝・昼も大きくは弱めない
+   * （昼に 0.5 まで弱めると、琉球石灰岩の明るい斑の上でコントラストが 3.5:1 まで下がった）
+   */
+  vignette: number;
 };
 
-export const AMBIENTS: Record<AmbientId, Ambient> = {
+export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
+  morning: {
+    haze: 1.8,
+    buildingFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
+    sceneFilter: "saturate(0.66) brightness(0.8)",
+    interiorFilter: "brightness(0.92) saturate(0.8)",
+    vignette: 0.9,
+  },
+  day: {
+    haze: 0.5,
+    buildingFilter: "sepia(0) brightness(1.02) contrast(1)",
+    sceneFilter: "saturate(0.78) brightness(0.94)",
+    interiorFilter: "brightness(0.84) saturate(0.66)",
+    vignette: 0.85,
+  },
   evening: {
-    background: "/images/top/top-bg-sea-sky.png",
-    backgroundFilter: "saturate(0.6) brightness(0.98) contrast(0.92)",
+    haze: 1,
     buildingFilter: "sepia(0.18) brightness(0.94) contrast(0.96)",
     sceneFilter: "saturate(0.72) brightness(0.8)",
+    interiorFilter: "brightness(1) saturate(1)",
+    vignette: 1,
   },
+  night: {
+    haze: 0.3,
+    buildingFilter: "sepia(0.05) brightness(0.52) contrast(0.98)",
+    sceneFilter: "saturate(0.5) brightness(0.42)",
+    interiorFilter: "brightness(1.06) saturate(1)",
+    vignette: 1,
+  },
+};
+
+const topVariables = (ambient: AmbientId) => {
+  const { haze, buildingFilter, sceneFilter, interiorFilter, vignette } = TOP_AMBIENTS[ambient];
+  return {
+    ...seaSkyVariables(ambient),
+    "--ambient-haze": haze,
+    "--ambient-building-filter": buildingFilter,
+    "--ambient-scene-filter": sceneFilter,
+    "--ambient-interior-filter": interiorFilter,
+    "--ambient-vignette": vignette,
+  };
+};
+
+/** AmbientRoot に渡す、時間帯ごとの CSS 変数（TopHero.module.css が読む） */
+export const TOP_AMBIENT_VARIABLES: AmbientVariables = {
+  morning: topVariables("morning"),
+  day: topVariables("day"),
+  evening: topVariables("evening"),
+  night: topVariables("night"),
 };

@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import ArchFlyby from "./ArchFlyby";
 import { CANVAS, toPercentBox, type Arch } from "./scene";
-import SwallowFlyby from "./SwallowFlyby";
 import styles from "./TopHero.module.css";
 
 type Props = {
   arch: Arch;
-  /** Contact のアーチ越しに見せる背景（時間帯で差し替わる） */
+  /** Contact のアーチ越しに見せる背景（色調は時間帯の CSS 変数で TopHero.module.css が決める） */
   background: string;
-  backgroundFilter: string;
 };
 
 /**
@@ -34,11 +33,7 @@ const interiorSizes = (openingWidth: number, frameWidth: string) => {
   return `(max-aspect-ratio: 6/7) ${portrait}, (max-width: 700px) ${portrait}, (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
 };
 
-const ArchEntrance = ({
-  arch,
-  background,
-  backgroundFilter,
-}: Props) => {
+const ArchEntrance = ({ arch, background }: Props) => {
   const { opening, interior } = arch;
   // 上端を半円にするための縦方向の半径（開口部の高さに対する比率）
   const radiusY = `${(opening.width / 2 / opening.height) * 100}%`;
@@ -74,13 +69,10 @@ const ArchEntrance = ({
             fill
             sizes={`${Math.round((opening.width / CANVAS.width) * 300)}vw`}
             className={styles.archView}
-            style={{
-              objectPosition: interior.objectPosition,
-              filter: backgroundFilter,
-            }}
+            style={{ objectPosition: interior.objectPosition }}
           />
         )}
-        {arch.flyby && <SwallowFlyby />}
+        {arch.flyby && <ArchFlyby />}
       </span>
 
       <span className={styles.archSmoke} aria-hidden="true" />
