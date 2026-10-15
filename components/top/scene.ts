@@ -67,7 +67,7 @@ export type Arch = {
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
   interior?: ImageInterior | ViewInterior;
-  /** アーチの奥を、時折リュウキュウツバメが横切る */
+  /** アーチの奥を、時折リュウキュウツバメ（夜はコウモリ）が横切る（ArchFlyby） */
   flyby?: boolean;
 };
 

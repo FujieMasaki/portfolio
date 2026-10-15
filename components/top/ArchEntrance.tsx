@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import ArchFlyby from "./ArchFlyby";
 import { CANVAS, toPercentBox, type Arch } from "./scene";
-import SwallowFlyby from "./SwallowFlyby";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -72,7 +72,7 @@ const ArchEntrance = ({ arch, background }: Props) => {
             style={{ objectPosition: interior.objectPosition }}
           />
         )}
-        {arch.flyby && <SwallowFlyby />}
+        {arch.flyby && <ArchFlyby />}
       </span>
 
       <span className={styles.archSmoke} aria-hidden="true" />
