@@ -39,7 +39,8 @@ type Props = ComponentProps<typeof Link> & {
  *   2. <html data-room-step> に向きを残して遷移する
  *   3. 次の部屋の main は、その向きの 12px 先から静かに着地する（AboutMuseum.module.css・ContactMuseum.module.css）
  *
- * 横にスライドするページ送りには見せない（距離は数 px、壁や景色の地は動かさない）。
+ * 横にスライドするページ送りには見せない（距離は数 px、館内の壁は動かさない）。
+ * /contact は景色ごと main の中にあるので、景色も一緒に数 px ずれて、館の外の暗い地の上で入れ替わる。
  * 修飾キー付きのクリック・prefers-reduced-motion・Web Animations が無い環境では、通常の Link と同じ。
  */
 const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
