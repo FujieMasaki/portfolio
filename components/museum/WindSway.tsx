@@ -43,6 +43,11 @@ type Props = {
   branches: SwayBranch[];
   /** 元の画像（ベース）と同じ sizes。部品は元の画像より小さいので、これで足りる */
   sizes: string;
+  /**
+   * ベースを優先して読む画面（TOP・/contact）では "high" にする。ベースには部品の部分に穴があるので、
+   * 画像がそろうのを待ってから見せる舞台（ParallaxStage）が、部品も一緒に待つようにする
+   */
+  fetchPriority?: "high";
 };
 
 const percent = (value: number, total: number) => `${(value / total) * 100}%`;
@@ -68,7 +73,7 @@ const originOf = (rect: Box, pivot: Point) =>
  * 動きの形と prefers-reduced-motion での停止は WindSway.module.css が決める。
  * 置く側は、元の画像と同じ大きさの箱（パララックスで動かすなら、その箱ごと）に入れる。
  */
-const WindSway = ({ canvas, branches, sizes }: Props) => {
+const WindSway = ({ canvas, branches, sizes, fetchPriority }: Props) => {
   const frame = { x: 0, y: 0, ...canvas };
 
   return (
@@ -87,7 +92,8 @@ const WindSway = ({ canvas, branches, sizes }: Props) => {
             } as CSSProperties
           }
         >
-          <Image src={branch.src} alt="" fill sizes={sizes} />
+          {/* ベースの穴を埋める部品なので、遅らせずに読む */}
+          <Image src={branch.src} alt="" fill loading="eager" fetchPriority={fetchPriority} sizes={sizes} />
           {branch.tip && (
             <div
               className={styles.tip}
@@ -100,7 +106,14 @@ const WindSway = ({ canvas, branches, sizes }: Props) => {
                 } as CSSProperties
               }
             >
-              <Image src={branch.tip.src} alt="" fill sizes={sizes} />
+              <Image
+                src={branch.tip.src}
+                alt=""
+                fill
+                loading="eager"
+                fetchPriority={fetchPriority}
+                sizes={sizes}
+              />
             </div>
           )}
         </div>

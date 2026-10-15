@@ -80,7 +80,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
           aria-hidden="true"
         >
           <div className={styles.swayShift}>
-            <WindSway canvas={CANVAS} branches={FOLIAGE_SWAY.back} sizes={PLANTS_SIZES} />
+            <WindSway canvas={CANVAS} branches={FOLIAGE_SWAY.back} sizes={PLANTS_SIZES} fetchPriority="high" />
           </div>
         </div>
 
@@ -131,7 +131,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
           aria-hidden="true"
         >
           <div className={styles.swayShift}>
-            <WindSway canvas={CANVAS} branches={FOLIAGE_SWAY.front} sizes={PLANTS_SIZES} />
+            <WindSway canvas={CANVAS} branches={FOLIAGE_SWAY.front} sizes={PLANTS_SIZES} fetchPriority="high" />
           </div>
         </div>
 

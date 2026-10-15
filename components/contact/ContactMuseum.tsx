@@ -144,7 +144,7 @@ const ContactMuseum = () => {
               />
             </div>
             <div className={styles.sway} aria-hidden="true">
-              <WindSway canvas={PLANTS_CANVAS} branches={PLANTS_SWAY} sizes={PLANTS_SIZES} />
+              <WindSway canvas={PLANTS_CANVAS} branches={PLANTS_SWAY} sizes={PLANTS_SIZES} fetchPriority="high" />
             </div>
 
             {/* 通り抜けてきたアーチの右、コンクリートの壁に置いた小さな案内 */}
