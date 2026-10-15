@@ -58,7 +58,8 @@ const Personal = () => {
         </div>
       </figure>
 
-      <div className={styles.plant} aria-hidden="true">
+      {/* 展示室の床に置かれた植物。床と同じく、順路の案内で移るときも動かさない（data-room-fixed。RoomStepLink） */}
+      <div className={styles.plant} aria-hidden="true" data-room-fixed>
         <Image
           src="/images/about/about-alocasia-plant.png"
           alt=""
