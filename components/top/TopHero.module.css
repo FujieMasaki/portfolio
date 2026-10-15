@@ -67,7 +67,7 @@
  *   sky        -0.3%   奥。ポインタと逆の向き
  *   building    0      支点（arches・archSigns も同じ）
  *   plants     +0.45%  植物（建物の奥の木立も手前の茂みも1枚の PNG なので同じ量にする）
- *   sway       +0.6%   前景で揺らす枝・葉
+ *   sway       +0.45%  揺らす枝・葉（植物から切り出した部品なので、植物と同じ量にして根元から離さない）
  */
 
 /*
@@ -147,6 +147,8 @@
 /* 2 / 5. 前景植物。手前側は建物の範囲を抜いたマスクで切り出す */
 .plantsBack,
 .plantsFront,
+.swayBack,
+.swayFront,
 .building {
   pointer-events: none;
 }
@@ -156,9 +158,16 @@
  * マスク（＝建物の輪郭）は建物と一緒に止まったままなので、奥の木立が建物の手前へはみ出さない
  */
 .plantsBack img,
-.plantsFront img {
+.plantsFront img,
+.swayShift {
   translate: calc(var(--px) * 0.45%) calc(var(--py) * 0.3%);
   transition: translate 1.6s var(--ease-calm);
+}
+
+/* 揺らす枝・葉（components/museum/WindSway）を、植物と同じ大きさの箱に入れて、植物と一緒にずらす */
+.swayShift {
+  position: absolute;
+  inset: 0;
 }
 
 .plantsFront {
@@ -457,19 +466,6 @@
   animation: swallow-flap var(--flap-duration, 1.15s) ease-in-out infinite;
 }
 
-/*
- * 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される）。
- * 周期と遅れはレイヤーごとに変え、すべての枝が同じ向きへ同時に動かないようにする。
- * 往復の折り返しは、keyframe ごとの ease-in-out でゆっくり止まってから戻す（等速の振り子にしない）
- */
-.sway {
-  pointer-events: none;
-  translate: calc(var(--px) * 0.6%) calc(var(--py) * 0.4%);
-  transition: translate 1.6s var(--ease-calm);
-  animation: foliage-sway var(--sway-duration) cubic-bezier(0.45, 0, 0.55, 1)
-    var(--sway-delay, 0s) infinite;
-}
-
 /* 6. 周辺減光と夕方の光 */
 .atmosphere {
   inset: 0;
@@ -627,23 +623,6 @@
   }
 }
 
-/* 一度大きく傾いて戻りかけ、もう一度少し押されてから戻る。一周の中で強さを変え、等速の往復に見せない */
-@keyframes foliage-sway {
-  0%,
-  100% {
-    rotate: calc(-0.4 * var(--sway-angle));
-  }
-  27% {
-    rotate: var(--sway-angle);
-  }
-  46% {
-    rotate: calc(0.35 * var(--sway-angle));
-  }
-  71% {
-    rotate: calc(0.8 * var(--sway-angle));
-  }
-}
-
 /*
  * 縦長画面：舞台を画面下に置き、3つのアーチが画面幅に収まる大きさにする。
  * 舞台の上に余る空は、空レイヤーだけを上へ伸ばして埋める（水平線の高さは舞台と揃えたまま）。
@@ -685,12 +664,9 @@
   }
 
   .plantsBack img,
-  .plantsFront img {
+  .plantsFront img,
+  .swayShift {
     translate: calc(var(--px) * 0.45%) 0;
-  }
-
-  .sway {
-    translate: calc(var(--px) * 0.6%) 0;
   }
 
   .sky img {
@@ -708,8 +684,10 @@
     );
   }
 
-  /* 舞台の上端で切れる木々の梢を空へ溶かす */
-  .plantsBack {
+  /* 舞台の上端で切れる木々の梢を空へ溶かす（揺らす枝・葉も同じ） */
+  .plantsBack,
+  .swayBack,
+  .swayFront {
     mask-image: linear-gradient(to bottom, transparent, #000 16%);
   }
 
@@ -752,8 +730,7 @@
   .plaque,
   .clouds,
   .sea,
-  .haze,
-  .sway {
+  .haze {
     animation: none;
   }
 
@@ -761,7 +738,7 @@
   .sky,
   .plantsBack img,
   .plantsFront img,
-  .sway {
+  .swayShift {
     transition: none;
   }
 }

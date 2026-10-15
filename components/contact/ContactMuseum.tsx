@@ -2,6 +2,7 @@ import Image from "next/image";
 import MuseumNav from "@/components/museum/MuseumNav";
 import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
 import ParallaxStage from "@/components/top/ParallaxStage";
+import WindSway, { type SwayBranch } from "@/components/museum/WindSway";
 import shared from "@/components/about/AboutMuseum.module.css";
 import styles from "./ContactMuseum.module.css";
 
@@ -28,6 +29,57 @@ const BUILDING_SIZES =
 
 const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
 
+/** 植物の素材（contact-plants-base.png と、揺らす部品を切り出した元の1枚絵）の大きさ */
+const PLANTS_CANVAS = { width: 1671, height: 941 };
+
+/**
+ * 風で揺らす枝・葉（components/museum/WindSway）。植物の1枚絵から切り出した部品を、その部分を抜いたベースに重ねる。
+ * 位置と支点は元の1枚絵（contact-plants.png。git の履歴にある）の px。周期は 27 秒前後で、場所ごとに少しずつ変える。
+ */
+const PLANTS_SWAY: SwayBranch[] = [
+  // 左上のアダンの、冠から垂れた長い葉。冠を支点にし、葉先は少し遅れてついてくる
+  {
+    src: "/images/contact/contact-plant-sway-01.png",
+    rect: { x: 114, y: 134, width: 298, height: 212 },
+    pivot: { x: 290, y: 140 },
+    angle: 0.3,
+    duration: 27.4,
+    delay: -6.1,
+    tip: {
+      src: "/images/contact/contact-plant-sway-01-tip.png",
+      rect: { x: 114, y: 160, width: 298, height: 186 },
+      pivot: { x: 290, y: 140 },
+      angle: 0.35,
+      lag: 0.3,
+    },
+  },
+  // 上の細い枝から垂れた葉の房。枝の付け根を支点にする
+  {
+    src: "/images/contact/contact-plant-sway-02.png",
+    rect: { x: 596, y: 94, width: 185, height: 134 },
+    pivot: { x: 668, y: 105 },
+    angle: 0.45,
+    duration: 26.2,
+    delay: -14.7,
+  },
+  // 左下のソテツの、右上へ伸びる外側の葉
+  {
+    src: "/images/contact/contact-plant-sway-03.png",
+    rect: { x: 294, y: 519, width: 237, height: 209 },
+    pivot: { x: 300, y: 722 },
+    angle: 0.25,
+    duration: 28.7,
+    delay: -21.3,
+    tip: {
+      src: "/images/contact/contact-plant-sway-03-tip.png",
+      rect: { x: 330, y: 519, width: 201, height: 209 },
+      pivot: { x: 300, y: 722 },
+      angle: 0.35,
+      lag: 0.25,
+    },
+  },
+];
+
 /**
  * /contact。3つ目の展示室ではなく、TOP の右のアーチ（Contact）を抜けて、美術館の海側・裏側へ出た場所。
  * 見えている建物は、TOP の3アーチの美術館を裏から見たもので、通り抜けてきたアーチが1つだけ見える。
@@ -35,7 +87,7 @@ const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
  * レイヤー（奥 → 手前）:
  *   1. sky      TOP と同じ海と空（top-bg-sea-sky.png）を左右反転して、館の反対側から見ていることにする
  *   2. building 美術館の背面とアーチ（植物の影は画像に含まれる。固定）
- *   3. plants   植物・琉球石灰岩（1枚の PNG。左上の木の梢だけを写しで切り出し、ごく弱く揺らす）
+ *   3. plants   植物・琉球石灰岩（揺らす枝・葉を抜いたベース）と、その上に重ねて揺らす枝・葉（PLANTS_SWAY）
  *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / Mail・GitHub・X）
  *
  * 建物・植物・案内は、完成イメージと同じ 1672:941 の舞台（.stage）に % で置く。素材の PNG もこの寸法で作られている。
@@ -81,10 +133,9 @@ const ContactMuseum = () => {
 
             <div className={styles.ground} aria-hidden="true" />
 
-            {/* 同じ画像を2枚重ね、下はそのまま、上は梢だけの写し（揺らす）にする。取得は1回で済む */}
             <div className={styles.plants} aria-hidden="true">
               <Image
-                src="/images/contact/contact-plants.png"
+                src="/images/contact/contact-plants-base.png"
                 alt=""
                 fill
                 loading="eager"
@@ -92,14 +143,8 @@ const ContactMuseum = () => {
                 sizes={PLANTS_SIZES}
               />
             </div>
-            <div className={styles.canopy} aria-hidden="true">
-              <Image
-                src="/images/contact/contact-plants.png"
-                alt=""
-                fill
-                loading="eager"
-                sizes={PLANTS_SIZES}
-              />
+            <div className={styles.sway} aria-hidden="true">
+              <WindSway canvas={PLANTS_CANVAS} branches={PLANTS_SWAY} sizes={PLANTS_SIZES} />
             </div>
 
             {/* 通り抜けてきたアーチの右、コンクリートの壁に置いた小さな案内 */}

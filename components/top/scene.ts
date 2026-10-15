@@ -1,3 +1,5 @@
+import type { SwayBranch } from "@/components/museum/WindSway";
+
 /**
  * TOP ヒーローの「舞台」定義。
  *
@@ -26,7 +28,7 @@ export const toPercentBox = ({ x, y, width, height }: Rect) => {
  */
 export const BUILDING: Rect = { x: 196, y: 200, width: 1283, height: 642 };
 
-/** 前景植物 PNG はキャンバスと同寸 */
+/** 前景植物 PNG（top-plants-base.png と、揺らす部品を切り出した元の1枚絵）はキャンバスと同寸 */
 export const FOREGROUND: Rect = { x: 0, y: 0, ...CANVAS };
 
 export type ArchId = "about" | "work" | "contact";
@@ -107,30 +109,63 @@ export const ARCHES: Arch[] = [
 ];
 
 /**
- * 前景の植物・枝を風でごく弱く揺らすためのレイヤー（初期実装では空）。
+ * 風で揺らす枝・葉（描き方は components/museum/WindSway）。
  *
- * 植物 PNG は1枚絵なので、そのまま揺らすと岩や地面まで動いてしまう。
- * 揺らしたい枝・葉だけを切り出した透過 PNG（キャンバスと同寸で書き出すと位置合わせが楽）を用意し、
- * ここに足すと TopHero が前景植物の上に重ね、根元（origin）を支点に揺らす。
- * 切り出した部分は、元の植物 PNG 側から消しておくと二重に見えない。
+ * 植物 PNG は1枚絵なので、そのまま揺らすと岩や地面まで動いてしまう。揺らす枝・葉だけを切り出した透過 PNG
+ * （top-plant-sway-*.png）を、その部分を抜いた静止のベース（top-plants-base.png）に重ね、根元を支点に傾ける。
+ * 部品の位置と支点は、元の植物 PNG（キャンバスと同寸）の px で書く。元の1枚絵（top-foreground-tropical-plants.png）は
+ * git の履歴にある。
+ *
+ * 建物の奥の層（back）は建物より奥、手前の層（front）は建物より手前に描く。
+ * 手前に描くのは、前景の手前用のマスク（top-foreground-front-mask.svg）の内側にある部分だけにする（奥の葉を建物の上に出さない）。
  */
-export type SwayLayer = {
-  src: string;
-  rect: Rect;
-  /** 揺れの支点（transform-origin）。枝の付け根を指定する */
-  origin: string;
-  /** 片側への最大傾き（deg）。0.3〜0.8 程度で十分 */
-  angle: number;
-  /**
-   * 一周の秒数。8〜14 秒程度のゆっくりした周期で、レイヤーごとに 9.8 / 12.4 / 13.7 のように少しずつ変える
-   * （同じ周期にすると、すべての枝が同じ向きへ同時に動く）
-   */
-  duration: number;
-  /** 揺れ始めの遅れ（秒）。負の値にすると、周期の途中から始まる */
-  delay?: number;
+export const FOLIAGE_SWAY: { back: SwayBranch[]; front: SwayBranch[] } = {
+  back: [
+    // ガジュマルの枝先から垂れた葉の房。枝の付け根（右）を支点にする
+    {
+      src: "/images/top/top-plant-sway-02.png",
+      rect: { x: 644, y: 129, width: 167, height: 135 },
+      pivot: { x: 790, y: 205 },
+      angle: 0.4,
+      duration: 27.1,
+      delay: -9.4,
+    },
+  ],
+  front: [
+    // 左上のアダンの、上へ広がる葉。冠を支点にし、葉先は少し遅れてついてくる
+    {
+      src: "/images/top/top-plant-sway-01.png",
+      rect: { x: 0, y: 0, width: 264, height: 124 },
+      pivot: { x: 135, y: 118 },
+      angle: 0.3,
+      duration: 25.9,
+      delay: -3.2,
+      tip: {
+        src: "/images/top/top-plant-sway-01-tip.png",
+        rect: { x: 0, y: 0, width: 264, height: 93 },
+        pivot: { x: 135, y: 118 },
+        angle: 0.35,
+        lag: 0.3,
+      },
+    },
+    // 左下のソテツの、右上へ伸びる外側の葉
+    {
+      src: "/images/top/top-plant-sway-03.png",
+      rect: { x: 344, y: 652, width: 175, height: 100 },
+      pivot: { x: 350, y: 746 },
+      angle: 0.3,
+      duration: 24.6,
+      delay: -15.8,
+      tip: {
+        src: "/images/top/top-plant-sway-03-tip.png",
+        rect: { x: 413, y: 652, width: 106, height: 99 },
+        pivot: { x: 350, y: 746 },
+        angle: 0.4,
+        lag: 0.25,
+      },
+    },
+  ],
 };
-
-export const FOLIAGE_SWAY: SwayLayer[] = [];
 
 /**
  * 時間帯ごとの空気感。
