@@ -31,7 +31,7 @@ type Props = {
  *   6. atmosphere 周辺減光と夕方の光
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  *
- * 舞台の上に、アーチを通り抜ける遷移の窓（ArchPassage）を重ねる。
+ * 館名と舞台を ArchPassage で包み、アーチを選んだときに、舞台の上へ通り抜ける遷移の窓を重ねる。
  */
 const TopHero = ({ ambient = "evening" }: Props) => {
   const { background, backgroundFilter, buildingFilter, sceneFilter } =
@@ -39,80 +39,80 @@ const TopHero = ({ ambient = "evening" }: Props) => {
 
   return (
     <section className={styles.hero} aria-labelledby="top-title">
-      {/* 読み上げ・Tab の順で、館名がメニューより先に来るよう舞台より前に置く（見た目は absolute で左下） */}
-      <header className={styles.plaque}>
-        <h1 className={styles.name} id="top-title">
-          Masaki Fujie
-        </h1>
-        <p className={styles.role}>Web Engineer</p>
-      </header>
+      {/* アーチを選んだときに、開口部が画面いっぱいに広がって次の部屋へ通り抜ける（館名と舞台を包む） */}
+      <ArchPassage>
+        {/* 読み上げ・Tab の順で、館名がメニューより先に来るよう舞台より前に置く（見た目は absolute で左下） */}
+        <header className={styles.plaque}>
+          <h1 className={styles.name} id="top-title">
+            Masaki Fujie
+          </h1>
+          <p className={styles.role}>Web Engineer</p>
+        </header>
 
-      <ParallaxStage className={styles.stage}>
-        <Sky background={background} backgroundFilter={backgroundFilter} />
+        <ParallaxStage className={styles.stage}>
+          <Sky background={background} backgroundFilter={backgroundFilter} />
 
-        <div
-          className={styles.plantsBack}
-          style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/top/top-foreground-tropical-plants.png"
-            alt=""
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-          />
-        </div>
-
-        <nav className={styles.arches} aria-label="メインメニュー">
-          {ARCHES.map((arch) => (
-            <ArchEntrance
-              key={arch.id}
-              arch={arch}
-              background={background}
-              backgroundFilter={backgroundFilter}
+          <div
+            className={styles.plantsBack}
+            style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/top/top-foreground-tropical-plants.png"
+              alt=""
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
             />
-          ))}
-        </nav>
+          </div>
 
-        <div
-          className={styles.building}
-          style={{ ...toPercentBox(BUILDING), filter: buildingFilter }}
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/top/top-building-arches.png"
-            alt=""
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
-          />
-        </div>
+          <nav className={styles.arches} aria-label="メインメニュー">
+            {ARCHES.map((arch) => (
+              <ArchEntrance
+                key={arch.id}
+                arch={arch}
+                background={background}
+                backgroundFilter={backgroundFilter}
+              />
+            ))}
+          </nav>
 
-        <div
-          className={styles.plantsFront}
-          style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/top/top-foreground-tropical-plants.png"
-            alt=""
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-          />
-        </div>
+          <div
+            className={styles.building}
+            style={{ ...toPercentBox(BUILDING), filter: buildingFilter }}
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/top/top-building-arches.png"
+              alt=""
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
+            />
+          </div>
 
-        <div className={styles.atmosphere} aria-hidden="true" />
+          <div
+            className={styles.plantsFront}
+            style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/top/top-foreground-tropical-plants.png"
+              alt=""
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
+            />
+          </div>
 
-        <ArchSigns />
-      </ParallaxStage>
+          <div className={styles.atmosphere} aria-hidden="true" />
 
-      {/* アーチを選んだときに、開口部が画面いっぱいに広がって次の部屋へ通り抜ける */}
-      <ArchPassage />
+          <ArchSigns />
+        </ParallaxStage>
+      </ArchPassage>
 
       {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}
       <noscript>

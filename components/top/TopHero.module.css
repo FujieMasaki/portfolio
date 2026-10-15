@@ -481,25 +481,30 @@
   background: #1c211b;
 }
 
+/* 館名と舞台を包む ArchPassage。配置には関わらず、中のアーチのクリックを受けるだけ */
+.passageScope {
+  display: contents;
+}
+
 /* 通り抜けている間は、ほかの入口に反応させない */
-.hero[data-passage] .stage {
+.passageScope[data-passage] .stage {
   pointer-events: none;
 }
 
 /* 選んだ入口以外を少しだけ落ち着かせる。暗くしすぎず、選んだアーチへ視線が残る程度 */
-.hero[data-passage="about"] .arch:not([data-arch="about"]) .archScene,
-.hero[data-passage="work"] .arch:not([data-arch="work"]) .archScene,
-.hero[data-passage="contact"] .arch:not([data-arch="contact"]) .archScene {
+.passageScope[data-passage="about"] .arch:not([data-arch="about"]) .archScene,
+.passageScope[data-passage="work"] .arch:not([data-arch="work"]) .archScene,
+.passageScope[data-passage="contact"] .arch:not([data-arch="contact"]) .archScene {
   filter: contrast(0.94) brightness(0.9);
 }
 
-.hero[data-passage="about"] .archSign:not([data-arch="about"]) .archPlate,
-.hero[data-passage="work"] .archSign:not([data-arch="work"]) .archPlate,
-.hero[data-passage="contact"] .archSign:not([data-arch="contact"]) .archPlate {
+.passageScope[data-passage="about"] .archSign:not([data-arch="about"]) .archPlate,
+.passageScope[data-passage="work"] .archSign:not([data-arch="work"]) .archPlate,
+.passageScope[data-passage="contact"] .archSign:not([data-arch="contact"]) .archPlate {
   opacity: 0.55;
 }
 
-.hero[data-passage] .plaque {
+.passageScope[data-passage] .plaque {
   opacity: 0;
   transition: opacity 0.5s var(--ease-calm);
 }
