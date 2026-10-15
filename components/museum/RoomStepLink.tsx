@@ -21,13 +21,18 @@ let stepping = false;
 let leaving: Animation[] = [];
 
 /**
- * 退かせる要素。床を持つ箱（data-room-floor。床は ::before / ::after で描く）は動かさず、その中身だけを動かす。
- * 床を含まない箱は、箱ごと動かす
+ * 退かせる要素。建物の一部は動かさない。
+ *   data-room-floor  床を持つ箱（床は ::before / ::after で描く）。箱は止め、その中身だけを動かす
+ *   data-room-fixed  窓の外の植物と壁の葉の影など、壁と一緒にあるもの。中身ごと止める
+ * どちらも含まない箱は、箱ごと動かす
  */
 const stepTargets = (container: Element): Element[] =>
-  Array.from(container.children).flatMap((child) =>
-    child.matches("[data-room-floor]") || child.querySelector("[data-room-floor]") ? stepTargets(child) : [child],
-  );
+  Array.from(container.children).flatMap((child) => {
+    if (child.matches("[data-room-fixed]")) return [];
+    const holdsBuilding =
+      child.matches("[data-room-floor]") || child.querySelector("[data-room-floor], [data-room-fixed]");
+    return holdsBuilding ? stepTargets(child) : [child];
+  });
 
 type Props = ComponentProps<typeof Link> & {
   href: string;

@@ -55,7 +55,8 @@ const WorkMuseum = () => {
           </div>
 
           {/* 窓の外の植物。葉の影（同じ画像を暗くぼかしたもの）を先に描き、壁に落ちているように見せる */}
-          <div className={styles.canopy} aria-hidden="true">
+          {/* data-room-fixed：壁と一緒にあるもの。順路の案内で移るときも動かさない（RoomStepLink） */}
+          <div className={styles.canopy} aria-hidden="true" data-room-fixed>
             <Image
               src="/images/work/work-plant-top-right.png"
               alt=""
