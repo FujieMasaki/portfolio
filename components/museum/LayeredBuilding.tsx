@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { preload } from "react-dom";
 import Image, { getImageProps } from "next/image";
 import styles from "./LayeredBuilding.module.css";
 
@@ -33,12 +34,9 @@ type Props = {
  */
 const MASK_WIDTH = 600;
 
-/** CSS の mask-image に渡す、最適化済みの（縮めた WebP / AVIF の）URL */
-const maskUrl = (src: string) => {
-  const {
-    props: { src: optimized },
-  } = getImageProps({ src, alt: "", width: MASK_WIDTH, height: MASK_WIDTH / 2 });
-  return `url("${optimized}")`;
+/** CSS の mask-image に使う、最適化済みの（縮めた WebP / AVIF の）画像の URL */
+const maskSrc = (src: string) => {
+  return getImageProps({ src, alt: "", width: MASK_WIDTH, height: MASK_WIDTH / 2 }).props.src;
 };
 
 /**
@@ -49,16 +47,24 @@ const maskUrl = (src: string) => {
  * 外枠は isolation で閉じ、multiply が背後の空や海と混ざらないようにする。
  */
 const LayeredBuilding = ({ layers, className, style, sizes }: Props) => {
+  const lightMask = maskSrc(layers.lightMask);
+  const baseMask = maskSrc(layers.base);
+  // マスクは CSS が読むまで取得が始まらないので、<img> と同時に取りにいく
+  preload(lightMask, { as: "image", fetchPriority: "high" });
+  preload(baseMask, { as: "image", fetchPriority: "high" });
+
   return (
     <div
       className={`${styles.building} ${className}`}
       style={
         {
           ...style,
-          "--building-light-mask": maskUrl(layers.lightMask),
-          "--building-base-mask": maskUrl(layers.base),
+          "--building-light-mask": `url("${lightMask}")`,
+          "--building-base-mask": `url("${baseMask}")`,
         } as CSSProperties
       }
+      // ParallaxStage は、<img> に加えてこのマスクがそろうまで舞台を出さない
+      data-await-images={`${lightMask} ${baseMask}`}
       aria-hidden="true"
     >
       <Image

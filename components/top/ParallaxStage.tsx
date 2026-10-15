@@ -45,9 +45,20 @@ const ParallaxStage = ({ className, children }: Props) => {
     const images = Array.from(
       node.querySelectorAll<HTMLImageElement>('img[fetchpriority="high"]'),
     );
-    Promise.all(images.map((img) => img.decode().catch(() => undefined))).then(
-      reveal,
-    );
+    // CSS の mask-image などで使う画像（<img> ではないもの）は、data-await-images に空白区切りで書いた URL を読んで待つ
+    // （建物の陰と光のマスク。待たないと、舞台が出た後に陰と光が遅れて乗る）
+    const cssImages = Array.from(
+      node.querySelectorAll<HTMLElement>("[data-await-images]"),
+    ).flatMap((element) => (element.dataset.awaitImages ?? "").split(" ").filter(Boolean));
+    const decodeUrl = (src: string) => {
+      const img = new Image();
+      img.src = src;
+      return img.decode();
+    };
+    Promise.all([
+      ...images.map((img) => img.decode().catch(() => undefined)),
+      ...cssImages.map((src) => decodeUrl(src).catch(() => undefined)),
+    ]).then(reveal);
     // 画像が極端に遅い回線でも、いつまでも真っ暗にはしない。
     // CSS 側の保険（6 秒）より先に表示し、保険で出た後に暗転し直すちらつきを避ける
     const fallback = window.setTimeout(reveal, JS_FALLBACK_MS);
