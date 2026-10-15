@@ -92,6 +92,8 @@
   inset: 0;
   width: 100%;
   height: auto;
+  /* 枝は右上の角の外から伸びている。葉の影の拡大（.leafShadow の scale）も、この角を基点にする */
+  transform-origin: 100% 0;
 }
 
 /* 屋外の光で撮られた葉を、/about の植物と同じく壁の暖かい光に寄せる */
