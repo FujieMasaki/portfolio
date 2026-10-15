@@ -464,24 +464,26 @@
 .bat svg {
   display: block;
   width: 100%;
-  transform-origin: 50% 45%;
-  animation: swallow-flap var(--flap-duration, 1.15s) ease-in-out infinite;
+  overflow: visible;
 }
 
 /*
- * コウモリは暗い夜の海の上を飛ぶ。黒いシルエットだけでは海に沈むので、翼を広げた形が燕より少し大きく見える幅にし、
- * 月明かりを受けたような淡い縁取りを付けて、翼の形と羽ばたきを読ませる
+ * 翼の1片。胴体は動かさず、翼だけを関節（ArchFlyby.tsx の origin。viewBox の座標）を支点に回す。
+ * 角度は ArchFlyby.tsx が wingbeat.ts のキーフレームで動かす
+ */
+.wing {
+  transform-box: view-box;
+}
+
+/*
+ * コウモリは暗い夜の海の上を飛ぶ。翼を広げた形が燕より少し大きく見える幅にし、
+ * 背景に完全には沈まない程度に、ごく弱い輪郭の差だけを付ける
  */
 .bat {
   width: clamp(28px, 30%, 56px);
   color: rgb(10 10 16);
-  opacity: 0.92;
-  filter: drop-shadow(0 0 0.6px rgb(176 184 214 / 0.75)) drop-shadow(0 0 3px rgb(150 160 196 / 0.3));
-}
-
-.bat svg {
-  transform-origin: 50% 35%;
-  animation-name: bat-flap;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 0.5px rgb(150 160 190 / 0.3));
 }
 
 /* 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される） */
@@ -628,35 +630,6 @@
   }
   to {
     transform: translate3d(1.5%, 0, 0);
-  }
-}
-
-/* 羽ばたいては滑空する。遠景なので、羽の形ではなくシルエットがわずかに変わる程度 */
-@keyframes swallow-flap {
-  0%,
-  50%,
-  100% {
-    scale: 1 1;
-  }
-  16% {
-    scale: 1 0.6;
-  }
-  32% {
-    scale: 1 1.04;
-  }
-}
-
-/* コウモリは翼を大きく打ち下ろし、すぐ広げ直す。小刻みで、燕の滑空のような止まりはない */
-@keyframes bat-flap {
-  0%,
-  100% {
-    scale: 1 1;
-  }
-  45% {
-    scale: 0.82 -0.55;
-  }
-  70% {
-    scale: 0.94 0.4;
   }
 }
 

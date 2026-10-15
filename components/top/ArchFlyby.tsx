@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import useAmbient from "@/components/museum/useAmbient";
 import styles from "./TopHero.module.css";
-
-/** 昼のあいだはリュウキュウツバメ、夜はコウモリ */
-type Flyer = "swallow" | "bat";
+import { buildWingKeyframes, type Flyer } from "./wingbeat";
 
 type Flight = {
   id: number;
@@ -18,27 +16,51 @@ type Flight = {
   duration: number;
   /** 右から左へ飛ぶか */
   reverse: boolean;
-  /** 羽ばたき1回の秒数 */
-  flap: number;
   /** 軌道のうねりを毎回変えるための乱数 */
   seed: number[];
 };
 
 /**
- * 飛び方の違い。コウモリは燕より小刻みに羽ばたき、上下にひらひらと揺れながら進む。
- * duration・flap は [最小, 最大] 秒、swell は上下の揺れの大きさ（アーチの高さに対する割合）
+ * 飛び方の違い。コウモリは上下にひらひらと揺れながら進む（羽ばたきの違いは wingbeat.ts）。
+ * duration は [最小, 最大] 秒、swell は上下の揺れの大きさ（アーチの高さに対する割合）
  */
-const FLIGHT_STYLE: Record<Flyer, { duration: [number, number]; flap: [number, number]; swell: number }> = {
-  swallow: { duration: [4, 6.5], flap: [1, 1.3], swell: 0.022 },
-  bat: { duration: [5, 7.5], flap: [0.28, 0.38], swell: 0.045 },
+const FLIGHT_STYLE: Record<Flyer, { duration: [number, number]; swell: number }> = {
+  swallow: { duration: [4, 6.5], swell: 0.022 },
+  bat: { duration: [5, 7.5], swell: 0.045 },
 };
 
-/** viewBox 40 x 20。どちらも横から見上げたシルエットで、羽ばたきは CSS（swallow-flap / bat-flap）が担う */
-const SILHOUETTE: Record<Flyer, string> = {
-  swallow:
-    "M20 9.2c-2.6-3.4-7.4-6.3-14.6-7.2 4.6 1.6 8.6 4.4 11 7.6-1.6.6-2.8 1.6-3.6 3l2.9-.8-1.6 4.4 3.4-3.6.9 0 3.4 3.6-1.6-4.4 2.9.8c-.8-1.4-2-2.4-3.6-3 2.4-3.2 6.4-6 11-7.6C27.4 2.9 22.6 5.8 20 9.2z",
-  bat: "M20 5L20.9 3.4L21.3 5.3L22.3 6.9Q26.5 3.9 31.5 3.2Q36.5 3.6 39.6 6.4Q37.6 6.2 35.6 9Q33.4 7.9 31.2 9.8Q29 8.9 26.8 10.9Q24.6 9.9 22.4 11.8Q21.2 11.2 20 13.6Q18.8 11.2 17.6 11.8Q15.4 9.9 13.2 10.9Q11 8.9 8.8 9.8Q6.6 7.9 4.4 9Q2.4 6.2 0.4 6.4Q3.5 3.6 8.5 3.2Q13.5 3.9 17.7 6.9L18.7 5.3L19.1 3.4Z",
+/** 関節を支点に回す翼の1片。origin は viewBox 上の関節の位置 */
+type WingPart = { path: string; origin: [number, number] };
+
+/**
+ * viewBox 48 x 24 の、下から見上げたシルエット。胴体は動かさず、翼だけを関節で回す。
+ * 翼は右側だけを描き、左側は同じ形を左右に映して置く（羽ばたきのための変形ではなく、常に同じ鏡像）。
+ * 翼の端から端までは、燕が viewBox の幅の約 7 割、コウモリがほぼいっぱい（大きさは TopHero.module.css）。
+ */
+const SILHOUETTE: Record<Flyer, { body: string; inner: WingPart; outer?: WingPart }> = {
+  // 細い胴と、深く切れ込んだ燕尾。翼は細長く、先が後ろへ反る
+  swallow: {
+    body: "M24 6C25 6 25.6 6.8 25.7 7.8L26.1 11L26.4 13.6L28.6 19.4L25.6 15.8L24 17L22.4 15.8L19.4 19.4L21.6 13.6L21.9 11L22.3 7.8C22.4 6.8 23 6 24 6Z",
+    inner: {
+      path: "M25.4 8.8C30.4 7.8 36 8.4 41.5 12.4C36.2 11.6 31 12 25.6 12.8Z",
+      origin: [25.4, 10.6],
+    },
+  },
+  // 耳の立った小さな胴。翼は腕（肩〜手首）と手（手首〜指先）に分け、後縁は指の間の膜で波打つ
+  bat: {
+    body: "M22.9 7.6L23.3 5.6L23.9 7.2L24.1 7.2L24.7 5.6L25.1 7.6C25.9 8.1 26.3 9.1 26.3 10.2C26.3 12.6 25.4 14.8 24 15.8C22.6 14.8 21.7 12.6 21.7 10.2C21.7 9.1 22.1 8.1 22.9 7.6Z",
+    inner: {
+      path: "M25.4 8.6L34.2 6.2L34.8 7.6Q32.6 10.4 30.4 11.6Q28.2 11.2 25.8 13Z",
+      origin: [25.4, 10],
+    },
+    outer: {
+      path: "M34 6Q39.6 5.2 46.8 8.6Q44.4 8.6 42.8 11Q40.8 9.6 38.6 11.4Q36.6 9.8 34.6 11.8Q33.6 10.2 33.4 8.8Z",
+      origin: [34.2, 7],
+    },
+  },
 };
+
+const wingOrigin = ({ origin: [x, y] }: WingPart) => ({ transformOrigin: `${x}px ${y}px` });
 
 const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
 
@@ -120,7 +142,7 @@ const ArchFlyby = () => {
       flightCount.current === 0 ? randomBetween(3000, 6000) : randomBetween(10000, 22000);
     const timer = window.setTimeout(() => {
       flightCount.current += 1;
-      const { duration, flap } = FLIGHT_STYLE[flyer];
+      const { duration } = FLIGHT_STYLE[flyer];
       setFlight({
         id: flightCount.current,
         flyer,
@@ -128,7 +150,6 @@ const ArchFlyby = () => {
         exitY: randomBetween(0.12, 0.4),
         duration: randomBetween(...duration),
         reverse: Math.random() < 0.4,
-        flap: randomBetween(...flap),
         seed: [
           randomBetween(0, Math.PI * 2),
           randomBetween(0, Math.PI * 2),
@@ -147,30 +168,45 @@ const ArchFlyby = () => {
     if (!flight || reducedMotion || !bird || !scene) return;
 
     const { width, height } = scene.getBoundingClientRect();
-    const animation = bird.animate(
-      buildFlightPath(flight, width, height, bird.offsetWidth),
-      { duration: flight.duration * 1000, easing: "linear", fill: "both" },
+    const timing: KeyframeAnimationOptions = {
+      duration: flight.duration * 1000,
+      easing: "linear",
+      fill: "both",
+    };
+    const animation = bird.animate(buildFlightPath(flight, width, height, bird.offsetWidth), timing);
+    // 翼は左右とも同じ角度で回す（左は鏡像の中にあるので、そのまま左右対称に動く）
+    const wings = buildWingKeyframes(flight.flyer, flight.duration);
+    const wingAnimations = Array.from(bird.querySelectorAll<SVGGElement>("[data-wing]")).map((wing) =>
+      wing.animate(wing.dataset.wing === "outer" && wings.outer ? wings.outer : wings.inner, timing),
     );
     animation.onfinish = () => setFlight(null);
-    return () => animation.cancel();
+    return () => {
+      animation.cancel();
+      wingAnimations.forEach((wing) => wing.cancel());
+    };
   }, [flight, reducedMotion]);
 
   // 動きを減らす設定の間は、飛んでいる途中の燕も描かない（次の燕も予約しない）
   if (!flight || reducedMotion) return null;
 
+  const { body, inner, outer } = SILHOUETTE[flight.flyer];
+  const wing = (
+    <g data-wing="inner" className={styles.wing} style={wingOrigin(inner)}>
+      <path d={inner.path} />
+      {outer && (
+        <g data-wing="outer" className={styles.wing} style={wingOrigin(outer)}>
+          <path d={outer.path} />
+        </g>
+      )}
+    </g>
+  );
+
   return (
-    <span
-      key={flight.id}
-      ref={birdRef}
-      className={styles[flight.flyer]}
-      style={{ "--flap-duration": `${flight.flap}s` } as CSSProperties}
-      aria-hidden="true"
-    >
-      <svg viewBox="0 0 40 20" focusable="false">
-        <path
-          d={SILHOUETTE[flight.flyer]}
-          fill="currentColor"
-        />
+    <span key={flight.id} ref={birdRef} className={styles[flight.flyer]} aria-hidden="true">
+      <svg viewBox="0 0 48 24" fill="currentColor" focusable="false">
+        {wing}
+        <g transform="matrix(-1 0 0 1 48 0)">{wing}</g>
+        <path d={body} />
       </svg>
     </span>
   );
