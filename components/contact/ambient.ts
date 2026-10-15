@@ -7,15 +7,16 @@ import { seaSkyVariables } from "@/components/museum/seaSky";
  *
  * TOP と同じ美術館の裏側なので、海と空と空気は TOP と同じ値（components/museum/seaSky.ts）を使い、
  * 建物と植物は TOP の明るさの関係（components/top/scene.ts の TOP_AMBIENTS）にそろえる。
- * 素材が TOP と違い、夕方の基準の値が少し違うので、値はこのページで持つ。夕方は今の見た目のまま。
+ * 素材が TOP と違い、夕方の基準の値が少し違うので、値はこのページで持つ。建物の夕方は素材のまま（何も変えない値）。
  * 壁の案内の文字は、暗いコンクリートの上でも読めるよう夜・深夜に明るくする（ContactMuseum.module.css の [data-ambient="night"] など）。
  *
  * filter は時間帯の間で滑らかに移るよう、どの時間帯も同じ関数を同じ順に並べる。
  */
 type ContactAmbient = {
   /**
-   * 建物（夕方の光と右の葉影が画像に含まれる）。saturate → brightness → contrast。
-   * 夕方以外はコントラストを落として、夕日の葉影を弱く見せる（夜はほとんど目立たせない）
+   * 建物（components/museum/LayeredBuilding。光と葉影は夕方で描いてある）。saturate → brightness → contrast。
+   * 夕方は素材のまま（何も変えない値）。夕方以外はコントラストを落として、夕日の葉影を弱く見せる（夜はほとんど目立たせない）。
+   * 夕方以外の値は旧画像のときのもので、新しい素材に合わせた調整は次の段階で行う
    */
   buildingFilter: string;
   /** 植物・琉球石灰岩（揺らす梢の写しも同じ）。saturate → brightness */
@@ -32,7 +33,7 @@ const CONTACT_AMBIENTS: Record<AmbientId, ContactAmbient> = {
     plantsFilter: "saturate(0.78) brightness(0.98)",
   },
   evening: {
-    buildingFilter: "saturate(0.62) brightness(0.97) contrast(1)",
+    buildingFilter: "saturate(1) brightness(1) contrast(1)",
     plantsFilter: "saturate(0.72) brightness(0.84)",
   },
   night: {

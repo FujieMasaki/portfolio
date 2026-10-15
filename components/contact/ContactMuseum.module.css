@@ -185,11 +185,20 @@
   width: 68%;
   height: 68%;
   /*
-   * 夕方の光の橙を落ち着かせ、TOP の建物（ライトグレーのコンクリート）に寄せる。
-   * 時間帯で変わる（./ambient.ts。夕方は saturate(0.62) brightness(0.97)）
+   * 素地・陰・奥行き・植物の影・夕方の光の5枚（components/museum/LayeredBuilding）。
+   * 素地が TOP より冷たいグレーなので、夕方の光を TOP より少しだけ強める。
+   * 葉影の素材は壁のほとんどが影に入った暗い絵なので、強く持ち上げて葉の形だけを残し、
+   * 陰の3層は案内の文字が 4.5:1 を保てる濃さに抑える（素材から合成した計算で、案内の範囲の中央値 約 5.2:1）。
+   * ほかの時間帯は、その上から filter で暗さを寄せる（./ambient.ts。夕方は何も変えない値）
    */
   filter: var(--ambient-building-filter);
   transition: filter var(--ambient-fade) var(--ease-calm);
+  --building-form-shadow-opacity: 0.35;
+  --building-arch-depth-opacity: 0.4;
+  --building-plant-shadow-opacity: 0.25;
+  --building-plant-shadow-lift: 2;
+  --building-light-color: rgb(214 152 94 / 0.3);
+
   pointer-events: none;
 }
 
@@ -257,9 +266,14 @@
   left: calc(706 / 1672 * 100%);
   top: calc(410 / 941 * 100%);
   width: calc(330 / 1672 * 100%);
-  /* コンクリートの上に直接書いた文字。TOP の部屋名プレート、/about の壁の文字と同じ色 */
-  --wall-ink: rgb(40 34 28);
-  --wall-ink-muted: rgb(58 51 44);
+  /*
+   * コンクリートの上に直接書いた文字。/about の壁の文字より少しだけ濃くし、札（CONTACT）も淡くしない。
+   * 建物の陰と葉影が案内の下にも落ちるので、朝・昼・夕方の暗い所でも 4.5:1 を保つため
+   * （素材から合成した計算で、案内の範囲の下位 5% が朝 4.6:1・昼 5.5:1・夕方 5.1:1。
+   * 夜・深夜の淡い文字は下の [data-ambient] の指定で、同じ計算で 6.6:1・9.2:1）
+   */
+  --wall-ink: rgb(24 20 16);
+  --wall-ink-muted: rgb(24 20 16);
   --wall-line: rgb(72 64 56 / 0.5);
 
   color: var(--wall-ink);
@@ -277,11 +291,6 @@
   --wall-line: rgb(226 216 200 / 0.46);
 
   text-shadow: 0 0 3px rgb(0 0 0 / 0.65);
-}
-
-/* 小さいリンクは、ふだん少しだけ落としている濃さを夜・深夜は落とさない */
-.contact:is([data-ambient="night"], [data-ambient="midnight"]) .link {
-  opacity: 1;
 }
 
 /* 建物の画像が読めなかったときの下地も、夜の壁の暗さにそろえる（淡い文字が読めるように） */
@@ -322,12 +331,11 @@
   letter-spacing: 0.08em;
 }
 
+/* 陰の上でも読めるよう、リンクは透かさない（hover は矢印の動きで示す） */
 .link {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  opacity: 0.92;
-  transition: opacity 0.4s var(--ease-calm);
 }
 
 .external {
@@ -341,10 +349,6 @@
 }
 
 @media (hover: hover) {
-  .link:hover {
-    opacity: 1;
-  }
-
   /* 矢印は、開く向きへ少しだけ動く */
   .link:hover .external {
     translate: 1.5px -1.5px;
@@ -354,10 +358,6 @@
 .link:focus-visible {
   outline: 1px solid var(--wall-ink-muted);
   outline-offset: 6px;
-}
-
-.link:focus-visible {
-  opacity: 1;
 }
 
 .visuallyHidden {

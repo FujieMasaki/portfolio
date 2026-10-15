@@ -1,0 +1,94 @@
+/*
+ * 2.5D の建物（LayeredBuilding.tsx）。5枚を同じ外枠の中で完全に重ねる。
+ * 各層の濃さと夕方の光の色は、ページ側のクラスで --building-* を上書きして調整する（ここは既定値）。
+ */
+
+/* 既定値は :where で詳細度を 0 にし、CSS の読み込み順にかかわらずページ側の上書きを勝たせる */
+:where(.building) {
+  /* 面の向きの陰。柱の丸みと壁の傾きを出す（0.25〜0.5） */
+  --building-form-shadow-opacity: 0.4;
+  /* アーチの内側の厚みと奥の暗さ。面の陰と重なる分を見て、こちらは少しだけ強くする（0.25〜0.55） */
+  --building-arch-depth-opacity: 0.45;
+  /* 植物の影。素材のままだと強いので、葉の形が分かる程度まで弱める（0.15〜0.4） */
+  --building-plant-shadow-opacity: 0.28;
+  /*
+   * 陰の層の持ち上げ（brightness）。陰の素材は影のない壁も 200〜240 ほどの灰色で描かれていて、そのまま multiply すると
+   * 壁全体が暗くなり、壁の上の文字（TOP の部屋名・Contact の案内）が 4.5:1 を下回る。
+   * 影のない壁をほぼ白まで持ち上げ、multiply が影の部分だけを暗くするようにする
+   */
+  --building-form-shadow-lift: 1.5;
+  --building-arch-depth-lift: 1.5;
+  --building-plant-shadow-lift: 1.5;
+  /*
+   * 夕方の光。マスクの白い範囲にだけ、この色を重ねる。
+   * soft-light / normal / screen を比べ、normal にした（soft-light は 0.3 以下ではほとんど見えず、
+   * screen は陰の暗部まで持ち上げて質量感が薄れる。normal は陰を残したまま光の当たる面だけが暖まる）
+   */
+  --building-light-color: rgb(214 152 94 / 0.22);
+  --building-light-blend: normal;
+}
+
+.building {
+  /* multiply と光の合成を、背後の空・海と混ぜず、この5枚の中だけで閉じる（ページ側の filter はこの合成の結果にかかる） */
+  isolation: isolate;
+}
+
+.building > * {
+  position: absolute;
+  inset: 0;
+}
+
+.base {
+  mix-blend-mode: normal;
+}
+
+/*
+ * 陰の3層。素材の外形が素地と数 px ずれていて、素地の透明な画素（開口部・輪郭の外）では multiply が効かず
+ * 灰色の縁として描かれるので、素地の alpha をマスクにして、素地のある範囲にだけ描く
+ */
+.formShadow,
+.archDepth,
+.plantShadow {
+  mix-blend-mode: multiply;
+  mask-image: var(--building-base-mask);
+  mask-mode: alpha;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.formShadow {
+  filter: brightness(var(--building-form-shadow-lift));
+  opacity: var(--building-form-shadow-opacity);
+}
+
+.archDepth {
+  filter: brightness(var(--building-arch-depth-lift));
+  opacity: var(--building-arch-depth-opacity);
+}
+
+.plantShadow {
+  filter: brightness(var(--building-plant-shadow-lift));
+  opacity: var(--building-plant-shadow-opacity);
+}
+
+/*
+ * 光：マスク画像の明るさ（luminance）で、暖色を当たる範囲にだけ残す。透過した開口部には光を置かない。
+ * luminance のマスクに対応しない環境では、暖色が外枠いっぱいの四角い面になるので描かない
+ */
+.light {
+  display: none;
+}
+
+@supports (mask-mode: luminance) {
+  .light {
+    display: block;
+    background: var(--building-light-color);
+    mix-blend-mode: var(--building-light-blend);
+    /* 光のマスクの白は素地の外（Contact の右の輪郭の外など）にも広がるので、素地の alpha と重なる所だけに描く */
+    mask-image: var(--building-light-mask), var(--building-base-mask);
+    mask-mode: luminance, alpha;
+    mask-composite: intersect;
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+  }
+}
