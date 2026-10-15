@@ -34,7 +34,7 @@ const LIGHT_MASK_WIDTH = 1200;
  * 2.5D の建物。5枚を同じ外枠の中で position: absolute; inset: 0 に完全に重ね、
  * 陰・奥行き・植物の影を multiply で素地に落とし、夕方の光をマスク越しの暖色で足す。
  *
- * Phase 1 の PoC として、光と陰は夕方に固定している（時間帯の filter は受けない）。
+ * Phase 1 の PoC として、光と陰は夕方で描いている。ほかの時間帯は、ページ側が外枠に filter をかけて暗さを寄せる。
  * 外枠は isolation で閉じ、multiply が背後の空や海と混ざらないようにする。
  */
 const LayeredBuilding = ({ layers, className, style, sizes }: Props) => {

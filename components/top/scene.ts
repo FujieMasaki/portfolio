@@ -140,7 +140,10 @@ export const ARCHES: Arch[] = [
 export type TopAmbient = {
   /** 水平線の霞の濃さ（夕方 = 1） */
   haze: number;
-  /** 昼光で撮られた建物を、その時間の光に寄せる。sepia → brightness → contrast */
+  /**
+   * 建物（components/museum/LayeredBuilding。光と陰は夕方で描いてある）を、その時間の光に寄せる。sepia → brightness → contrast。
+   * 夕方は素材のまま（何も変えない値）。ほかの時間帯の値は旧画像のときのもので、新しい素材に合わせた調整は次の段階で行う
+   */
   buildingFilter: string;
   /** 植物を同じ光の中に置く。saturate → brightness */
   sceneFilter: string;
@@ -170,7 +173,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
   },
   evening: {
     haze: 1,
-    buildingFilter: "sepia(0.18) brightness(0.94) contrast(0.96)",
+    buildingFilter: "sepia(0) brightness(1) contrast(1)",
     sceneFilter: "saturate(0.72) brightness(0.8)",
     interiorFilter: "brightness(1) saturate(1)",
     vignette: 1,

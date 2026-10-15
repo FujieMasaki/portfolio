@@ -186,9 +186,11 @@
   height: 68%;
   /*
    * 素地・陰・奥行き・植物の影・夕方の光の5枚（components/museum/LayeredBuilding）。
-   * Phase 1 の PoC として夕方に固定し、時間帯の filter はかけない。
-   * 素地が TOP より冷たいグレーなので、夕方の光と葉影を TOP より少しだけ強める
+   * 素地が TOP より冷たいグレーなので、夕方の光と葉影を TOP より少しだけ強める。
+   * ほかの時間帯は、その上から filter で暗さを寄せる（./ambient.ts。夕方は何も変えない値）
    */
+  filter: var(--ambient-building-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
   --building-form-shadow-opacity: 0.38;
   --building-plant-shadow-opacity: 0.32;
   --building-light-color: rgb(214 152 94 / 0.3);
