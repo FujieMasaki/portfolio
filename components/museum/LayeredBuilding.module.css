@@ -1,0 +1,60 @@
+/*
+ * 2.5D の建物（LayeredBuilding.tsx）。5枚を同じ外枠の中で完全に重ねる。
+ * 各層の濃さと夕方の光の色は、ページ側のクラスで --building-* を上書きして調整する（ここは既定値）。
+ */
+
+/* 既定値は :where で詳細度を 0 にし、CSS の読み込み順にかかわらずページ側の上書きを勝たせる */
+:where(.building) {
+  /* 面の向きの陰。柱の丸みと壁の傾きを出す（0.25〜0.5） */
+  --building-form-shadow-opacity: 0.4;
+  /* アーチの内側の厚みと奥の暗さ。面の陰と重なる分を見て、こちらは少しだけ強くする（0.25〜0.55） */
+  --building-arch-depth-opacity: 0.45;
+  /* 植物の影。素材のままだと強いので、葉の形が分かる程度まで弱める（0.15〜0.4） */
+  --building-plant-shadow-opacity: 0.28;
+  /*
+   * 夕方の光。マスクの白い範囲にだけ、この色を重ねる。
+   * soft-light / normal / screen を比べ、normal にした（soft-light は 0.3 以下ではほとんど見えず、
+   * screen は陰の暗部まで持ち上げて質量感が薄れる。normal は陰を残したまま光の当たる面だけが暖まる）
+   */
+  --building-light-color: rgb(214 152 94 / 0.22);
+  --building-light-blend: normal;
+}
+
+.building {
+  /* multiply と光の合成を、背後の空・海と混ぜず、この5枚の中だけで閉じる */
+  isolation: isolate;
+}
+
+.building > * {
+  position: absolute;
+  inset: 0;
+}
+
+.base {
+  mix-blend-mode: normal;
+}
+
+.formShadow {
+  mix-blend-mode: multiply;
+  opacity: var(--building-form-shadow-opacity);
+}
+
+.archDepth {
+  mix-blend-mode: multiply;
+  opacity: var(--building-arch-depth-opacity);
+}
+
+.plantShadow {
+  mix-blend-mode: multiply;
+  opacity: var(--building-plant-shadow-opacity);
+}
+
+/* 光：マスク画像の明るさ（luminance）で、暖色を当たる範囲にだけ残す。透過した開口部には光を置かない */
+.light {
+  background: var(--building-light-color);
+  mix-blend-mode: var(--building-light-blend);
+  mask-image: var(--building-light-mask);
+  mask-mode: luminance;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
