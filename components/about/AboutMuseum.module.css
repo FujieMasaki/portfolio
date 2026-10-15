@@ -192,3 +192,23 @@
   }
 }
 
+
+/*
+ * 印刷：まだ現れていない展示（[data-reveal="pending"]）や、現れる途中の札・線も含めて、すべてをそのまま写す。
+ * 動きの指定はどれも後から重ねたものなので、ここで外せば元の見え方に戻る（!important で、印・hover などの指定にも勝たせる）
+ */
+@media print {
+  .museum,
+  .museum *,
+  .museum *::before,
+  .museum *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .museum [data-reveal] {
+    opacity: 1 !important;
+    translate: none !important;
+    transform: none !important;
+  }
+}
