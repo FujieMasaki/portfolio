@@ -23,6 +23,9 @@ const STEPS = 12;
  */
 const CLEAR_MS = 4000;
 
+/** 前に付けた着地の印の片付け。付け直す前に呼び、古いタイマーが新しい印を外さないようにする */
+let clearArrival: (() => void) | null = null;
+
 /**
  * TOP のアーチを「通り抜けて」展示室へ入る遷移（Mask transition + Zoom through）。
  *
@@ -137,12 +140,14 @@ const ArchPassage = () => {
 
     // 次の部屋の着地の動きが終わったら、印を外す（Menu で移ったときや再読み込みでは、この動きをしない）
     const markArrival = () => {
+      clearArrival?.();
       const root = document.documentElement;
       let timer = 0;
       const clear = () => {
         delete root.dataset.arrival;
         document.removeEventListener("animationend", onEnd);
         window.clearTimeout(timer);
+        if (clearArrival === clear) clearArrival = null;
       };
       const onEnd = (end: AnimationEvent) => {
         if (end.animationName.includes("passage-arrive")) clear();
@@ -152,6 +157,7 @@ const ArchPassage = () => {
       root.dataset.arrival = "passage";
       document.addEventListener("animationend", onEnd);
       timer = window.setTimeout(clear, CLEAR_MS);
+      clearArrival = clear;
     };
 
     // 通り抜けている途中で「動きを減らす」に変わったら、動きをその場で終わらせ、遷移はそのまま続ける
