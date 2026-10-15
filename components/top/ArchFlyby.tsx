@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import useAmbient from "@/components/museum/useAmbient";
 import styles from "./TopHero.module.css";
-import { buildWingKeyframes, type Flyer } from "./wingbeat";
+import { buildWingKeyframes, flybyDelayRange, flyerFor, type Flyer } from "./wingbeat";
 
 type Flight = {
   id: number;
@@ -152,7 +152,8 @@ const buildFlightPath = (flight: Flight, width: number, height: number, birdWidt
 };
 
 /**
- * Contact のアーチ越しに、少し奥の海の上をリュウキュウツバメが横切る。夜（時間帯が night）はコウモリになる。
+ * Contact のアーチ越しに、少し奥の海の上をリュウキュウツバメが横切る。夜・深夜（night・midnight）はコウモリになり、
+ * 深夜は飛ぶ間をさらに空ける（どちらも wingbeat.ts の flyerFor・flybyDelayRange）。
  * 主役ではなく「見ていたら、たまたま横切った」程度の気配だが、黒い点やアイコンではなく、
  * 真横から見た姿で、静止していても燕・コウモリと分かるようにする（大きさは TopHero.module.css）。
  * 同じ軌道の繰り返しに見えないよう、飛ぶたびに高さ・うねり・速さ・向きを変えて1羽だけ通す。
@@ -175,7 +176,8 @@ const ArchFlyby = () => {
     () => window.matchMedia(REDUCED_MOTION).matches,
     () => true,
   );
-  const flyer: Flyer = useAmbient() === "night" ? "bat" : "swallow";
+  const ambient = useAmbient();
+  const flyer: Flyer = flyerFor(ambient);
   const flightCount = useRef(0);
   const birdRef = useRef<HTMLSpanElement>(null);
 
@@ -183,8 +185,7 @@ const ArchFlyby = () => {
   useEffect(() => {
     if (flight || reducedMotion) return;
 
-    const delay =
-      flightCount.current === 0 ? randomBetween(3000, 6000) : randomBetween(10000, 22000);
+    const delay = randomBetween(...flybyDelayRange(ambient, flightCount.current === 0));
     const timer = window.setTimeout(() => {
       flightCount.current += 1;
       const { duration } = FLIGHT_STYLE[flyer];
@@ -205,7 +206,7 @@ const ArchFlyby = () => {
       });
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [flight, reducedMotion, flyer]);
+  }, [flight, reducedMotion, flyer, ambient]);
 
   // 1羽分の軌道を作って飛ばし、抜けたら片付ける
   useEffect(() => {

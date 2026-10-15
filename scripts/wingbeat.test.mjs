@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildWingKeyframes, planWingbeats } from "../components/top/wingbeat.ts";
+import { buildWingKeyframes, flybyDelayRange, flyerFor, planWingbeats } from "../components/top/wingbeat.ts";
 
 /** 再現できる乱数（線形合同法） */
 const seeded = (seed) => {
@@ -70,4 +70,22 @@ test("コウモリの手首から先は、腕に遅れて折れ曲がる（燕�
   const angles = near.outer.map((frame) => Number.parseFloat(frame.transform.slice(7)));
   assert.ok(Math.max(...angles) - Math.min(...angles) > 10, "手首から先がほとんど動いていない");
   assert.equal(buildWingKeyframes("swallow", 5, seeded(11)).near.outer, null);
+});
+
+test("夜と深夜はコウモリ、それ以外の時間帯は燕が横切る", () => {
+  assert.equal(flyerFor("night"), "bat");
+  assert.equal(flyerFor("midnight"), "bat");
+  for (const ambient of ["morning", "day", "evening"]) {
+    assert.equal(flyerFor(ambient), "swallow", ambient);
+  }
+});
+
+test("深夜は、夜より長く間を空けてから飛ぶ", () => {
+  for (const first of [true, false]) {
+    const [nightMin, nightMax] = flybyDelayRange("night", first);
+    const [midnightMin, midnightMax] = flybyDelayRange("midnight", first);
+    assert.ok(midnightMin > nightMin && midnightMax > nightMax, `first: ${first}`);
+  }
+  assert.deepEqual(flybyDelayRange("midnight", true), [10000, 25000]);
+  assert.deepEqual(flybyDelayRange("midnight", false), [20000, 45000]);
 });
