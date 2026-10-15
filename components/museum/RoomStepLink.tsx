@@ -8,7 +8,10 @@ import { useRouter } from "next/navigation";
 const EXIT_MS = 600;
 /** 退く距離。次の部屋は反対側の同じ距離から現れる */
 const STEP_PX = 12;
-/** 次の部屋の room-step が終わらなかったとき（入口の TOP には room-step が無い）に、印を外すまでの時間 */
+/**
+ * 次の部屋の room-step が終わらなかったときに、印を外すまでの時間。
+ * TODO: 遷移が極端に遅いと、着地の途中で切れる（ArchPassage の CLEAR_MS と同じ。原因の見当はそちらに書いた）
+ */
 const CLEAR_MS = 4000;
 /** サイト共通の easing（--ease-calm と同じ値） */
 const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
