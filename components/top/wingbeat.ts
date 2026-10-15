@@ -77,15 +77,14 @@ const OUTER_REST = -4;
 /** ある時刻の、腕（肩から先）の角度 */
 const innerAngle = (flyer: Flyer, segments: WingSegment[], time: number, scale = 1) => {
   const { base, up, down, sway } = WING[flyer];
+  // 風を受けた数度の揺れ。滑空中も羽ばたき中も同じだけ重ね、切り替わるときに角度が跳ばないようにする
+  const rest = base + sway * Math.sin((2 * Math.PI * Math.max(0, time)) / 1.6);
   const segment = segments.find((s) => time < s.start + s.duration) ?? segments[segments.length - 1];
-  if (!segment || segment.kind === "glide" || time < segment.start) {
-    // 滑空中は翼を広げたまま、風を受けて数度だけ揺れる
-    return base + sway * Math.sin((2 * Math.PI * Math.max(0, time)) / 1.6);
-  }
+  if (!segment || segment.kind === "glide" || time < segment.start) return rest;
   const phase = (time - segment.start) / segment.duration;
   // 前半で打ち上げ、後半で打ち下ろす。始めと終わりは滑空の角度に戻るので、つなぎ目で跳ばない
   const stroke = Math.sin(2 * Math.PI * phase);
-  return base + (stroke > 0 ? up : down) * segment.amplitude * scale * stroke;
+  return rest + (stroke > 0 ? up : down) * segment.amplitude * scale * stroke;
 };
 
 /** キーフレームを切る間隔（秒）。回転の補間は linear なので、細かく刻んで曲線に近づける */
