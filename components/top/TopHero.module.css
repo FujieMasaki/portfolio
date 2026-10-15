@@ -387,7 +387,11 @@
   letter-spacing: 0.22em;
   text-align: center;
   text-transform: uppercase;
-  color: rgb(62 53 44 / 0.92);
+  /*
+   * 建物の陰と葉影が部屋名の下にも落ちるので、文字は透かさず濃くする
+   * （素材から合成した計算で、3つの部屋名の範囲の暗い側（下位 5%）が朝 4.8:1・昼 5.8:1・夕方 5.6:1）
+   */
+  color: rgb(32 27 22);
   border-block: 1px solid rgb(112 103 92 / 0.4);
   /* 層全体は pointer-events: none。部屋名だけは押せるようにする */
   pointer-events: auto;
@@ -400,7 +404,7 @@
 /* hover の無い端末では、プレートだけで入口だと分かるよう少し濃くする */
 @media (hover: none) {
   .archPlate {
-    color: rgb(52 44 36 / 0.96);
+    color: rgb(28 23 18);
     border-color: rgb(104 95 85 / 0.5);
   }
 }
@@ -409,7 +413,7 @@
 .stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
 .stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
 .stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
-  color: rgb(44 37 30 / 0.98);
+  color: rgb(24 20 16);
   border-color: rgb(96 88 78 / 0.58);
 }
 
@@ -418,7 +422,7 @@
   .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
   .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
   .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
-    color: rgb(44 37 30 / 0.98);
+    color: rgb(24 20 16);
     border-color: rgb(96 88 78 / 0.58);
   }
 }
