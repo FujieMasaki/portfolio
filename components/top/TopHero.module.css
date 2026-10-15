@@ -626,9 +626,10 @@
   filter: var(--ambient-sky-filter);
 }
 
-.building {
-  filter: var(--ambient-building-filter);
-}
+/*
+ * 建物は Phase 1 の PoC として夕方の光と陰に固定し、時間帯の filter をかけない
+ * （光と陰は components/museum/LayeredBuilding の5枚で決める。TOP は LayeredBuilding.module.css の既定値の濃さを使う）
+ */
 
 .plantsBack,
 .plantsFront {
@@ -642,7 +643,6 @@
 
 .sky img,
 .archView,
-.building,
 .plantsBack,
 .plantsFront,
 .archImage {

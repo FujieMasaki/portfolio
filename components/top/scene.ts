@@ -9,6 +9,7 @@
 
 import type { AmbientId } from "@/components/museum/ambient";
 import type { AmbientVariables } from "@/components/museum/AmbientRoot";
+import type { BuildingLayers } from "@/components/museum/LayeredBuilding";
 import { seaSkyVariables } from "@/components/museum/seaSky";
 
 export const CANVAS = { width: 1672, height: 941 } as const;
@@ -29,6 +30,15 @@ export const toPercentBox = ({ x, y, width, height }: Rect) => {
  * 外形の左端・上端・右端を完成イメージに合わせた結果、倍率は約 0.723。
  */
 export const BUILDING: Rect = { x: 196, y: 200, width: 1283, height: 642 };
+
+/** 建物を構成する5枚（どれも 1774 x 887 で、BUILDING の位置に重ねる） */
+export const BUILDING_LAYERS: BuildingLayers = {
+  base: "/images/top/building-base-top.png",
+  formShadow: "/images/top/building-form-shadow-top.png",
+  archDepth: "/images/top/building-arch-depth-top.png",
+  plantShadow: "/images/top/building-plant-shadow-top.png",
+  lightMask: "/images/top/building-light-mask-top.png",
+};
 
 /** 前景植物 PNG はキャンバスと同寸 */
 export const FOREGROUND: Rect = { x: 0, y: 0, ...CANVAS };
@@ -63,7 +73,10 @@ export type Arch = {
    * 部屋名プレートは、この範囲の上端（＝アーチの頂点）のすぐ上に取り付ける。
    */
   body: Rect;
-  /** 建物 PNG の透過している開口部（上端は半円）。縁は建物が覆うので数 px 外側に取る */
+  /**
+   * 建物の素地（building-base-top.png）の透過している開口部（上端は半円）。縁は建物が覆うので左右 2px ほど外側に取る。
+   * 素地を差し替えたら、開口部の範囲を測り直して合わせる（ずれると、展示室との間に隙間ができる）
+   */
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
   interior?: ImageInterior | ViewInterior;
@@ -77,7 +90,7 @@ export const ARCHES: Arch[] = [
     href: "/about",
     title: "About",
     caption: "About / Career / Interest",
-    opening: { x: 464, y: 422, width: 142, height: 394 },
+    opening: { x: 454, y: 418, width: 148, height: 404 },
     body: { x: 355, y: 340, width: 310, height: 300 },
     interior: {
       kind: "image",
@@ -90,7 +103,7 @@ export const ARCHES: Arch[] = [
     href: "/work",
     title: "Work",
     caption: "Writings / Projects",
-    opening: { x: 767, y: 422, width: 150, height: 394 },
+    opening: { x: 762, y: 418, width: 153, height: 404 },
     body: { x: 688, y: 340, width: 309, height: 300 },
     interior: {
       kind: "image",
@@ -102,7 +115,7 @@ export const ARCHES: Arch[] = [
     id: "contact",
     href: "/contact",
     title: "Contact",
-    opening: { x: 1077, y: 422, width: 144, height: 394 },
+    opening: { x: 1083, y: 418, width: 149, height: 404 },
     body: { x: 1023, y: 340, width: 307, height: 300 },
     // 海の切り取りは一旦外している。戻すときは次を指定する:
     // interior: { kind: "view", objectPosition: "60% 30%" },
