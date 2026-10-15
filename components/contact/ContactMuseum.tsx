@@ -1,8 +1,12 @@
 import Image from "next/image";
+import AmbientRoot from "@/components/museum/AmbientRoot";
+import ambientStyles from "@/components/museum/ambient.module.css";
 import MuseumNav from "@/components/museum/MuseumNav";
 import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
+import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
 import ParallaxStage from "@/components/top/ParallaxStage";
 import shared from "@/components/about/AboutMuseum.module.css";
+import { CONTACT_AMBIENT_VARIABLES } from "./ambient";
 import styles from "./ContactMuseum.module.css";
 
 const EMAIL = "masakifujie.work@gmail.com";
@@ -26,8 +30,6 @@ const PLANTS_SIZES =
 const BUILDING_SIZES =
   "(max-aspect-ratio: 6/7) 165vw, (max-width: 700px) 165vw, (max-aspect-ratio: 4/3) 143vw, 92vw";
 
-const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
-
 /**
  * /contact。3つ目の展示室ではなく、TOP の右のアーチ（Contact）を抜けて、美術館の海側・裏側へ出た場所。
  * 見えている建物は、TOP の3アーチの美術館を裏から見たもので、通り抜けてきたアーチが1つだけ見える。
@@ -42,10 +44,13 @@ const SKY_FILTER = "saturate(0.6) brightness(0.98) contrast(0.92)";
  * 海と空は舞台の外に置く（揺らす写しや反転を舞台と分けるため）。水平線はどの画面でも舞台の上から約 58%（アーチの開口部の中）に合わせ、
  * 縦長の画面では画面の上端まで空を伸ばす。
  * ポインタに合わせたごく弱いパララックスと、画像がそろってからのフェードインは TOP の ParallaxStage を使う。
+ *
+ * 光と空気は TOP と同じ時間帯で変わる（AmbientRoot が ./ambient.ts の値を CSS 変数として流す）。
+ * 海と空・空気は TOP と同じ値を使い、TOP から通り抜けてきても同じ時刻の同じ場所に見えるようにする。
  */
 const ContactMuseum = () => {
   return (
-    <div className={styles.contact}>
+    <AmbientRoot className={styles.contact} variables={CONTACT_AMBIENT_VARIABLES}>
       <MuseumNav current="contact" />
 
       <main>
@@ -54,15 +59,15 @@ const ContactMuseum = () => {
           <div className={styles.sky} aria-hidden="true">
             <div className={styles.skyFlip}>
               <Image
-                src="/images/top/top-bg-sea-sky.png"
+                src={SEA_SKY_BACKGROUND}
                 alt=""
                 fill
                 loading="eager"
                 fetchPriority="high"
                 sizes={SKY_SIZES}
-                style={{ filter: SKY_FILTER }}
               />
             </div>
+            <div className={ambientStyles.glaze} />
           </div>
 
           <div className={styles.stage}>
@@ -144,7 +149,7 @@ const ContactMuseum = () => {
         {/* .scene:not([data-ready]) と同じ詳細度にし、後に出るこちらを勝たせる */}
         <style>{`.${styles.scene}:not([data-ready]){opacity:1;visibility:visible;animation:none}`}</style>
       </noscript>
-    </div>
+    </AmbientRoot>
   );
 };
 
