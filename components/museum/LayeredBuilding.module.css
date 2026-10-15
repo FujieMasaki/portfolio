@@ -84,8 +84,10 @@
     display: block;
     background: var(--building-light-color);
     mix-blend-mode: var(--building-light-blend);
-    mask-image: var(--building-light-mask);
-    mask-mode: luminance;
+    /* 光のマスクの白は素地の外（Contact の右の輪郭の外など）にも広がるので、素地の alpha と重なる所だけに描く */
+    mask-image: var(--building-light-mask), var(--building-base-mask);
+    mask-mode: luminance, alpha;
+    mask-composite: intersect;
     mask-size: 100% 100%;
     mask-repeat: no-repeat;
   }
