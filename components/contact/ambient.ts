@@ -8,7 +8,7 @@ import { seaSkyVariables } from "@/components/museum/seaSky";
  * TOP と同じ美術館の裏側なので、海と空と空気は TOP と同じ値（components/museum/seaSky.ts）を使い、
  * 建物と植物は TOP の明るさの関係（components/top/scene.ts の TOP_AMBIENTS）にそろえる。
  * 素材が TOP と違い、夕方の基準の値が少し違うので、値はこのページで持つ。夕方は今の見た目のまま。
- * 壁の案内の文字は、暗いコンクリートの上でも読めるよう夜に明るくする（ContactMuseum.module.css の [data-ambient="night"]）。
+ * 壁の案内の文字は、暗いコンクリートの上でも読めるよう夜・深夜に明るくする（ContactMuseum.module.css の [data-ambient="night"] など）。
  *
  * filter は時間帯の間で滑らかに移るよう、どの時間帯も同じ関数を同じ順に並べる。
  */
@@ -39,6 +39,11 @@ const CONTACT_AMBIENTS: Record<AmbientId, ContactAmbient> = {
     buildingFilter: "saturate(0.35) brightness(0.46) contrast(0.82)",
     plantsFilter: "saturate(0.5) brightness(0.46)",
   },
+  /* 深夜：TOP と同じく、植物と琉球石灰岩はシルエットに近づけ、建物は外形とアーチが分かる暗さに留める */
+  midnight: {
+    buildingFilter: "saturate(0.22) brightness(0.26) contrast(0.74)",
+    plantsFilter: "saturate(0.3) brightness(0.22)",
+  },
 };
 
 const contactVariables = (ambient: AmbientId) => {
@@ -52,6 +57,7 @@ const contactVariables = (ambient: AmbientId) => {
 
 /** AmbientRoot に渡す、時間帯ごとの CSS 変数（ContactMuseum.module.css が読む） */
 export const CONTACT_AMBIENT_VARIABLES: AmbientVariables = {
+  midnight: contactVariables("midnight"),
   morning: contactVariables("morning"),
   day: contactVariables("day"),
   evening: contactVariables("evening"),

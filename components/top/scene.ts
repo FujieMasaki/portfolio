@@ -118,8 +118,8 @@ export const ARCHES: Arch[] = [
  * 同じ美術館に時間が流れて見えるよう、建物の形・植物・アーチ・展示は共通のまま、
  * 光の量・色温度・霞・室内灯だけを変える。夕方が基準のビジュアルで、
  * 海と空の光と、景色にかかる空気の色は /contact と共有する（components/museum/seaSky.ts。夕方は足す色を透明にする）。
- * 部屋名プレートの文字だけは、暗いコンクリートの上でも読めるよう夜に明るくする
- * （hover などの状態ごとに色が分かれるので、TopHero.module.css の [data-ambient="night"] に置く）。
+ * 部屋名プレートの文字だけは、暗いコンクリートの上でも読めるよう夜・深夜に明るくする
+ * （hover などの状態ごとに色が分かれるので、TopHero.module.css の [data-ambient="night"]・[data-ambient="midnight"] に置く）。
  *
  * filter は時間帯の間で滑らかに移るよう、どの時間帯も同じ関数を同じ順に並べる
  * （順番や数が違うと、CSS の transition が補間せずに一度に切り替わる）。
@@ -169,6 +169,17 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     interiorFilter: "brightness(1.06) saturate(1)",
     vignette: 1,
   },
+  /*
+   * 深夜：景色（植物・霞）は夜より大きく沈めてシルエットにし、建物は外形と質感が分かる暗さに留める。
+   * About / Work の室内灯は夜より数%だけ上げ、外が暗いことで相対的に目立たせる（色は夕方の淡い琥珀のまま）
+   */
+  midnight: {
+    haze: 0.12,
+    buildingFilter: "sepia(0.04) brightness(0.33) contrast(0.98)",
+    sceneFilter: "saturate(0.3) brightness(0.2)",
+    interiorFilter: "brightness(1.12) saturate(1)",
+    vignette: 1,
+  },
 };
 
 const topVariables = (ambient: AmbientId) => {
@@ -185,6 +196,7 @@ const topVariables = (ambient: AmbientId) => {
 
 /** AmbientRoot に渡す、時間帯ごとの CSS 変数（TopHero.module.css が読む） */
 export const TOP_AMBIENT_VARIABLES: AmbientVariables = {
+  midnight: topVariables("midnight"),
   morning: topVariables("morning"),
   day: topVariables("day"),
   evening: topVariables("evening"),

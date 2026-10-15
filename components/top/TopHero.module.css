@@ -424,26 +424,26 @@
 }
 
 /*
- * 夜は建物が暗くなり、濃い文字が沈むので、灯りを受けた淡い色の文字と線にする。
+ * 夜・深夜は建物が暗くなり、濃い文字が沈むので、灯りを受けた淡い色の文字と線にする。
  * 選ばれた入口だけ少し明るくする関係は昼と同じ
  */
-.hero[data-ambient="night"] .archPlate {
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .archPlate {
   color: rgb(226 216 200 / 0.92);
   border-color: rgb(214 202 184 / 0.34);
 }
 
-.hero[data-ambient="night"] .stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
-.hero[data-ambient="night"] .stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
-.hero[data-ambient="night"] .stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
   color: rgb(240 232 218 / 0.96);
   border-color: rgb(226 214 196 / 0.52);
 }
 
 @media (hover: hover) {
-  .hero[data-ambient="night"] .archPlate:hover,
-  .hero[data-ambient="night"] .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
-  .hero[data-ambient="night"] .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
-  .hero[data-ambient="night"] .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .archPlate:hover,
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
     color: rgb(240 232 218 / 0.96);
     border-color: rgb(226 214 196 / 0.52);
   }

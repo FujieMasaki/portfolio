@@ -62,6 +62,20 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
     air: { top: "rgb(24 28 56 / 0.18)", bottom: "rgb(8 10 20 / 0.2)" },
     skyShade: 0,
   },
+  /*
+   * 深夜：夜よりさらに色と光を落とし、空と海を黒に近い濃紺（#080a10 付近）へ沈める。
+   * 水平線だけは消さずにごく薄く残し、目が慣れると海辺だと分かる程度にする（完全な黒にはしない）
+   */
+  midnight: {
+    filter: "saturate(0.16) brightness(0.24) contrast(0.9)",
+    glaze: {
+      sky: "rgb(8 10 18 / 0.7)",
+      horizon: "rgb(30 34 52 / 0.36)",
+      sea: "rgb(6 8 14 / 0.72)",
+    },
+    air: { top: "rgb(8 10 18 / 0.3)", bottom: "rgb(6 8 14 / 0.34)" },
+    skyShade: 0,
+  },
 };
 
 /** 海と空の光を、ambient.module.css の .glaze と各ページの背景画像・空気のレイヤーが読む CSS 変数にする */
