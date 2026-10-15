@@ -211,4 +211,9 @@
     translate: none !important;
     transform: none !important;
   }
+
+  /* まだ引かれていない線（順路の案内の札の線など）も、引き終えた長さで写す */
+  .museum [data-reveal] *::before {
+    scale: none !important;
+  }
 }
