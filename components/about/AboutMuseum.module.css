@@ -131,33 +131,92 @@
 /* ---- 現れ方 ---- */
 
 /*
- * Career / Interests の展示は、画面に入るときに静かに現れる（スクロール位置に応じて進む CSS アニメーション）。
- * 画面の下へ戻すとまた薄くなるが、移動量は 10px なので往復しても目立たない。
- * 対応していないブラウザと prefers-reduced-motion では、何もせず最初から見える。
+ * Career / Interests の展示は、最初に視界へ入ったときに一度だけ静かに現れる。
+ * 画面の下にある展示に RevealOnce.tsx が "pending" を付け、画面に入ったら "shown" に替える。
+ * スクロールを戻しても、また薄くはならない。
+ * JS が動かない環境と prefers-reduced-motion では "pending" が付かず、最初から見える。
  */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .museum [data-reveal] {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 5% entry 65%;
-    }
+@media (prefers-reduced-motion: no-preference) {
+  .museum [data-reveal] {
+    transition:
+      opacity 1.6s var(--ease-calm),
+      translate 1.6s var(--ease-calm);
+  }
 
-    /*
-     * 幅の狭い画面では、Career の列（5点を縦に並べる）や Interests の2段が画面より高くなる。
-     * 割合で決めると、上端が画面の上の方に来るまで薄いままになるので、入ってから 200px で現れ終える。
-     */
-    @media (max-width: 760px) {
-      .museum [data-reveal] {
-        animation-range: entry 0% entry 200px;
-      }
-    }
+  .museum [data-reveal="pending"] {
+    opacity: 0;
+    translate: 0 10px;
   }
 }
 
-@keyframes reveal {
+/*
+ * 順路の案内（RoomStepLink）から来たときは、壁と床は動かさず、入ってすぐの札・展示が、それぞれの現れ方（arrive）の
+ * 時間差のまま、進んだ向きの 12px 先から着地する（--room-step を Personal・WorkMuseum の arrive が使う）。
+ * 印（<html data-room-step>）は、札・展示が現れ終わった後（room-step-hold の終わり）に RoomStepLink が外す。
+ * --room-step を使う中でいちばん遅いのは /about の所在地（0.71s 遅れ ＋ 1.6s ＝ 2.31s）なので、少し余裕を持たせて 2.5s にする
+ * （床の植物は横へずらさない arrive-in-place なので数えない）。
+ * それより先に外すと、--room-step が途中で 0 に戻り、現れている途中の札が横に跳ぶ
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step="next"]) .museum {
+    --room-step: 12px;
+
+    animation: room-step-hold 2.5s linear;
+  }
+
+  :global(:root[data-room-step="previous"]) .museum {
+    --room-step: -12px;
+
+    animation: room-step-hold 2.5s linear;
+  }
+}
+
+/* 見た目は変えず、札・展示の arrive が終わるまでの時間だけを数える */
+@keyframes room-step-hold {
+  to {
+    --room-step-hold: 1;
+  }
+}
+
+/*
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）だけ、暗がり（globals.css）の上に、部屋全体
+ * （壁・床・展示・Menu）が、目が慣れるように静かに現れる。壁の色を暗い状態から明るくする動きにはしない。
+ * 印（<html data-arrival>）は、この動きが終わると ArchPassage が外す。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-arrival="passage"]) .museum {
+    animation: passage-arrive 0.8s var(--ease-calm) both;
+  }
+}
+
+@keyframes passage-arrive {
   from {
     opacity: 0;
-    translate: 0 10px;
+    translate: 0 4px;
+  }
+}
+
+/*
+ * 印刷：まだ現れていない展示（[data-reveal="pending"]）や、現れる途中の札・線も含めて、すべてをそのまま写す。
+ * 動きの指定はどれも後から重ねたものなので、ここで外せば元の見え方に戻る（!important で、印・hover などの指定にも勝たせる）
+ */
+@media print {
+  .museum,
+  .museum *,
+  .museum *::before,
+  .museum *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .museum [data-reveal] {
+    opacity: 1 !important;
+    translate: none !important;
+    transform: none !important;
+  }
+
+  /* まだ引かれていない線（順路の案内の札の線など）も、引き終えた長さで写す */
+  .museum [data-reveal] *::before {
+    scale: none !important;
   }
 }

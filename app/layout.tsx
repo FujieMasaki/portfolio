@@ -43,6 +43,9 @@ const RootLayout = ({
   return (
     <html
       lang="ja"
+      // globals.css の smooth scroll を、ページ遷移で先頭へ戻すときだけ Next に外させる
+      // （無いと、順路の案内で前のページの末尾から先頭まで流れるようにスクロールしてしまう）
+      data-scroll-behavior="smooth"
       className={`${shipporiMincho.variable} ${notoSansJP.variable}`}
     >
       {gtmId && <GoogleTagManager gtmId={gtmId} />}

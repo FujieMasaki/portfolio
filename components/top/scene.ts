@@ -113,27 +113,6 @@ export const ARCHES: Arch[] = [
 ];
 
 /**
- * 前景の植物・枝を風でごく弱く揺らすためのレイヤー（初期実装では空）。
- *
- * 植物 PNG は1枚絵なので、そのまま揺らすと岩や地面まで動いてしまう。
- * 揺らしたい枝・葉だけを切り出した透過 PNG（キャンバスと同寸で書き出すと位置合わせが楽）を用意し、
- * ここに足すと TopHero が前景植物の上に重ね、根元（origin）を支点に揺らす。
- * 切り出した部分は、元の植物 PNG 側から消しておくと二重に見えない。
- */
-export type SwayLayer = {
-  src: string;
-  rect: Rect;
-  /** 揺れの支点（transform-origin）。枝の付け根を指定する */
-  origin: string;
-  /** 片側への最大傾き（deg）。0.3〜0.8 程度で十分 */
-  angle: number;
-  /** 1往復の秒数。8〜14 秒程度のゆっくりした周期 */
-  duration: number;
-};
-
-export const FOLIAGE_SWAY: SwayLayer[] = [];
-
-/**
  * TOP の時間帯ごとの光と空気（時間帯は components/museum/ambient.ts が訪問者のローカル時刻で決める）。
  *
  * 同じ美術館に時間が流れて見えるよう、建物の形・植物・アーチ・展示は共通のまま、

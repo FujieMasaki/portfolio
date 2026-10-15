@@ -3,11 +3,29 @@
  * 壁・文字・見出し・額・床は AboutMuseum.module.css と共通。ここでは並べ方と現れ方だけを決める。
  */
 
-/* Masaki Fujie は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ） */
+/*
+ * Masaki Fujie は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ）。
+ * 順路の案内から来たときは、進んだ向きの 12px 先から現れる（--room-step。AboutMuseum.module.css）
+ */
 @keyframes arrive {
   from {
     opacity: 0;
+    translate: var(--room-step, 0px) 6px;
+  }
+}
+
+/* 床に置かれた植物の現れ方。順路の案内から来たときも横へはずらさない（--room-step を使わない） */
+@keyframes arrive-in-place {
+  from {
+    opacity: 0;
     translate: 0 6px;
+  }
+}
+
+/* 札の細線を、左から引く */
+@keyframes line-draw {
+  from {
+    scale: 0 1;
   }
 }
 
@@ -51,7 +69,37 @@
 .archiveText {
   /* 写真より少し下に置き、2つの展示の高さをずらす */
   padding-top: clamp(24px, 8svh, 96px);
-  animation: arrive 1.6s var(--ease-calm) 0.2s both;
+}
+
+/*
+ * 札は、ABOUT → Masaki Fujie → WEB ENGINEER → 本文 → 所在地 の順に、ごく短い時間差で現れる。
+ * 間は 90 → 120 → 150ms と少しずつ広げ、読む順に視線が降りていく速さにする。一文字ずつは出さない
+ */
+.archiveText h1 > *,
+.role,
+.introduction,
+.place {
+  animation: arrive 1.6s var(--ease-calm) both;
+}
+
+.archiveText h1 > :first-child {
+  animation-delay: 0.2s;
+}
+
+.archiveText h1 > :nth-child(2) {
+  animation-delay: 0.29s;
+}
+
+.role {
+  animation-delay: 0.41s;
+}
+
+.introduction {
+  animation-delay: 0.56s;
+}
+
+.place {
+  animation-delay: 0.71s;
 }
 
 /* 肩書き（WEB ENGINEER）。名前のすぐ下に、ABOUT の札と同じくらいの小ささで置き、色だけ少し濃くして札より少しだけ強くする */
@@ -96,10 +144,13 @@
   color: var(--wall-ink-muted);
 }
 
+/* 所在地の横の細線。札が現れ終わるころに、館内の案内が置かれたように一度だけ引かれる */
 .place::after {
   content: "";
   width: 56px;
   border-top: 1px solid var(--wall-line);
+  transform-origin: left;
+  animation: line-draw 0.65s var(--ease-calm) 1.5s both;
 }
 
 /* 額は壁の中ほどの高さに掛け、この部屋の主展示にする */
@@ -129,7 +180,8 @@
   z-index: 1;
   width: var(--plant-w);
   pointer-events: none;
-  animation: arrive 1.6s var(--ease-calm) 0.8s both;
+  /* 床に置かれた植物なので、順路の案内から来たときも横からは現れず、その場で現れる（arrive-in-place） */
+  animation: arrive-in-place 1.6s var(--ease-calm) 0.8s both;
 }
 
 .plant img {
@@ -211,7 +263,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .archiveText,
+  .archiveText h1 > *,
+  .role,
+  .introduction,
+  .place,
+  .place::after,
   .portrait,
   .plant {
     animation: none;

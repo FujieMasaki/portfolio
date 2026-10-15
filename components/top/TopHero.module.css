@@ -56,6 +56,17 @@
 }
 
 /*
+ * パララックス（ParallaxStage.tsx が流すポインタ位置 --px / --py は -1〜1）。
+ * 動かすのは奥の空だけで、建物・アーチ・部屋名・植物は止めておく。
+ * 植物は建物の奥の木立と手前の茂みが1枚の大きな PNG なので、動かすと植物全体が一緒にスライドして見え、
+ * 固定の手前用のマスク（top-foreground-front-mask.svg）や建物との重なりもずれる。
+ *
+ *   sky        -0.3%   奥。ポインタと逆の向き
+ *   building    0      固定（arches・archSigns も同じ）
+ *   plants      0      固定
+ */
+
+/*
  * 1. 海と空：ごく弱いパララックス。動いても端が見えないよう少し大きく敷く。
  * 雲・海・霞の動きはどれも「気づかなくてもよい」程度に留め、建築より目立たせない。
  */
@@ -64,7 +75,7 @@
   --horizon: 42.2%;
 
   inset: -2%;
-  transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
+  transform: translate3d(calc(var(--px) * -0.3%), calc(var(--py) * -0.2%), 0);
   transition: transform 1.6s var(--ease-calm);
 }
 
@@ -382,7 +393,8 @@
   pointer-events: auto;
   transition:
     color 0.5s var(--ease-calm),
-    border-color 0.5s var(--ease-calm);
+    border-color 0.5s var(--ease-calm),
+    opacity 0.5s var(--ease-calm);
 }
 
 /* hover の無い端末では、プレートだけで入口だと分かるよう少し濃くする */
@@ -495,12 +507,6 @@
   filter: drop-shadow(0 0 0.5px rgb(150 160 190 / 0.3));
 }
 
-/* 風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY に足したものだけが描画される） */
-.sway {
-  pointer-events: none;
-  animation: foliage-sway var(--sway-duration) ease-in-out infinite alternate;
-}
-
 /*
  * 6. 周辺減光と空気。周辺減光の強さ（--ambient-vignette）と上下からかかる空気の色（--ambient-air-*。/contact と共有）は
  * 時間帯で変わる。夕方は減光が下の値のまま、空気の色は透明
@@ -516,6 +522,60 @@
     ),
     linear-gradient(to bottom, rgb(40 36 52 / 0.12), transparent 30%),
     linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
+}
+
+/*
+ * アーチを通り抜ける遷移（ArchPassage.tsx）。
+ * 選んだ入口の開口部と同じアーチの形の窓を、clip-path で画面いっぱいまで広げる。
+ * 窓の中は次の部屋ではなく、アーチの奥の暗がりにする。遷移の後も同じ暗がり（globals.css）の上に次の部屋が現れるので、
+ * 暗がりを抜けて次の空間が目に入ってくるように見える。
+ */
+.passage {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 館内（/about・/work）へ抜ける通路の暗がり。真っ黒にはせず、暖かいチャコールにする（色は globals.css の --passage-dark） */
+.passage[data-to="about"],
+.passage[data-to="work"] {
+  background: var(--passage-dark);
+}
+
+/* /contact は館の外。景色が現れる前の地（ContactMuseum.module.css の .contact）と同じ色 */
+.passage[data-to="contact"] {
+  background: #1c211b;
+}
+
+/* 館名と舞台を包む ArchPassage。配置には関わらず、中のアーチのクリックを受けるだけ */
+.passageScope {
+  display: contents;
+}
+
+/* 通り抜けている間は、ほかの入口に反応させない（部屋名のプレートは自分で pointer-events: auto を持つので、別に止める） */
+.passageScope[data-passage] .stage,
+.passageScope[data-passage] .archPlate {
+  pointer-events: none;
+}
+
+/* 選んだ入口以外を少しだけ落ち着かせる。暗くしすぎず、選んだアーチへ視線が残る程度 */
+.passageScope[data-passage="about"] .arch:not([data-arch="about"]) .archScene,
+.passageScope[data-passage="work"] .arch:not([data-arch="work"]) .archScene,
+.passageScope[data-passage="contact"] .arch:not([data-arch="contact"]) .archScene {
+  filter: contrast(0.94) brightness(0.9);
+}
+
+.passageScope[data-passage="about"] .archSign:not([data-arch="about"]) .archPlate,
+.passageScope[data-passage="work"] .archSign:not([data-arch="work"]) .archPlate,
+.passageScope[data-passage="contact"] .archSign:not([data-arch="contact"]) .archPlate {
+  opacity: 0.55;
+}
+
+.passageScope[data-passage] .plaque {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-calm);
 }
 
 /* 館名のプレート */
@@ -571,8 +631,7 @@
 }
 
 .plantsBack,
-.plantsFront,
-.sway {
+.plantsFront {
   filter: var(--ambient-scene-filter);
 }
 
@@ -642,15 +701,6 @@
   }
 }
 
-@keyframes foliage-sway {
-  from {
-    rotate: calc(-1 * var(--sway-angle));
-  }
-  to {
-    rotate: var(--sway-angle);
-  }
-}
-
 /*
  * 縦長画面：舞台を画面下に置き、3つのアーチが画面幅に収まる大きさにする。
  * 舞台の上に余る空は、空レイヤーだけを上へ伸ばして埋める（水平線の高さは舞台と揃えたまま）。
@@ -678,13 +728,17 @@
     translate: -50% 0;
   }
 
-  /* 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ */
+  /*
+   * 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ。
+   * 空の上端と舞台の下端は画面の端にそろえているので、パララックスは横にだけ動かす（縦に動かすと端に背景色が出る）
+   */
   .sky {
     --horizon: 44.9%;
 
     top: calc(-1 * var(--sky-above));
     bottom: auto;
     height: calc((var(--sky-above) + 0.423 * var(--stage-h)) / 0.449);
+    transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
   .sky img {
@@ -749,8 +803,7 @@
   .plaque,
   .clouds,
   .sea,
-  .haze,
-  .sway {
+  .haze {
     animation: none;
   }
 

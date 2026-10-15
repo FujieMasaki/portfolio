@@ -1,6 +1,7 @@
 import Image from "next/image";
 import MuseumNav from "@/components/museum/MuseumNav";
 import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
+import RevealOnce from "@/components/museum/RevealOnce";
 import shared from "@/components/about/AboutMuseum.module.css";
 import Projects from "./Projects";
 import Studies from "./Studies";
@@ -18,7 +19,7 @@ import styles from "./WorkMuseum.module.css";
  * 部屋の名前（WORK）は最初の札にだけ書き、展示の題（Writing など）には番号も部屋の名前も付けない（/about と同じ決まり）。
  * 最初の札の題は、/about の Masaki Fujie にあたるもので、この部屋で見る3つの展示の名前を並べる。
  * 壁・文字・札・床・現れ方（[data-reveal]）は /about と同じもの（AboutMuseum.module.css）を使い、部屋ごとに別の体系を作らない。
- * 動くのは右上の植物と葉の影だけで、風に揺れるくらいのごく遅い動きにする（prefers-reduced-motion では止める）。
+ * 右上の植物と葉の影は静止したまま置く（風の揺れは、枝・葉を自然に分けた素材ができてから改めて考える）。
  */
 const WorkMuseum = () => {
   return (
@@ -54,7 +55,8 @@ const WorkMuseum = () => {
           </div>
 
           {/* 窓の外の植物。葉の影（同じ画像を暗くぼかしたもの）を先に描き、壁に落ちているように見せる */}
-          <div className={styles.canopy} aria-hidden="true">
+          {/* data-room-fixed：壁と一緒にあるもの。順路の案内で移るときも動かさない（RoomStepLink） */}
+          <div className={styles.canopy} aria-hidden="true" data-room-fixed>
             <Image
               src="/images/work/work-plant-top-right.png"
               alt=""
@@ -80,7 +82,8 @@ const WorkMuseum = () => {
         <Projects />
         <Studies />
 
-        <div className={styles.floor}>
+        {/* 床（.floor::before）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink） */}
+        <div className={styles.floor} data-room-floor>
           <MuseumRoomNavigation
             previous={{ label: "Previous room", title: "About", href: "/about" }}
             next={{ label: "Next room", title: "Contact", href: "/contact" }}
@@ -88,6 +91,8 @@ const WorkMuseum = () => {
           />
         </div>
       </main>
+
+      <RevealOnce />
     </div>
   );
 };

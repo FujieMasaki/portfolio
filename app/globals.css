@@ -12,6 +12,9 @@
   --color-accent-700: #7c5518;
   --color-hero-mist: #dde3e4;
 
+  /* アーチを通り抜けて館内へ入るときの暗がり（TopHero.module.css の .passage と、着いた直後の body の地） */
+  --passage-dark: #1f1b18;
+
   --header-height: 64px;
   --container-max-width: 1160px;
   --container-padding: 32px;
@@ -54,6 +57,15 @@ picture,
 video {
   display: block;
   max-width: 100%;
+}
+
+/*
+ * アーチを通り抜けて来た直後（ArchPassage が <html data-arrival> を付けている間）は、
+ * 通り抜けの暗がりと同じ色を地に敷き、次の部屋がその上に現れるようにする。
+ * /contact は自分の地（暗い外景）が全面を覆うので、この色は見えない
+ */
+:root[data-arrival="passage"] body {
+  background: var(--passage-dark);
 }
 
 a {

@@ -27,6 +27,55 @@
   text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
 }
 
+/*
+ * 景色と順路の案内は、.contact の大きさの main の中に置く。
+ * 順路の案内から来たときに main ごとずらすため、main を .contact と同じ大きさの箱にしておく
+ * （main 自体には高さが無いので、ずらすと中の absolute の景色がつぶれる）
+ */
+.contact > main {
+  position: absolute;
+  inset: 0;
+}
+
+/* 順路の案内（RoomStepLink）から来たときだけ、進んだ向きの 12px 先から着地する（AboutMuseum.module.css と同じ動き） */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step="next"]) .contact > main {
+    --room-step: 12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+
+  :global(:root[data-room-step="previous"]) .contact > main {
+    --room-step: -12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+}
+
+/*
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）は、景色はこれまでどおり暗がりから現れ、
+ * Menu だけを静かに現す（印は AboutMuseum.module.css と同じ。ArchPassage が名前に passage-arrive を含む動きの終わりで印を外すので、
+ * 動きは薄く現すだけでもこの名前にする）
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-arrival="passage"]) .contact > header {
+    animation: passage-arrive 0.8s var(--ease-calm) both;
+  }
+}
+
+@keyframes passage-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes room-step {
+  from {
+    opacity: 0;
+    translate: var(--room-step) 0;
+  }
+}
+
 /* ---- 景色（海と空・建物・植物・案内）。画像がそろってから一度にフェードインする ---- */
 
 .scene {
@@ -173,22 +222,14 @@
 
 /*
  * 3. 植物・琉球石灰岩：素材は舞台と同寸。花の赤が強く出すぎないよう、TOP の植物と同じ程度に彩度と明るさを落とす。
- * 左上の木の梢だけを .canopy の写しで切り出して揺らす。下の .plants は抜かずにそのまま敷き、
- * 写しが動いても隙間や半透明の境目が出ないようにする（ずれは 1px 未満なので、二重には見えない）。
+ * 植物は静止したまま置く（風の揺れは、枝・葉を自然に分けた素材ができてから改めて考える）。
  */
-.plants,
-.canopy {
+.plants {
   inset: 0;
   /* 時間帯で変わる（./ambient.ts。夕方は saturate(0.72) brightness(0.84)） */
   filter: var(--ambient-plants-filter);
   transition: filter var(--ambient-fade) var(--ease-calm);
   pointer-events: none;
-}
-
-/* 梢：根元より上だけを、14 秒かけて 1.5px ほど横へ往復させる（岩や低木は動かさない） */
-.canopy {
-  mask-image: radial-gradient(ellipse 54% 38% at 0% 0%, #000 72%, transparent 100%);
-  animation: canopy-sway 14s ease-in-out infinite alternate;
 }
 
 /*
@@ -362,14 +403,10 @@
 
   /*
    * 舞台の上に空が続くので、左上の木の梢は幹から離れて宙に浮いて見える。
-   * 梢は外し、植物は建物の足元の茂みと岩だけにする（揺らす写しも出さない）
+   * 梢は外し、植物は建物の足元の茂みと岩だけにする
    */
   .plants {
     mask-image: linear-gradient(to bottom, transparent 34%, #000 50%);
-  }
-
-  .canopy {
-    display: none;
   }
 
   /*
@@ -428,15 +465,6 @@
   }
 }
 
-@keyframes canopy-sway {
-  from {
-    translate: -0.75px 0;
-  }
-  to {
-    translate: 0.75px 0.5px;
-  }
-}
-
 /* 動きを止める（フェードインもしない）。リンクの hover の矢印も動かさない */
 @media (prefers-reduced-motion: reduce) {
   .scene[data-ready] {
@@ -444,7 +472,6 @@
   }
 
   .scene[data-ready],
-  .canopy,
   .roomNavigation {
     animation: none;
   }

@@ -1,4 +1,5 @@
 import MuseumNav from "@/components/museum/MuseumNav";
+import RevealOnce from "@/components/museum/RevealOnce";
 import CareerPath from "./CareerPath";
 import Interests from "./Interests";
 import Personal from "./Personal";
@@ -16,8 +17,8 @@ import styles from "./AboutMuseum.module.css";
  *
  * 壁（about-wall.webp）は .museum に1枚だけ敷き、セクションごとに背景を変えない。床も同じ素材から作る。
  * 3つの展示はそれぞれ Personal・CareerPath・Interests にあり、ここでは壁と案内の上に順に並べるだけ。
- * Masaki Fujie は読み込み時に一度だけ現れる。Career / Interests の展示は CSS の scroll-driven animation で現れ、
- * 対応していないブラウザと prefers-reduced-motion では最初から全部見える（AboutMuseum.module.css の [data-reveal]）。
+ * Masaki Fujie は読み込み時に一度だけ現れる。Career / Interests の展示は、最初に視界へ入ったときに一度だけ現れ（RevealOnce）、
+ * JS が動かない環境と prefers-reduced-motion では最初から全部見える（AboutMuseum.module.css の [data-reveal]）。
  */
 const AboutMuseum = () => {
   return (
@@ -29,6 +30,8 @@ const AboutMuseum = () => {
         <CareerPath />
         <Interests />
       </main>
+
+      <RevealOnce />
     </div>
   );
 };

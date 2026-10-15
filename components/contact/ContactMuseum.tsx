@@ -37,7 +37,7 @@ const BUILDING_SIZES =
  * レイヤー（奥 → 手前）:
  *   1. sky      TOP と同じ海と空（top-bg-sea-sky.png）を左右反転して、館の反対側から見ていることにする
  *   2. building 美術館の背面とアーチ（植物の影は画像に含まれる。固定）
- *   3. plants   植物・琉球石灰岩（1枚の PNG。左上の木の梢だけを写しで切り出し、ごく弱く揺らす）
+ *   3. plants   植物・琉球石灰岩（1枚の PNG。静止）
  *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / Mail・GitHub・X）
  *
  * 建物・植物・案内は、完成イメージと同じ 1672:941 の舞台（.stage）に % で置く。素材の PNG もこの寸法で作られている。
@@ -86,7 +86,6 @@ const ContactMuseum = () => {
 
             <div className={styles.ground} aria-hidden="true" />
 
-            {/* 同じ画像を2枚重ね、下はそのまま、上は梢だけの写し（揺らす）にする。取得は1回で済む */}
             <div className={styles.plants} aria-hidden="true">
               <Image
                 src="/images/contact/contact-plants.png"
@@ -94,15 +93,6 @@ const ContactMuseum = () => {
                 fill
                 loading="eager"
                 fetchPriority="high"
-                sizes={PLANTS_SIZES}
-              />
-            </div>
-            <div className={styles.canopy} aria-hidden="true">
-              <Image
-                src="/images/contact/contact-plants.png"
-                alt=""
-                fill
-                loading="eager"
                 sizes={PLANTS_SIZES}
               />
             </div>

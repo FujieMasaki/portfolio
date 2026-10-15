@@ -1,15 +1,14 @@
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import AmbientRoot from "@/components/museum/AmbientRoot";
 import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
 import ArchEntrance from "./ArchEntrance";
+import ArchPassage from "./ArchPassage";
 import ArchSigns from "./ArchSigns";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
 import {
   ARCHES,
   BUILDING,
-  FOLIAGE_SWAY,
   FOREGROUND,
   TOP_AMBIENT_VARIABLES,
   toPercentBox,
@@ -25,12 +24,13 @@ import styles from "./TopHero.module.css";
  *   3. arch       アーチ内の展示室・ツバメ（＋ hover のスモークと GO TO の案内）
  *   4. building   建物本体（開口部は透過）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
- *      sway       風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY。初期実装では空）
  *   6. atmosphere 周辺減光と、時間帯の空気の色
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  *
  * 光・霞・室内灯・空気は訪問者のローカル時刻で変わる（AmbientRoot が scene.ts の TOP_AMBIENT_VARIABLES を
  * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
+ *
+ * 館名と舞台を ArchPassage で包み、アーチを選んだときに、舞台の上へ通り抜ける遷移の窓を重ねる。
  */
 const TopHero = () => {
   return (
@@ -40,94 +40,79 @@ const TopHero = () => {
       labelledBy="top-title"
       variables={TOP_AMBIENT_VARIABLES}
     >
-      {/* 読み上げ・Tab の順で、館名がメニューより先に来るよう舞台より前に置く（見た目は absolute で左下） */}
-      <header className={styles.plaque}>
-        <h1 className={styles.name} id="top-title">
-          Masaki Fujie
-        </h1>
-        <p className={styles.role}>Web Engineer</p>
-      </header>
+      {/* アーチを選んだときに、開口部が画面いっぱいに広がって次の部屋へ通り抜ける（館名と舞台を包む） */}
+      <ArchPassage>
+        {/* 読み上げ・Tab の順で、館名がメニューより先に来るよう舞台より前に置く（見た目は absolute で左下） */}
+        <header className={styles.plaque}>
+          <h1 className={styles.name} id="top-title">
+            Masaki Fujie
+          </h1>
+          <p className={styles.role}>Web Engineer</p>
+        </header>
 
-      <ParallaxStage className={styles.stage}>
-        <Sky background={SEA_SKY_BACKGROUND} />
+        <ParallaxStage className={styles.stage}>
+          <Sky background={SEA_SKY_BACKGROUND} />
 
-        <div
-          className={styles.plantsBack}
-          style={toPercentBox(FOREGROUND)}
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/top/top-foreground-tropical-plants.png"
-            alt=""
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-          />
-        </div>
-
-        <nav className={styles.arches} aria-label="メインメニュー">
-          {ARCHES.map((arch) => (
-            <ArchEntrance
-              key={arch.id}
-              arch={arch}
-              background={SEA_SKY_BACKGROUND}
-            />
-          ))}
-        </nav>
-
-        <div
-          className={styles.building}
-          style={toPercentBox(BUILDING)}
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/top/top-building-arches.png"
-            alt=""
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
-          />
-        </div>
-
-        <div
-          className={styles.plantsFront}
-          style={toPercentBox(FOREGROUND)}
-          aria-hidden="true"
-        >
-          <Image
-            src="/images/top/top-foreground-tropical-plants.png"
-            alt=""
-            fill
-            loading="eager"
-            fetchPriority="high"
-            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-          />
-        </div>
-
-        {FOLIAGE_SWAY.map((layer) => (
           <div
-            key={layer.src}
-            className={styles.sway}
-            style={
-              {
-                ...toPercentBox(layer.rect),
-                transformOrigin: layer.origin,
-                "--sway-angle": `${layer.angle}deg`,
-                "--sway-duration": `${layer.duration}s`,
-              } as CSSProperties
-            }
+            className={styles.plantsBack}
+            style={toPercentBox(FOREGROUND)}
             aria-hidden="true"
           >
-            <Image src={layer.src} alt="" fill sizes="100vw" />
+            <Image
+              src="/images/top/top-foreground-tropical-plants.png"
+              alt=""
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
+            />
           </div>
-        ))}
 
-        <div className={styles.atmosphere} aria-hidden="true" />
+          <nav className={styles.arches} aria-label="メインメニュー">
+            {ARCHES.map((arch) => (
+              <ArchEntrance
+                key={arch.id}
+                arch={arch}
+                background={SEA_SKY_BACKGROUND}
+              />
+            ))}
+          </nav>
 
-        <ArchSigns />
-      </ParallaxStage>
+          <div
+            className={styles.building}
+            style={toPercentBox(BUILDING)}
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/top/top-building-arches.png"
+              alt=""
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
+            />
+          </div>
+
+          <div
+            className={styles.plantsFront}
+            style={toPercentBox(FOREGROUND)}
+            aria-hidden="true"
+          >
+            <Image
+              src="/images/top/top-foreground-tropical-plants.png"
+              alt=""
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
+            />
+          </div>
+
+          <div className={styles.atmosphere} aria-hidden="true" />
+
+          <ArchSigns />
+        </ParallaxStage>
+      </ArchPassage>
 
       {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}
       <noscript>
