@@ -34,7 +34,7 @@
 | 1 | `modern-web-design` | サイト全体の設計判断（レイアウト・タイポグラフィ・余白・スクロール体験・レスポンシブ・UI・ページ遷移・視覚的リズム）。設計判断ではまずこれを参照する |
 | 2 | `r3f-fundamentals` | R3F の基盤（Canvas、component 構成、useFrame、refs、lifecycle、Three.js との責務分離） |
 | 2 | `r3f-animation` | 自然現象・時間変化（植物の揺れ、海面のわずかな動き、木漏れ日、呼吸するような微細な動き）。派手な演出には使わない |
-| 2 | `r3f-lighting` | 訪問者の現地時刻（朝・昼・夕方・夜）に応じた太陽光・光の色・光量・影・室内灯の滑らかな変化。**基準ビジュアルは夕方** |
+| 2 | `r3f-lighting` | 訪問者の現地時刻（朝・昼・夕方・夜・深夜）に応じた太陽光・光の色・光量・影・室内灯の滑らかな変化。**基準ビジュアルは夕方** |
 | 2 | `r3f-textures` | ライトグレーのコンクリート、自然なムラ、琉球石灰岩、海面、植物、建築の微細な表面。リアルすぎる PBR より世界観との統一を優先する |
 | 2 | `r3f-shaders` | 必要な場合のみ（海面の揺らぎ、光の揺れ、木漏れ日、空気の揺らぎ、ごく弱い頂点変形）。shader なしで十分ならより単純な実装を選ぶ |
 | 3 | `developing-threejs-apps` | 品質・安全性・パフォーマンスの監査専用（dispose、memory leak、texture 管理、color space、tone mapping、renderer 設定、Three.js の version 差異）。通常の R3F 実装は Priority 2 を優先する |

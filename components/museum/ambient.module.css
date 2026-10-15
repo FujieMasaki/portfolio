@@ -89,7 +89,7 @@
 }
 
 /*
- * 縦長の画面で、空の上端（館名・Menu を置く帯）を沈める層。朝・昼だけ効く（--ambient-sky-shade。夕方・夜は 0）。
+ * 縦長の画面で、空の上端（館名・Menu を置く帯）を沈める層。朝・昼だけ効く（--ambient-sky-shade。夕方・夜・深夜は 0）。
  * 各ページの縦長の .atmosphere が background の1枚として使う
  */
 .root {

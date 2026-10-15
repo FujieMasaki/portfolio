@@ -17,7 +17,7 @@ export type SeaSkyLight = {
    */
   air: { top: string; bottom: string };
   /**
-   * 縦長の画面で、空の上端（館名・Menu を置く帯）を沈める濃さ（0〜1）。夕方・夜は 0。
+   * 縦長の画面で、空の上端（館名・Menu を置く帯）を沈める濃さ（0〜1）。夕方・夜・深夜は 0。
    * 朝・昼は空が淡く、明るい文字のコントラストが 4.5:1 を下回るため（390px 幅で実測した）
    */
   skyShade: number;
@@ -60,6 +60,20 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
       sea: "rgb(10 16 34 / 0.5)",
     },
     air: { top: "rgb(24 28 56 / 0.18)", bottom: "rgb(8 10 20 / 0.2)" },
+    skyShade: 0,
+  },
+  /*
+   * 深夜：夜よりさらに色と光を落とし、空と海を黒に近い濃紺（#080a10 付近）へ沈める。
+   * 水平線だけは消さずにごく薄く残し、目が慣れると海辺だと分かる程度にする（完全な黒にはしない）
+   */
+  midnight: {
+    filter: "saturate(0.16) brightness(0.24) contrast(0.9)",
+    glaze: {
+      sky: "rgb(8 10 18 / 0.7)",
+      horizon: "rgb(30 34 52 / 0.36)",
+      sea: "rgb(6 8 14 / 0.72)",
+    },
+    air: { top: "rgb(8 10 18 / 0.3)", bottom: "rgb(6 8 14 / 0.34)" },
     skyShade: 0,
   },
 };
