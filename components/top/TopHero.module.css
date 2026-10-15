@@ -23,11 +23,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  /*
-   * 画面より 1% だけ大きく敷き、上下左右に 0.5% ずつの見えない余白を作る。
-   * 植物をパララックスで最大 0.45% ずらしても、画面の端に奥の空や背景色がのぞかない
-   */
-  width: max(101vw, calc(max(100svh, 560px) * 1.01 * 1672 / 941));
+  width: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
   aspect-ratio: 1672 / 941;
   translate: -50% -50%;
   container-type: inline-size;
@@ -61,13 +57,13 @@
 
 /*
  * パララックス（ParallaxStage.tsx が流すポインタ位置 --px / --py は -1〜1）。
- * 建物（とその開口部にあるアーチ・部屋名）を支点にして動かさず、奥の空と手前の植物を逆の向きにずらす。
- * 手前ほど大きく動かすが、どれも舞台の幅の 1% に満たない。レイヤーが横にずれていると分かる量にはしない。
+ * 動かすのは奥の空だけで、建物・アーチ・部屋名・植物は止めておく。
+ * 植物は建物の奥の木立と手前の茂みが1枚の大きな PNG なので、動かすと植物全体が一緒にスライドして見え、
+ * 固定の手前用のマスク（top-foreground-front-mask.svg）や建物との重なりもずれる。
  *
  *   sky        -0.3%   奥。ポインタと逆の向き
- *   building    0      支点（arches・archSigns も同じ）
- *   plants     +0.45%  植物（建物の奥の木立も手前の茂みも1枚の PNG なので同じ量にする）
- *   sway       +0.45%  揺らす枝・葉（植物から切り出した部品なので、植物と同じ量にして根元から離さない）
+ *   building    0      固定（arches・archSigns も同じ）
+ *   plants      0      固定
  */
 
 /*
@@ -147,35 +143,8 @@
 /* 2 / 5. 前景植物。手前側は建物の範囲を抜いたマスクで切り出す */
 .plantsBack,
 .plantsFront,
-.swayBack,
-.swayFront,
 .building {
   pointer-events: none;
-}
-
-/*
- * 植物のパララックスは、マスクを持つ箱ではなく中の画像だけをずらす。
- * マスク（＝建物の輪郭）は建物と一緒に止まったままなので、奥の木立が建物の手前へはみ出さない
- */
-.plantsBack img,
-.plantsFront img,
-.swayShift {
-  translate: calc(var(--px) * 0.45%) calc(var(--py) * 0.3%);
-  transition: translate 1.6s var(--ease-calm);
-}
-
-/* 揺らす枝・葉（components/museum/WindSway）を、植物と同じ大きさの箱に入れて、植物と一緒にずらす */
-.swayShift {
-  position: absolute;
-  inset: 0;
-}
-
-/*
- * 植物と同じ色調（TopHero.tsx が --scene-filter に渡す）は、回る部品の画像そのものにかける。
- * 親の箱にかけると、中の部品が動くたびに箱全体へ掛け直すことになる
- */
-.swayShift img {
-  filter: var(--scene-filter);
 }
 
 .plantsFront {
@@ -670,11 +639,6 @@
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
-  .plantsBack img,
-  .plantsFront img,
-  .swayShift {
-    translate: calc(var(--px) * 0.45%) 0;
-  }
 
   .sky img {
     object-position: 50% 0%;
@@ -691,10 +655,8 @@
     );
   }
 
-  /* 舞台の上端で切れる木々の梢を空へ溶かす（揺らす枝・葉も同じ） */
-  .plantsBack,
-  .swayBack,
-  .swayFront {
+  /* 舞台の上端で切れる木々の梢を空へ溶かす */
+  .plantsBack {
     mask-image: linear-gradient(to bottom, transparent, #000 16%);
   }
 
@@ -742,10 +704,7 @@
   }
 
   /* 案内とスモークの切り替えは残し、パララックスだけ止める */
-  .sky,
-  .plantsBack img,
-  .plantsFront img,
-  .swayShift {
+  .sky {
     transition: none;
   }
 }

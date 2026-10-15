@@ -1,6 +1,4 @@
-import type { CSSProperties } from "react";
 import Image from "next/image";
-import WindSway from "@/components/museum/WindSway";
 import ArchEntrance from "./ArchEntrance";
 import ArchPassage from "./ArchPassage";
 import ArchSigns from "./ArchSigns";
@@ -10,17 +8,11 @@ import {
   AMBIENTS,
   ARCHES,
   BUILDING,
-  CANVAS,
-  FOLIAGE_SWAY,
   FOREGROUND,
   toPercentBox,
   type AmbientId,
 } from "./scene";
 import styles from "./TopHero.module.css";
-
-/** 舞台の幅に合わせた前景植物の sizes（縦長・正方形に近い窓は 200vw、横長は 100vw） */
-const PLANTS_SIZES =
-  "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw";
 
 type Props = {
   /** 時間帯演出を足すときはここに現在の時間帯を渡す（scene.ts の AMBIENTS を参照） */
@@ -32,12 +24,10 @@ type Props = {
  *
  * レイヤー（奥 → 手前）:
  *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞を含む。Sky.tsx）
- *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる。揺らす枝・葉を抜いたベース）
- *      swayBack   建物の奥で揺らす枝・葉（scene.ts の FOLIAGE_SWAY.back）
+ *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）
  *   3. arch       アーチ内の展示室・ツバメ（＋ hover のスモークと GO TO の案内）
  *   4. building   建物本体（開口部は透過）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
- *      swayFront  建物より手前で揺らす枝・葉（scene.ts の FOLIAGE_SWAY.front）
  *   6. atmosphere 周辺減光と夕方の光
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  *
@@ -66,24 +56,13 @@ const TopHero = ({ ambient = "evening" }: Props) => {
           aria-hidden="true"
         >
           <Image
-            src="/images/top/top-plants-base.png"
+            src="/images/top/top-foreground-tropical-plants.png"
             alt=""
             fill
             loading="eager"
             fetchPriority="high"
-            sizes={PLANTS_SIZES}
+            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
           />
-        </div>
-
-        <div
-          className={styles.swayBack}
-          // 色調は回る部品の画像そのものにかける（.swayShift img）。親にかけると、揺れるたびに掛け直しになる
-          style={{ ...toPercentBox(FOREGROUND), "--scene-filter": sceneFilter } as CSSProperties}
-          aria-hidden="true"
-        >
-          <div className={styles.swayShift}>
-            <WindSway canvas={CANVAS} branches={FOLIAGE_SWAY.back} sizes={PLANTS_SIZES} fetchPriority="high" />
-          </div>
         </div>
 
         <nav className={styles.arches} aria-label="メインメニュー">
@@ -118,23 +97,13 @@ const TopHero = ({ ambient = "evening" }: Props) => {
           aria-hidden="true"
         >
           <Image
-            src="/images/top/top-plants-base.png"
+            src="/images/top/top-foreground-tropical-plants.png"
             alt=""
             fill
             loading="eager"
             fetchPriority="high"
-            sizes={PLANTS_SIZES}
+            sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
           />
-        </div>
-
-        <div
-          className={styles.swayFront}
-          style={{ ...toPercentBox(FOREGROUND), "--scene-filter": sceneFilter } as CSSProperties}
-          aria-hidden="true"
-        >
-          <div className={styles.swayShift}>
-            <WindSway canvas={CANVAS} branches={FOLIAGE_SWAY.front} sizes={PLANTS_SIZES} fetchPriority="high" />
-          </div>
         </div>
 
         <div className={styles.atmosphere} aria-hidden="true" />
