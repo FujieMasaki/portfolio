@@ -482,7 +482,8 @@
 /*
  * アーチを通り抜ける遷移（ArchPassage.tsx）。
  * 選んだ入口の開口部と同じアーチの形の窓を、clip-path で画面いっぱいまで広げる。
- * 窓の中は遷移先の最初の地と同じにし、遷移が終わったときに地が切り替わって見えないようにする。
+ * 窓の中は次の部屋ではなく、アーチの奥の暗がりにする。遷移の後も同じ暗がり（globals.css）の上に次の部屋が現れるので、
+ * 暗がりを抜けて次の空間が目に入ってくるように見える。
  */
 .passage {
   position: fixed;
@@ -492,12 +493,10 @@
   pointer-events: none;
 }
 
-/* /about・/work の壁（AboutMuseum.module.css の .museum と同じ素材・敷き方） */
+/* 館内（/about・/work）へ抜ける通路の暗がり。真っ黒にはせず、暖かいチャコールにする（globals.css の --passage-dark と同じ） */
 .passage[data-to="about"],
 .passage[data-to="work"] {
-  background: url("/images/about/about-wall.webp") center top / max(100%, 1280px) auto repeat-y
-    #faf4ec;
-  background-blend-mode: multiply;
+  background: #1f1b18;
 }
 
 /* /contact は館の外。景色が現れる前の地（ContactMuseum.module.css の .contact）と同じ色 */

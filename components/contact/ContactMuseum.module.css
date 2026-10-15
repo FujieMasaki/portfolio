@@ -59,7 +59,7 @@
  */
 @media (prefers-reduced-motion: no-preference) {
   :global(:root[data-arrival="passage"]) .contact > header {
-    animation: passage-arrive 1.3s var(--ease-calm) both;
+    animation: passage-arrive 0.8s var(--ease-calm) both;
   }
 }
 

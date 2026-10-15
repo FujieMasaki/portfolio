@@ -2,11 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ARCHES, type ArchId } from "./scene";
+import { ARCHES } from "./scene";
 import styles from "./TopHero.module.css";
 
-/** 通り抜けにかける時間。ズームと開口部の広がりは同じ時間で終える */
-const DURATION = 1150;
+/** 通り抜けにかける時間。ズームと開口部の広がりは同じ時間で終える。待たされると感じない長さに留める */
+const DURATION = 950;
 /** 舞台のズーム量。カメラが大きく動いたと感じない、数歩近づく程度 */
 const ZOOM = 1.05;
 /** サイト共通の easing（--ease-calm と同じ値） */
@@ -14,16 +14,13 @@ const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
 /** 開口部の広がりを刻む数。拡大率を等比で刻み、広がる速さが途中で急に変わって見えないようにする */
 const STEPS = 12;
 /**
- * 広がっている間だけ、次の部屋の地にかける陰。着地したら LIFT_MS かけて元の色に戻す。
- * 明るい壁の部屋（/about・/work）は深めにし、もともと暗い館の外（/contact）は浅いままにする
+ * 次の部屋の passage-arrive が終わらなかったときに、着地の印を外すまでの時間。
+ *
+ * TODO: 遷移が極端に遅い（先読みが済んでおらず、次の部屋が描かれるまで約 3 秒以上かかる）と、
+ * この時間が次の部屋の着地の途中で切れ、展示が途中の不透明度から一度に表示へ切り替わる。
+ * 時間を push の時点から数えているのが原因と見ている。直すなら、次の部屋が mount してから数える
+ * （RoomStepLink の CLEAR_MS も同じ）
  */
-const SHADE: Record<ArchId, string> = {
-  about: "rgb(24 20 16 / 0.36)",
-  work: "rgb(24 20 16 / 0.36)",
-  contact: "rgb(24 20 16 / 0.24)",
-};
-const LIFT_MS = 1200;
-/** 次の部屋の passage-arrive が終わらなかったときに、着地の印を外すまでの時間 */
 const CLEAR_MS = 4000;
 
 /**
@@ -32,13 +29,10 @@ const CLEAR_MS = 4000;
  *   1. 選んだアーチ以外と館名を少しだけ落ち着かせる（.hero[data-passage]。TopHero.module.css）
  *   2. 舞台を、選んだアーチの開口部を中心に 1 → 1.05 へごく弱くズームする
  *   3. 同時に、開口部と同じアーチの形をした窓（.passage）を画面全体が収まるまで広げる。
- *      窓の中は行き先の壁（/about・/work）か、館の外の暗がり（/contact）で、遷移先の最初の地と同じにする
- *      広がっている間は、窓と同じ形の陰（shade）を重ねて、次の部屋の地を少しだけ暗く見せる
+ *      窓の中は、次の部屋の壁ではなく、アーチの奥の暗がり（館内は暖かいチャコール、/contact は館の外の暗がり）にする
  *   4. 広がり終えたら router.push で遷移する。<html data-arrival="passage"> を付けておき、
- *      /about・/work の展示はズームの続きのように少しだけ広がりながら、Menu と /contact は静かに薄く現れる
- *      （AboutMuseum / ContactMuseum の passage-arrive・passage-fade）
- *   5. 次の部屋に替わって TOP が外れたら（この effect の後片付け）、陰を静かに消して元の色に戻す。
- *      陰は遷移の後も残るよう、React の外（body の直下）に置き、TOP の CSS が外れても困らないよう style を直に書く
+ *      次の部屋は同じ暗がりの上に、目が慣れるように静かに現れる（AboutMuseum / ContactMuseum の passage-arrive。
+ *      暗がりの色は globals.css が、印のある間だけ body に敷く）
  *
  * アーチ（ArchEntrance）と部屋名（ArchSigns）は Link のままにし、ここではクリックを横取りするだけにする。
  * JS が動かない環境・修飾キー付きのクリック・prefers-reduced-motion・Web Animations が無い環境では
@@ -56,7 +50,6 @@ const ArchPassage = () => {
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let animations: Animation[] = [];
-    let shade: HTMLDivElement | null = null;
     let passing = false;
 
     const archFor = (target: EventTarget | null) => {
@@ -126,26 +119,12 @@ const ArchPassage = () => {
         ((rect.top + halfH - stageRect.top) / stageRect.height) * 100
       }%`;
 
-      shade = document.createElement("div");
-      shade.setAttribute("aria-hidden", "true");
-      Object.assign(shade.style, {
-        position: "fixed",
-        inset: "0",
-        zIndex: "10",
-        background: SHADE[arch.id],
-        pointerEvents: "none",
-      });
-      document.body.append(shade);
-
       const timing = { duration: DURATION, easing: EASE, fill: "forwards" } as const;
       animations = [
         stage.animate({ scale: [1, ZOOM] }, timing),
         overlay.animate(openingKeyframes, timing),
-        // 開口部の奥から現れるよう、窓の中の地は前半で静かに濃くする
+        // 開口部の奥の暗がりが、前半で静かに濃くなる
         overlay.animate({ opacity: [0, 1] }, { ...timing, duration: DURATION * 0.45 }),
-        // 陰は窓と同じ形で広げ、窓の中だけを暗くする（TOP の景色は暗くしない）
-        shade.animate(openingKeyframes, timing),
-        shade.animate({ opacity: [0, 1] }, timing),
       ];
       Promise.all(animations.map((animation) => animation.finished))
         .then(() => {
@@ -192,31 +171,9 @@ const ArchPassage = () => {
       hero.removeEventListener("pointerdown", onIntent);
       hero.removeEventListener("click", onClick);
       reducedMotion.removeEventListener("change", onMotionChange);
-      // cancel すると playState が戻るので、広がりきったかどうかは先に取っておく
-      const finished = animations.length > 0 && animations.every((animation) => animation.playState === "finished");
       animations.forEach((animation) => animation.cancel());
       delete hero.dataset.passage;
       stage.style.transformOrigin = "";
-      // 次の部屋に替わった。陰は画面全体を覆ったまま、元の色へ静かに戻す。
-      // 広がりきる前に（戻る操作などで）離れたときは、元のページを暗くしないよう、すぐ外す
-      // 「動きを減らす」のときも、フェードせずにすぐ外す
-      if (shade && (!finished || reducedMotion.matches)) shade.remove();
-      if (shade && finished && !reducedMotion.matches) {
-        const leaving = shade;
-        leaving.style.clipPath = "none";
-        const lift = leaving.animate({ opacity: [1, 0] }, { duration: LIFT_MS, easing: EASE, fill: "forwards" });
-        // 陰が晴れていく間に「動きを減らす」に変わったら、フェードをやめてすぐ外す（この effect の購読はもう外れている）
-        const onLiftMotionChange = () => {
-          if (reducedMotion.matches) lift.cancel();
-        };
-        reducedMotion.addEventListener("change", onLiftMotionChange);
-        lift.finished
-          .catch(() => undefined)
-          .then(() => {
-            reducedMotion.removeEventListener("change", onLiftMotionChange);
-            leaving.remove();
-          });
-      }
     };
   }, [router]);
 

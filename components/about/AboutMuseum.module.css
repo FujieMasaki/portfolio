@@ -168,31 +168,20 @@
 }
 
 /*
- * TOP のアーチを通り抜けて来たとき（ArchPassage）だけ、展示はズームの続きのように少しだけ広がりながら、
- * Menu は静かに現れる。壁は通り抜けの窓と同じなので動かさない。
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）だけ、暗がり（globals.css）の上に、部屋全体
+ * （壁・床・展示・Menu）が、目が慣れるように静かに現れる。壁の色を暗い状態から明るくする動きにはしない。
  * 印（<html data-arrival>）は、この動きが終わると ArchPassage が外す。
  */
 @media (prefers-reduced-motion: no-preference) {
-  :global(:root[data-arrival="passage"]) .museum > main {
-    transform-origin: 50% 50svh;
-    animation: passage-arrive 1.3s var(--ease-calm) both;
-  }
-
-  :global(:root[data-arrival="passage"]) .museum > header {
-    animation: passage-fade 1.3s var(--ease-calm) both;
+  :global(:root[data-arrival="passage"]) .museum {
+    animation: passage-arrive 0.8s var(--ease-calm) both;
   }
 }
 
 @keyframes passage-arrive {
   from {
     opacity: 0;
-    scale: 0.985;
-  }
-}
-
-@keyframes passage-fade {
-  from {
-    opacity: 0;
+    translate: 0 4px;
   }
 }
 
