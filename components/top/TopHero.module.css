@@ -1,0 +1,814 @@
+/*
+ * TOP ヒーロー
+ * 舞台（.stage）は完成イメージと同じ 1672:941 の箱で、中の各レイヤーは scene.ts の座標を % で置く。
+ * 画面に対しては object-fit: cover と同じ考え方で舞台を拡大・中央寄せする。
+ */
+
+.hero {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --hero-ink: #f4f1ec;
+
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1c211b;
+}
+
+.stage {
+  --px: 0;
+  --py: 0;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
+  aspect-ratio: 1672 / 941;
+  translate: -50% -50%;
+  container-type: inline-size;
+  opacity: 0;
+}
+
+.stage[data-ready] {
+  animation: stage-arrive 2.4s var(--ease-calm) both;
+}
+
+/* CSS の保険で表示された後に ready になった場合は、フェードインをやり直さない（一度暗転させない） */
+.stage[data-ready="late"] {
+  opacity: 1;
+  animation: none;
+}
+
+/*
+ * 保険：JS の読み込みや hydration に失敗して data-ready が付かなくても、
+ * 6 秒たったら CSS だけで舞台を表示する（見えないリンクだけが残らないように）。
+ */
+.stage:not([data-ready]) {
+  /* 表示されるまでは、見えないアーチのリンクに Tab でフォーカスが入らないようにする */
+  visibility: hidden;
+  /* 6s は ParallaxStage.tsx の JS_FALLBACK_MS（5 秒）より長くしておく */
+  animation: stage-fallback 0.8s var(--ease-calm) 6s forwards;
+}
+
+.stage > * {
+  position: absolute;
+}
+
+/*
+ * パララックス（ParallaxStage.tsx が流すポインタ位置 --px / --py は -1〜1）。
+ * 動かすのは奥の空だけで、建物・アーチ・部屋名・植物は止めておく。
+ * 植物は建物の奥の木立と手前の茂みが1枚の大きな PNG なので、動かすと植物全体が一緒にスライドして見え、
+ * 固定の手前用のマスク（top-foreground-front-mask.svg）や建物との重なりもずれる。
+ *
+ *   sky        -0.3%   奥。ポインタと逆の向き
+ *   building    0      固定（arches・archSigns も同じ）
+ *   plants      0      固定
+ */
+
+/*
+ * 1. 海と空：ごく弱いパララックス。動いても端が見えないよう少し大きく敷く。
+ * 雲・海・霞の動きはどれも「気づかなくてもよい」程度に留め、建築より目立たせない。
+ */
+.sky {
+  /* .sky の箱の中での水平線の高さ。雲と海の写しはここで上下に切り分ける */
+  --horizon: 42.2%;
+
+  inset: -2%;
+  transform: translate3d(calc(var(--px) * -0.3%), calc(var(--py) * -0.2%), 0);
+  transition: transform 1.6s var(--ease-calm);
+}
+
+.sky img {
+  object-fit: cover;
+  /* 水平線を完成イメージと同じ高さ（舞台の上から約 42%）に合わせる */
+  object-position: 50% 53%;
+}
+
+.clouds,
+.sea,
+.haze {
+  position: absolute;
+  inset: 0;
+}
+
+/* 雲：水平線より上の写しを、片道 90 秒かけて横へ往復させる（往復なのでループの継ぎ目が出ない） */
+.clouds {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--horizon) - 2.5%),
+    transparent calc(var(--horizon) - 0.3%)
+  );
+  animation: cloud-drift 90s ease-in-out infinite alternate;
+}
+
+/*
+ * 海：水平線より下の写しを、水平線を支点にわずかに縦へ伸縮させる。
+ * 手前ほど大きく、遠くほど動かないので遠近が崩れない。半透明で元の画像と重ね、揺らぎだけを残す。
+ */
+.sea {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon) + 0.4%),
+    #000 calc(var(--horizon) + 5%)
+  );
+  opacity: 0.7;
+  transform-origin: 50% var(--horizon);
+  animation: sea-breathe 11s ease-in-out infinite alternate;
+}
+
+/*
+ * 霞：水平線の帯と、建物の左右奥の遠景にだけ。霧と分かるほど白くしない。
+ * 濃さは時間帯で変わる（--ambient-haze。夕方 = 1 で下の値のまま）
+ */
+.haze {
+  background:
+    linear-gradient(
+      to bottom,
+      transparent calc(var(--horizon) - 8%),
+      rgb(238 228 224 / calc(0.07 * var(--ambient-haze))) calc(var(--horizon) - 0.5%),
+      rgb(238 228 224 / calc(0.05 * var(--ambient-haze))) calc(var(--horizon) + 2%),
+      transparent calc(var(--horizon) + 12%)
+    ),
+    radial-gradient(
+      ellipse 16% 12% at 10% var(--horizon),
+      rgb(238 228 224 / calc(0.06 * var(--ambient-haze))),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 16% 12% at 90% var(--horizon),
+      rgb(238 228 224 / calc(0.06 * var(--ambient-haze))),
+      transparent 70%
+    );
+  animation: haze-drift 120s ease-in-out infinite alternate;
+}
+
+/* 2 / 5. 前景植物。手前側は建物の範囲を抜いたマスクで切り出す */
+.plantsBack,
+.plantsFront,
+.building {
+  pointer-events: none;
+}
+
+.plantsFront {
+  mask-image: url("/images/top/top-foreground-front-mask.svg");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* 3. アーチ */
+.arches {
+  inset: 0;
+}
+
+.arch {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  /* Safari で、合成レイヤーになった燕が角丸の外へはみ出さないようにする */
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.archScene {
+  position: absolute;
+  inset: 0;
+  transition: filter 0.8s var(--ease-calm);
+}
+
+.archImage {
+  position: absolute;
+}
+
+.archImage img {
+  width: 100%;
+  height: auto;
+}
+
+.archView {
+  object-fit: cover;
+  /* アーチ越しの景色は少し明るく、建物の中から外を覗いた抜け感にする */
+  scale: 1.02;
+}
+
+/* 開口部の縁にかかる陰影で、アーチの奥行きを出す */
+.archScene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 18px 24px -12px rgb(30 22 14 / 0.45);
+  pointer-events: none;
+}
+
+/*
+ * hover / focus：開口部の内側だけに薄い黒のスモーク。
+ * 室内の照明や海が見える濃さに留め、ease-out で静かにフェードする。
+ * .arch 自体がアーチ形に切り抜かれているので、コンクリートや植物にはかからない。
+ */
+.archSmoke {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.24);
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+/*
+ * 通常はスモークと GO TO でフォーカスを示し、線は出さない。
+ * フォーカス中のアーチにだけ透明な outline を付けると、強制カラーモードでは
+ * システムの色に置き換わり、どのアーチを選んでいるかが分かる。
+ */
+.arch:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+/*
+ * 選ばれた入口の見せ方は、キーボード（:focus-visible）ではどの端末でも、
+ * マウスの hover は hover できる端末だけで出す（下の @media (hover: hover)）。
+ * タッチ端末で :hover に反応させると、iOS Safari で1回目のタップが hover 表示だけで止まったり、
+ * 戻ったときに hover の見た目が残ったりするため。
+ */
+.arch:focus-visible .archSmoke,
+.arch:focus-visible .archLabel::before {
+  opacity: 1;
+}
+
+/*
+ * hover / focus の案内：アーチの中央付近に「GO TO・カテゴリ名・説明」。
+ * 通常時は出さない（どこへ行けるかは ArchSigns の案内表示が担う）。
+ */
+.archLabel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 40%;
+  translate: 0 -50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.75em;
+  isolation: isolate;
+  color: var(--hero-ink);
+  text-align: center;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.32);
+  pointer-events: none;
+}
+
+/*
+ * 文字の後ろだけに敷く、ぼかした暗い帯。明るい壁や額の上でも案内が読めるようにする。
+ * 縁は大きくぼかし、帯の形が見えないようにする（スモークは 0.24 のまま）。
+ */
+.archLabel::before {
+  content: "";
+  position: absolute;
+  inset: -1.1em -4%;
+  z-index: -1;
+  border-radius: 40%;
+  background: rgb(12 10 8 / 0.42);
+  filter: blur(12px);
+  opacity: 0;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.archGoTo,
+.archTitle,
+.archCaption {
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease-calm);
+}
+
+.archGoTo {
+  font-size: max(0.5cqw, 9px);
+  letter-spacing: 0.36em;
+  /* 字間の分だけ右にずれて見えるのを戻す */
+  margin-right: -0.36em;
+}
+
+.archTitle {
+  font-family: var(--font-heading), serif;
+  font-size: max(1.2cqw, 16px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  margin-right: -0.2em;
+  text-transform: uppercase;
+}
+
+/* 狭いアーチでも切れないよう、説明だけは折り返しを許す */
+.archCaption {
+  max-width: 88%;
+  white-space: normal;
+  line-height: 1.5;
+  font-size: max(0.56cqw, 9.5px);
+  letter-spacing: 0.04em;
+  color: rgb(244 241 236 / 0.86);
+}
+
+/* 小さな GO TO → カテゴリ名 → 説明 の順に、少しずつ現れる */
+.arch:focus-visible .archGoTo {
+  opacity: 0.78;
+  transition-delay: 0.1s;
+}
+
+.arch:focus-visible .archTitle {
+  opacity: 1;
+  transition-delay: 0.18s;
+}
+
+.arch:focus-visible .archCaption {
+  opacity: 1;
+  transition-delay: 0.3s;
+}
+
+/* ほかの入口は暗くせず、コントラストを数%落とすだけにする */
+.arches:has(.arch:focus-visible) .arch:not(:focus-visible) .archScene {
+  filter: contrast(0.96);
+}
+
+@media (hover: hover) {
+  .arch:hover .archSmoke,
+  .arch:hover .archLabel::before {
+    opacity: 1;
+  }
+
+  .arch:hover .archGoTo {
+    opacity: 0.78;
+    transition-delay: 0.1s;
+  }
+
+  .arch:hover .archTitle {
+    opacity: 1;
+    transition-delay: 0.18s;
+  }
+
+  .arch:hover .archCaption {
+    opacity: 1;
+    transition-delay: 0.3s;
+  }
+
+  .arches:has(.arch:hover) .arch:not(:hover, :focus-visible) .archScene {
+    filter: contrast(0.96);
+  }
+}
+
+/* 7. 部屋名のプレート（ArchSigns） */
+.archSigns {
+  inset: 0;
+  pointer-events: none;
+}
+
+.archSign {
+  position: absolute;
+}
+
+/*
+ * 各アーチの真上に静かに取り付けた部屋名。文字と、上下の短い細線だけ。
+ * 四辺を囲わず背景も敷かないことで、ボタンや入力欄に見せない。
+ * 3つとも同じ幅・高さ・余白で、外側のアーチの中心軸（頂点）にそろえる。
+ * 見え方の強さは「文字 → 上下の線 → コンクリート」の順。
+ */
+.archPlate {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.25cqw);
+  translate: -50% 0;
+  width: max(7.4cqw, 7.4em);
+  margin: 0;
+  /* 字間の分だけ左に寄せて、中央を合わせる */
+  padding: 0.36em 0 0.32em 0.22em;
+  font-family: var(--font-heading), serif;
+  font-size: max(1cqw, 15px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+  color: rgb(62 53 44 / 0.92);
+  border-block: 1px solid rgb(112 103 92 / 0.4);
+  /* 層全体は pointer-events: none。部屋名だけは押せるようにする */
+  pointer-events: auto;
+  transition:
+    color 0.5s var(--ease-calm),
+    border-color 0.5s var(--ease-calm),
+    opacity 0.5s var(--ease-calm);
+}
+
+/* hover の無い端末では、プレートだけで入口だと分かるよう少し濃くする */
+@media (hover: none) {
+  .archPlate {
+    color: rgb(52 44 36 / 0.96);
+    border-color: rgb(104 95 85 / 0.5);
+  }
+}
+
+/* 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする（hover は hover できる端末だけ） */
+.stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
+.stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
+.stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
+  color: rgb(44 37 30 / 0.98);
+  border-color: rgb(96 88 78 / 0.58);
+}
+
+@media (hover: hover) {
+  .archPlate:hover,
+  .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
+  .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
+  .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
+    color: rgb(44 37 30 / 0.98);
+    border-color: rgb(96 88 78 / 0.58);
+  }
+}
+
+/*
+ * 夜・深夜は建物が暗くなり、濃い文字が沈むので、灯りを受けた淡い色の文字と線にする。
+ * 選ばれた入口だけ少し明るくする関係は昼と同じ
+ */
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .archPlate {
+  color: rgb(226 216 200 / 0.92);
+  border-color: rgb(214 202 184 / 0.34);
+}
+
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
+.hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
+  color: rgb(240 232 218 / 0.96);
+  border-color: rgb(226 214 196 / 0.52);
+}
+
+@media (hover: hover) {
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .archPlate:hover,
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
+  .hero:is([data-ambient="night"], [data-ambient="midnight"]) .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
+    color: rgb(240 232 218 / 0.96);
+    border-color: rgb(226 214 196 / 0.52);
+  }
+}
+
+/*
+ * Contact：アーチの奥、少し奥の海の上を時折横切るリュウキュウツバメ（夜・深夜はコウモリ）。
+ * 軌道（位置・向き）は ArchFlyby.tsx が飛ぶたびに作る。ここでは大きさ・見え方と羽ばたきだけ。
+ *
+ * 真横から見たシルエットで、大きさは翼と尾の形が分かる程度にする。黒い点にはせず、建物より手前に見えるほど大きくもしない。
+ * くちばし（鼻先）から尾・翼の先までを、アーチの開口幅（% の基準）の約 1/4（1440px 幅で約 35〜37px、画面幅の約 2.5%）にする。
+ * スマホ幅でも鳥・コウモリと分かるよう、下限を px で確保する（390px 幅では開口幅の約 1/3〜1/2 になるが、
+ * 「何かが飛んだ」ではなく燕・コウモリと分かることを優先する）。
+ * アイコンに見えないよう、真っ黒にせず海に馴染む濃さにし、輪郭をわずかに霞ませる。
+ */
+.swallow,
+.bat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: clamp(32px, 38%, 66px);
+  color: rgb(36 31 33);
+  opacity: 0.86;
+  filter: blur(0.3px);
+  will-change: transform;
+}
+
+.swallow svg,
+.bat svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+/*
+ * 翼の1片。真横から見たシルエットの胴体は動かさず、翼だけを関節（ArchFlyby.tsx の origin。viewBox の座標）を支点に回す。
+ * 角度は ArchFlyby.tsx が wingbeat.ts のキーフレームで動かす
+ */
+.wing {
+  transform-box: view-box;
+}
+
+/* 奥の翼は胴体の後ろにあり、手前の翼よりわずかに淡い */
+.farWing {
+  opacity: 0.72;
+}
+
+/* 右から左へ飛ぶときの向き。常に同じ鏡像で、羽ばたきには使わない */
+.flyLeft {
+  scale: -1 1;
+}
+
+/*
+ * コウモリは暗い夜の海の上を飛ぶ。シルエットが箱の中で燕より短いので、箱の幅を少し広げてそろえる。
+ * 月明かりのような演出はせず、背景に完全には沈まない程度に、ごく弱い輪郭の差だけを付ける
+ */
+.bat {
+  width: clamp(30px, 36%, 64px);
+  color: rgb(10 10 16);
+  opacity: 0.9;
+  filter: drop-shadow(0 0 0.5px rgb(150 160 190 / 0.3));
+}
+
+/*
+ * 6. 周辺減光と空気。周辺減光の強さ（--ambient-vignette）と上下からかかる空気の色（--ambient-air-*。/contact と共有）は
+ * 時間帯で変わる。夕方は減光が下の値のまま、空気の色は透明
+ */
+.atmosphere {
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 52%,
+      transparent 55%,
+      rgb(16 18 14 / calc(0.38 * var(--ambient-vignette))) 100%
+    ),
+    linear-gradient(to bottom, rgb(40 36 52 / 0.12), transparent 30%),
+    linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
+}
+
+/*
+ * アーチを通り抜ける遷移（ArchPassage.tsx）。
+ * 選んだ入口の開口部と同じアーチの形の窓を、clip-path で画面いっぱいまで広げる。
+ * 窓の中は次の部屋ではなく、アーチの奥の暗がりにする。遷移の後も同じ暗がり（globals.css）の上に次の部屋が現れるので、
+ * 暗がりを抜けて次の空間が目に入ってくるように見える。
+ */
+.passage {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 館内（/about・/work）へ抜ける通路の暗がり。真っ黒にはせず、暖かいチャコールにする（色は globals.css の --passage-dark） */
+.passage[data-to="about"],
+.passage[data-to="work"] {
+  background: var(--passage-dark);
+}
+
+/* /contact は館の外。景色が現れる前の地（ContactMuseum.module.css の .contact）と同じ色 */
+.passage[data-to="contact"] {
+  background: #1c211b;
+}
+
+/* 館名と舞台を包む ArchPassage。配置には関わらず、中のアーチのクリックを受けるだけ */
+.passageScope {
+  display: contents;
+}
+
+/* 通り抜けている間は、ほかの入口に反応させない（部屋名のプレートは自分で pointer-events: auto を持つので、別に止める） */
+.passageScope[data-passage] .stage,
+.passageScope[data-passage] .archPlate {
+  pointer-events: none;
+}
+
+/* 選んだ入口以外を少しだけ落ち着かせる。暗くしすぎず、選んだアーチへ視線が残る程度 */
+.passageScope[data-passage="about"] .arch:not([data-arch="about"]) .archScene,
+.passageScope[data-passage="work"] .arch:not([data-arch="work"]) .archScene,
+.passageScope[data-passage="contact"] .arch:not([data-arch="contact"]) .archScene {
+  filter: contrast(0.94) brightness(0.9);
+}
+
+.passageScope[data-passage="about"] .archSign:not([data-arch="about"]) .archPlate,
+.passageScope[data-passage="work"] .archSign:not([data-arch="work"]) .archPlate,
+.passageScope[data-passage="contact"] .archSign:not([data-arch="contact"]) .archPlate {
+  opacity: 0.55;
+}
+
+.passageScope[data-passage] .plaque {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-calm);
+}
+
+/* 館名のプレート */
+.plaque {
+  position: absolute;
+  left: clamp(20px, 3vw, 48px);
+  bottom: clamp(20px, 4svh, 44px);
+  z-index: 1;
+  color: var(--hero-ink);
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.35);
+  animation: plaque-arrive 1.6s var(--ease-calm) 1.2s both;
+  pointer-events: none;
+}
+
+/*
+ * 朝・昼は植物と空が明るくなり、左下の琉球石灰岩の明るい斑や上の空の上で館名が沈むので、
+ * 文字の縁にだけ細い影を足す（夕方・夜・深夜は今のまま）
+ */
+.hero:is([data-ambient="morning"], [data-ambient="day"]) .plaque {
+  text-shadow:
+    0 0 3px rgb(0 0 0 / 0.5),
+    0 1px 12px rgb(0 0 0 / 0.4);
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-heading), serif;
+  font-size: clamp(14px, 1.1vw, 18px);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.role {
+  margin: 0.4em 0 0;
+  font-size: clamp(10px, 0.7vw, 11px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+/*
+ * 時間帯の光（値は scene.ts の TOP_AMBIENTS と components/museum/seaSky.ts。AmbientRoot が .hero に CSS 変数として流す）。
+ * 建物・植物・アーチの形は変えず、光の量と色温度だけを filter で寄せる。
+ * 色と濃さの補間、--ambient-fade、prefers-reduced-motion の扱いは components/museum/ambient.module.css
+ */
+.sky img,
+.archView {
+  filter: var(--ambient-sky-filter);
+}
+
+.building {
+  filter: var(--ambient-building-filter);
+}
+
+.plantsBack,
+.plantsFront {
+  filter: var(--ambient-scene-filter);
+}
+
+/* About / Work の室内灯。夜・深夜は少し存在感が増し（深夜がいちばん目立つ）、昼はほとんど目立たない */
+.archImage {
+  filter: var(--ambient-interior-filter);
+}
+
+.sky img,
+.archView,
+.building,
+.plantsBack,
+.plantsFront,
+.archImage {
+  transition: filter var(--ambient-fade) var(--ease-calm);
+}
+
+@keyframes stage-arrive {
+  from {
+    opacity: 0;
+    scale: 1.025;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes stage-fallback {
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes plaque-arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translate3d(-1.2%, 0, 0);
+  }
+  to {
+    transform: translate3d(1.2%, 0, 0);
+  }
+}
+
+@keyframes sea-breathe {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.003, 1.012);
+  }
+}
+
+@keyframes haze-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+  to {
+    transform: translate3d(1.5%, 0, 0);
+  }
+}
+
+/*
+ * 縦長画面：舞台を画面下に置き、3つのアーチが画面幅に収まる大きさにする。
+ * 舞台の上に余る空は、空レイヤーだけを上へ伸ばして埋める（水平線の高さは舞台と揃えたまま）。
+ * 境目は 6/7。4/5 だと、それより少しだけ横長の画面（640×800 など）で舞台が画面より大きく広がり、
+ * 右端のアーチと部屋名が切れていた。舞台の高さ（200vw × 941/1672 ≒ 1.13 × 幅）が画面の高さを
+ * 超えない範囲（縦横比 0.88 まで）なら、このルールで3つのアーチが収まる。
+ * 幅 700px 以下も、縦横比によらずこのルールにする。高さの低いスマホ幅（390×450 など）では、
+ * 通常のルールだと最低の高さ（560px）から舞台が約 1000px に広がり、右端の入口と部屋名が切れるため。
+ * 700px 以下なら、舞台の上が切れても部屋名とアーチの頂点（舞台の上から約 32%）は画面に残る。
+ */
+@media (max-aspect-ratio: 6/7), (max-width: 700px) {
+  .stage {
+    --stage-h: calc(200vw * 941 / 1672);
+    --above: calc(max(100svh, 560px) - var(--stage-h));
+    /*
+     * 空を伸ばす高さは 0 で止める。横向きのスマホなど高さの低い画面では --above が負になり、
+     * そのままだと空の箱が舞台の下まで届かず、背景の暗色が見えていた。
+     * 0 で止めても水平線の位置合わせは成り立ち、届かないのは舞台の下端 6% ほど（手前の植物と岩が覆う）。
+     */
+    --sky-above: max(var(--above), 0px);
+
+    top: auto;
+    bottom: 0;
+    width: 200vw;
+    translate: -50% 0;
+  }
+
+  /*
+   * 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ。
+   * 空の上端と舞台の下端は画面の端にそろえているので、パララックスは横にだけ動かす（縦に動かすと端に背景色が出る）
+   */
+  .sky {
+    --horizon: 44.9%;
+
+    top: calc(-1 * var(--sky-above));
+    bottom: auto;
+    height: calc((var(--sky-above) + 0.423 * var(--stage-h)) / 0.449);
+    transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
+  }
+
+  .sky img {
+    object-position: 50% 0%;
+  }
+
+  .atmosphere {
+    top: calc(-1 * var(--sky-above));
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(40 36 52 / 0.16),
+        transparent 40%,
+        transparent 75%,
+        rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
+      ),
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
+  }
+
+  /* 舞台の上端で切れる木々の梢を空へ溶かす */
+  .plantsBack {
+    mask-image: linear-gradient(to bottom, transparent, #000 16%);
+  }
+
+  .plantsFront {
+    mask-image:
+      url("/images/top/top-foreground-front-mask.svg"),
+      linear-gradient(to bottom, transparent, #000 16%);
+    mask-composite: intersect;
+  }
+
+  /* アーチの幅が狭いので、名前が切れないよう字間を詰める */
+  .archTitle {
+    font-size: min(12px, 3vw);
+    letter-spacing: 0.1em;
+    margin-right: -0.1em;
+  }
+
+  /* アーチの間隔が狭いので、プレートは文字に合わせた幅にし、字間も少し詰める */
+  .archPlate {
+    left: var(--opening-center);
+    width: auto;
+    padding: 0.4em 0.6em 0.36em 0.74em;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    white-space: nowrap;
+  }
+
+  .plaque {
+    top: clamp(28px, 8svh, 64px);
+    bottom: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage[data-ready] {
+    opacity: 1;
+  }
+
+  .stage[data-ready],
+  .plaque,
+  .clouds,
+  .sea,
+  .haze {
+    animation: none;
+  }
+
+  /* 案内とスモークの切り替えは残し、パララックスだけ止める */
+  .sky {
+    transition: none;
+  }
+}

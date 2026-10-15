@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1672 941" preserveAspectRatio="none">
+  <!--
+    前景植物を「建物より手前」に描くときのマスク（不透明な部分だけ手前に出る）。
+    植物 PNG には建物の背後にあるべき木立（右のガジュマルの枝など）も含まれるため、
+    建物の範囲は茂みの上端より上を抜き、その部分は建物の後ろに置いた植物で見せる。
+    座標は完成イメージ（1672 x 941）基準。
+  -->
+  <defs>
+    <!-- 切り口が滑らかな曲線だと丘のように見えるので、ノイズで葉の縁のように崩す -->
+    <filter id="soften" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="7" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="46" xChannelSelector="R" yChannelSelector="G" result="ragged" />
+      <feGaussianBlur in="ragged" stdDeviation="1.5" />
+    </filter>
+  </defs>
+  <path
+    fill="#fff"
+    fill-rule="evenodd"
+    filter="url(#soften)"
+    d="M-60 -60 H1732 V1001 H-60 Z
+       M262 -60 L262 520 L320 550 L440 600 L520 660 L720 650 L880 720 L1040 720 L1120 700 L1240 640 L1290 590 L1340 600 L1422 610 L1422 -60 Z"
+  />
+</svg>

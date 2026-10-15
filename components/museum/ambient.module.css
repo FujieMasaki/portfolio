@@ -1,0 +1,109 @@
+/*
+ * 美術館の時間帯の光（AmbientRoot.tsx が付ける .root と、TOP・/contact の空に重ねる .glaze）。
+ * 値は CSS 変数（--ambient-*）で、AmbientRoot が時間帯ごとに流す。
+ *
+ * 色と濃さは型を登録した変数にし、外枠（.root）で補間して子のレイヤーへそのまま引き継ぐ。
+ * filter は型を登録できないので、各ページの CSS で、filter を持つレイヤーごとに transition を付ける。
+ * 時間帯が見えている間に変わったとき（境界の時刻・タブに戻ったとき）は、気づいたら光が変わっていた程度に馴染ませる。
+ * hydration の直後に夕方から実際の時間帯へ移るときは、舞台のフェードインと重ならないよう馴染ませない
+ * （AmbientRoot が描画の落ち着いた後に data-ambient-settled を付ける）。
+ */
+
+@property --ambient-glaze-sky {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --ambient-glaze-horizon {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --ambient-glaze-sea {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --ambient-air-top {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --ambient-air-bottom {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --ambient-haze {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@property --ambient-sky-shade {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --ambient-vignette {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+.root {
+  --ambient-fade: 2s;
+
+  transition-property:
+    --ambient-glaze-sky, --ambient-glaze-horizon, --ambient-glaze-sea, --ambient-air-top,
+    --ambient-air-bottom, --ambient-sky-shade, --ambient-haze, --ambient-vignette;
+  transition-duration: var(--ambient-fade);
+  transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.root:not([data-ambient-settled]) {
+  --ambient-fade: 0s;
+}
+
+/*
+ * 時間帯の光の色（components/museum/seaSky.ts の glaze）。上空・水平線・海の3点で、空と海の画像の上から薄く重ねる。
+ * 水平線の高さ（--horizon）は、置く側の箱での高さを指定する。夕方は透明で、背景の色をそのまま見せる
+ */
+.glaze {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--ambient-glaze-sky),
+    var(--ambient-glaze-horizon) calc(var(--horizon) - 0.3%),
+    var(--ambient-glaze-sea) calc(var(--horizon) + 1.5%),
+    var(--ambient-glaze-sea)
+  );
+}
+
+/*
+ * 縦長の画面で、空の上端（館名・Menu を置く帯）を沈める層。朝・昼だけ効く（--ambient-sky-shade。夕方・夜・深夜は 0）。
+ * 各ページの縦長の .atmosphere が background の1枚として使う
+ */
+.root {
+  --ambient-sky-shade-layer: linear-gradient(
+    to bottom,
+    rgb(30 38 54 / var(--ambient-sky-shade)),
+    rgb(30 38 54 / var(--ambient-sky-shade)) 14%,
+    transparent 28%
+  );
+}
+
+/* 時間帯の色は変えるが、馴染ませる動きはせずに切り替える */
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    --ambient-fade: 0s;
+  }
+}

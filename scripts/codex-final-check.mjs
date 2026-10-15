@@ -47,11 +47,11 @@ export const DISABLED_FEATURES = [
 // root would also be followed.
 export const UNEXPECTED_CODEX_FILES = [".codex", "AGENTS.override.md", ".agents", "personal-conventions.md"];
 
-export function findUnexpectedCodexFiles(root, exists = existsSync) {
+export const findUnexpectedCodexFiles = (root, exists = existsSync) => {
   return UNEXPECTED_CODEX_FILES.filter((name) => exists(path.join(root, name)));
-}
+};
 
-export function validateArgs(args) {
+export const validateArgs = (args) => {
   if (args.length !== 1) {
     return { ok: false, error: "base branch only: node scripts/codex-final-check.mjs origin/<base>" };
   }
@@ -60,9 +60,9 @@ export function validateArgs(args) {
     return { ok: false, error: `invalid base: ${base} (expected origin/<branch>)` };
   }
   return { ok: true, base };
-}
+};
 
-export function buildCodexArgs(base, outputFile) {
+export const buildCodexArgs = (base, outputFile) => {
   const prompt =
     `docs/code-review/final-check.md を読み、その手順で ${base}...HEAD の差分を最終チェックしてください。`;
   // --sandbox only confines shell commands the model runs. execpolicy `allow` rules, MCP servers
@@ -90,7 +90,7 @@ export function buildCodexArgs(base, outputFile) {
     outputFile,
     prompt,
   ];
-}
+};
 
 // spawnSync's timeout sends the signal but then waits for the child however long it takes, and
 // never reaches the processes the child started. Codex runs in its own process group instead, so
@@ -100,7 +100,7 @@ export function buildCodexArgs(base, outputFile) {
 // exits on SIGTERM / SIGINT / SIGHUP (otherwise codex would keep running with no deadline).
 export const FORWARDED_SIGNALS = ["SIGTERM", "SIGINT", "SIGHUP"];
 
-export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs = KILL_GRACE_MS, exitOnSignal = false }) {
+export const runWithTimeout = (command, args, { cwd, stdio, timeoutMs, graceMs = KILL_GRACE_MS, exitOnSignal = false }) => {
   return new Promise((resolve) => {
     const child = spawn(command, args, { cwd, stdio, detached: true });
     let timedOut = false;
@@ -133,9 +133,9 @@ export function runWithTimeout(command, args, { cwd, stdio, timeoutMs, graceMs =
     child.on("error", (error) => finish({ error }));
     child.on("close", (status, signal) => finish({ status, signal }));
   });
-}
+};
 
-async function main(args) {
+const main = async (args) => {
   const result = validateArgs(args);
   if (!result.ok) {
     console.error(result.error);
@@ -193,7 +193,7 @@ async function main(args) {
 
   process.stdout.write(readFileSync(outputFile, "utf8"));
   return 0;
-}
+};
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   process.exitCode = await main(process.argv.slice(2));

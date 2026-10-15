@@ -1,0 +1,222 @@
+/*
+ * /about の展示室（壁・床・展示室の札・額）。
+ * 文字・額・壁・床は Masaki Fujie・Career・Interests の3つともここから使い、部屋ごとに別の体系を作らない。
+ * 同じ館の続きの部屋（/work）も、壁・札・床・現れ方をここから使う。
+ */
+
+.museum {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* 壁に直接書いた文字。TOP の部屋名プレート（rgb(62 53 44)）と同じ系統で、壁に対して読める濃さにする */
+  --wall-ink: rgb(40 34 28);
+  --wall-ink-muted: rgb(58 51 44);
+  --wall-line: rgb(72 64 56 / 0.5);
+  --gutter: clamp(24px, 7vw, 128px);
+  --floor-h: clamp(96px, 14svh, 160px);
+  /*
+   * 左上の館内案内（MuseumNav）のための余白。Menu を開いたときに項目（Top〜Contact）が届く高さ（約 196px）に、
+   * 余白を足したもの。冒頭の札はここより下から始め、Menu を開いても閉じても本文の位置は動かさない。
+   */
+  --nav-clearance: 280px;
+
+  /*
+   * 床。別の画像は使わず、壁と同じ素材の別の場所（下寄り）を1枚だけ敷き、ほんの少しだけ暗く・暖かくする。
+   * 横には繰り返さない（素材の左右の端は継ぎ目になるため。幅は壁と同じ max(100%, 1280px)）。
+   * 壁との境は線を引かず、壁の付け根に落ちるごく淡い陰と、上端を数 px で溶かす mask で分ける。
+   * 使う側（::after など）で、background と mask にこの値をそのまま入れる（Interests の床も同じ）。
+   */
+  --floor-background:
+    linear-gradient(to bottom, rgb(56 42 28 / 0.07), rgb(56 42 28 / 0) 24px),
+    linear-gradient(to bottom, rgb(150 116 80 / 0.08), rgb(150 116 80 / 0.04)),
+    url("/images/about/about-wall.webp") center 70% / max(100%, 1280px) auto no-repeat #f4ebdf;
+  --floor-blend: normal, normal, multiply;
+  --floor-mask: linear-gradient(to bottom, transparent, #000 14px);
+
+  position: relative;
+  /* Interests の床（z-index: -1）を、壁の背景の上・展示の下に描く */
+  isolation: isolate;
+  min-height: 100svh;
+  color: var(--wall-ink);
+  font-family:
+    var(--font-heading), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+  font-weight: 500;
+  /*
+   * 壁は1枚の素材をページ全体に敷く。about-wall.webp は about-background-img.png の上端 200px に
+   * 下端 200px を少しずつ重ねて溶かしたもので、縦に繰り返しても継ぎ目が出ない（1774 x 687）。
+   * ごく淡い暖色を乗算し、TOP の建物（夕方の光のコンクリート）と色温度をそろえる。
+   */
+  background-color: #faf4ec;
+  background-image: url("/images/about/about-wall.webp");
+  background-size: max(100%, 1280px) auto;
+  background-position: center top;
+  background-repeat: repeat-y;
+  background-blend-mode: multiply;
+}
+
+/* 幅の狭い画面では館内案内の文字が小さく（13px）、項目は約 155px まで届く */
+@media (max-width: 700px) {
+  .museum {
+    --nav-clearance: 210px;
+  }
+}
+
+/* ---- 展示室の札（ABOUT / Masaki Fujie・Career・Interests の見出し。3つとも同じ大きさ） ---- */
+
+/* Career・Interests の札。Masaki Fujie と同じく、壁の左の余白にそろえて縦に積む */
+.sectionHeader {
+  padding-inline: var(--gutter);
+}
+
+.heading {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 展示室のカテゴリ。題より目立たせず、壁に埋もれない大きさにする */
+.eyebrow {
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--wall-ink-muted);
+}
+
+.roomTitle {
+  font-size: clamp(34px, 3.4vw, 50px);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 2.2em 0 0;
+  font-size: clamp(14px, 1.05vw, 15.5px);
+  line-height: 2.2;
+  letter-spacing: 0.14em;
+  /* 幅の狭い画面で折り返すときに、語の途中で切らない（対応していないブラウザは通常の折り返し） */
+  word-break: auto-phrase;
+}
+
+/* ---- 額（木の額縁は about-frame.webp を border-image で伸ばして使う） ---- */
+
+.frame {
+  /* 木の太さ。額の大きさに合わせて各展示で上書きする */
+  --frame: 14px;
+
+  position: relative;
+  border: var(--frame) solid #6b4a2c;
+  /* about-frame.webp（910 x 1075）の木の部分の幅：上 53 / 右 56 / 下 57 / 左 55 px */
+  border-image: url("/images/about/about-frame.webp") 53 56 57 55 stretch;
+  background: #e8e2d8;
+  /* 壁から少しだけ浮いている程度の影。光源は上 */
+  box-shadow: 0 18px 26px -22px rgb(36 28 20 / 0.5);
+}
+
+/* 額の内側の縁に落ちる、ごく浅い陰 */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 2px 5px rgb(30 22 14 / 0.28);
+  pointer-events: none;
+}
+
+.photo {
+  object-fit: cover;
+  /* 鮮やかな昼の写真を、壁の光の中に置く */
+  filter: saturate(0.88);
+}
+
+/* ---- 現れ方 ---- */
+
+/*
+ * Career / Interests の展示は、最初に視界へ入ったときに一度だけ静かに現れる。
+ * 画面の下にある展示に RevealOnce.tsx が "pending" を付け、画面に入ったら "shown" に替える。
+ * スクロールを戻しても、また薄くはならない。
+ * JS が動かない環境と prefers-reduced-motion では "pending" が付かず、最初から見える。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .museum [data-reveal] {
+    transition:
+      opacity 1.6s var(--ease-calm),
+      translate 1.6s var(--ease-calm);
+  }
+
+  .museum [data-reveal="pending"] {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+/*
+ * 順路の案内（RoomStepLink）から来たときは、壁と床は動かさず、入ってすぐの札・展示が、それぞれの現れ方（arrive）の
+ * 時間差のまま、進んだ向きの 12px 先から着地する（--room-step を Personal・WorkMuseum の arrive が使う）。
+ * 印（<html data-room-step>）は、札・展示が現れ終わった後（room-step-hold の終わり）に RoomStepLink が外す。
+ * --room-step を使う中でいちばん遅いのは /about の所在地（0.71s 遅れ ＋ 1.6s ＝ 2.31s）なので、少し余裕を持たせて 2.5s にする
+ * （床の植物は横へずらさない arrive-in-place なので数えない）。
+ * それより先に外すと、--room-step が途中で 0 に戻り、現れている途中の札が横に跳ぶ
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step="next"]) .museum {
+    --room-step: 12px;
+
+    animation: room-step-hold 2.5s linear;
+  }
+
+  :global(:root[data-room-step="previous"]) .museum {
+    --room-step: -12px;
+
+    animation: room-step-hold 2.5s linear;
+  }
+}
+
+/* 見た目は変えず、札・展示の arrive が終わるまでの時間だけを数える */
+@keyframes room-step-hold {
+  to {
+    --room-step-hold: 1;
+  }
+}
+
+/*
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）だけ、暗がり（globals.css）の上に、部屋全体
+ * （壁・床・展示・Menu）が、目が慣れるように静かに現れる。壁の色を暗い状態から明るくする動きにはしない。
+ * 印（<html data-arrival>）は、この動きが終わると ArchPassage が外す。
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-arrival="passage"]) .museum {
+    animation: passage-arrive 0.8s var(--ease-calm) both;
+  }
+}
+
+@keyframes passage-arrive {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+/*
+ * 印刷：まだ現れていない展示（[data-reveal="pending"]）や、現れる途中の札・線も含めて、すべてをそのまま写す。
+ * 動きの指定はどれも後から重ねたものなので、ここで外せば元の見え方に戻る（!important で、印・hover などの指定にも勝たせる）
+ */
+@media print {
+  .museum,
+  .museum *,
+  .museum *::before,
+  .museum *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .museum [data-reveal] {
+    opacity: 1 !important;
+    translate: none !important;
+    transform: none !important;
+  }
+
+  /* まだ引かれていない線（順路の案内の札の線など）も、引き終えた長さで写す */
+  .museum [data-reveal] *::before {
+    scale: none !important;
+  }
+}

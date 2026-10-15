@@ -1,0 +1,76 @@
+import Image from "next/image";
+import shared from "./AboutMuseum.module.css";
+import styles from "./Personal.module.css";
+
+/** 札の本文。段落ごとに、幅の広い画面での改行位置で行を分ける（幅の狭い画面では行をつなげ、語の切れ目で折り返す） */
+const INTRODUCTION = [
+  ["沖縄で暮らしながら、", "フロントエンドを中心に", "プロダクトづくりをしています。"],
+  ["実装だけでなく、", "使う人にとって何が必要かを考え、", "仕様やUIの改善にも関わっています。"],
+];
+
+/**
+ * ABOUT / Masaki Fujie：人物そのものを見る展示。壁に文章、文章の近くに額装した写真、右端の床に鉢ごと置いた植物だけを置く。
+ * 札は、部屋の名前（ABOUT）・この展示の主題（名前）・肩書き・何をしている人かの短い文・所在地の順に並べる。
+ * これまでのこと（Career）と、好きなこと（Interests）は次の展示に任せ、ここでは説明しすぎない。
+ * 入った直後に見える展示なので、スクロールではなく読み込み時に一度だけ現れる（Personal.module.css の arrive）。
+ */
+const Personal = () => {
+  return (
+    <section
+      className={styles.archive}
+      aria-labelledby="person-title"
+      // 床（.archive::after）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink）
+      data-room-floor
+    >
+      <div className={styles.archiveText}>
+        <h1 className={shared.heading} id="person-title">
+          <span className={shared.eyebrow}>About</span>
+          <span className={shared.roomTitle}>Masaki Fujie</span>
+        </h1>
+        {/* 名前のすぐ下の小さな肩書き。見出しにはせず、名前よりかなり小さく置く */}
+        <p className={styles.role}>Web Engineer</p>
+        <div className={styles.introduction}>
+          {INTRODUCTION.map((lines) => (
+            <p key={lines[0]}>
+              {lines.map((line) => (
+                <span key={line} className={styles.line}>
+                  {line}
+                </span>
+              ))}
+            </p>
+          ))}
+        </div>
+        <p className={styles.place}>Okinawa, Japan</p>
+      </div>
+
+      <figure className={styles.portrait}>
+        <div className={`${shared.frame} ${styles.portraitFrame}`}>
+          <Image
+            src="/images/about/about-me.webp"
+            alt="沖縄の海辺で、海に向かって砂浜を歩く後ろ姿"
+            fill
+            // 入ってすぐ目に入る展示なので、TOP の舞台の画像と同じく最優先で読む
+            loading="eager"
+            fetchPriority="high"
+            sizes="(max-width: 760px) 62vw, (max-width: 923px) 240px, (max-width: 1538px) 26vw, 400px"
+            className={shared.photo}
+          />
+        </div>
+      </figure>
+
+      {/* 展示室の床に置かれた植物。床と同じく、順路の案内で移るときも動かさない（data-room-fixed。RoomStepLink） */}
+      <div className={styles.plant} aria-hidden="true" data-room-fixed>
+        <Image
+          src="/images/about/about-alocasia-plant.png"
+          alt=""
+          width={1150}
+          height={1368}
+          // 幅の狭い画面は min(44vw, 200px)、広い画面は clamp(200px, 24vw, 400px)
+          sizes="(max-width: 454px) 44vw, (max-width: 833px) 200px, (max-width: 1666px) 24vw, 400px"
+        />
+      </div>
+    </section>
+  );
+};
+
+export default Personal;

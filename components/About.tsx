@@ -1,7 +1,7 @@
 import Image from "next/image";
 import styles from "./About.module.css";
 
-export default function About() {
+const About = () => {
   return (
     <section
       className={styles.section}
@@ -60,4 +60,6 @@ export default function About() {
       </div>
     </section>
   );
-}
+};
+
+export default About;

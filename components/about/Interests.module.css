@@ -1,0 +1,310 @@
+/*
+ * ABOUT / Interests：低い展示台に実物を置いた収蔵品の展示。
+ * 展示台は石 / コンクリートの塊として、壁と同じ素材を少し濃くして作る（画像にしない）。
+ */
+
+.interests {
+  /* 展示台の手前から、次の展示室の案内までの床。展示を見終えて少し歩いた先に案内がある距離 */
+  --next-floor: clamp(240px, 32svh, 320px);
+
+  position: relative;
+  padding-top: clamp(96px, 14svh, 168px);
+  /* スマホで床の線を左右へ伸ばすため、はみ出しを横だけ切る */
+  overflow-x: clip;
+}
+
+.hall {
+  --plinth-base: clamp(110px, 10vw, 150px);
+  /* 解説（最大4行ほど）が床の帯に収まる高さ */
+  --floor-band: clamp(168px, 20svh, 200px);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--hall-columns);
+  align-items: end;
+  column-gap: clamp(20px, 4vw, 72px);
+  margin: clamp(88px, 14svh, 160px) 0 0;
+  padding: 0 var(--gutter) var(--floor-band);
+  list-style: none;
+}
+
+/*
+ * 床。Masaki Fujie の床と同じ作り（AboutMuseum.module.css の --floor-*）。展示台の下端が床の奥の端にそろう。
+ * 順路の案内（.roomNavigation）の下まで続け、手前（下端）に向かってごく僅かに暗くして奥行きを出す。
+ */
+.hall::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 calc(var(--next-floor) * -1);
+  z-index: -1;
+  height: calc(var(--floor-band) + var(--next-floor));
+  background:
+    linear-gradient(to bottom, rgb(56 42 28 / 0) 45%, rgb(56 42 28 / 0.06)),
+    var(--floor-background);
+  background-blend-mode: normal, var(--floor-blend);
+  mask-image: var(--floor-mask);
+}
+
+.exhibit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: none;
+}
+
+/* フォーカスの線は、壁に対して見分けられる濃さ（不透明の --wall-ink-muted）にする */
+.exhibit:focus-visible .plinth {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 6px;
+}
+
+/* 展示物。画像は透明な余白ごと置き、見える範囲（box）を展示台の天板に合わせる */
+.object {
+  position: relative;
+  /* 天板の奥に少し沈めて、載っているように見せる */
+  margin-bottom: -3px;
+}
+
+.object img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  /* 展示物の真下に落ちる、ごく弱い接地の影 */
+  filter: drop-shadow(0 6px 5px rgb(30 22 14 / 0.2));
+  transition: translate 0.35s var(--ease-calm);
+}
+
+.plinth {
+  position: relative;
+  width: 100%;
+  /* 低い台の題が2行に折り返す幅（タブレットの縦向きなど）でも、文字が台の外へ出ないよう高さは下限で決める */
+  min-height: calc(var(--plinth-base) * var(--plinth-h, 1));
+  padding: clamp(18px, 1.8vw, 26px) clamp(16px, 2.2vw, 32px);
+  background-color: #ddd6cc;
+  background-image: url("/images/about/about-wall.webp");
+  background-size: 900px auto;
+  background-blend-mode: multiply;
+  box-shadow: 0 22px 30px -26px rgb(30 22 14 / 0.45);
+}
+
+/* 天板。光を受ける上面だけ、わずかに明るい */
+.plinth::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: rgb(255 250 242 / 0.26);
+  border-bottom: 1px solid rgb(60 50 40 / 0.12);
+}
+
+.number {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--wall-ink-muted);
+}
+
+.title {
+  margin: 0.5em 0 0;
+  font-size: clamp(14px, 1.15vw, 17px);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+.title::after {
+  content: "";
+  display: block;
+  width: 16px;
+  margin-top: 0.7em;
+  border-top: 1px solid var(--wall-line);
+}
+
+/* 展示解説。展示台の手前の床に、近づいたときだけ現れる */
+.note {
+  position: absolute;
+  /* 展示台との間（22px）も解説に含め、リンクへマウスを下ろす途中で hover が切れないようにする */
+  top: 100%;
+  left: clamp(16px, 2.2vw, 32px);
+  margin: 0;
+  padding-top: 22px;
+  /* 隣の列の解説と重ならないよう、列の幅（＋列の間の半分ほど）で折り返す */
+  width: max-content;
+  max-width: calc(100% - clamp(16px, 2.2vw, 32px) + clamp(10px, 2vw, 36px));
+  font-size: 12.5px;
+  line-height: 1.9;
+  letter-spacing: 0.1em;
+  word-break: auto-phrase;
+  opacity: 0;
+  translate: 0 6px;
+  /* 見えていない間は、床の何もない場所に hover しただけで現れないようにする */
+  pointer-events: none;
+  transition:
+    opacity 0.32s var(--ease-calm),
+    translate 0.32s var(--ease-calm);
+}
+
+/* 解説の中のリンクへ Tab で進んでも、解説は出たままにする */
+.exhibit:focus-visible .note,
+.exhibit:has(.noteLink:focus-visible) .note {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+
+/* 解説の中のリンク。キャプションの文字のまま、細い下線だけで示す */
+.noteLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--wall-line);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.3s var(--ease-calm);
+}
+
+@media (hover: hover) {
+  .noteLink:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.noteLink:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 3px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.exhibit:focus-visible .object img {
+  translate: 0 -3px;
+}
+
+@media (hover: hover) {
+  /* 解説は1つずつしか出ないので、隣の列にかかっても行のまま見せる（列が細い画面で細かく折り返さない） */
+  .note {
+    max-width: none;
+    white-space: nowrap;
+  }
+
+  /* 右端の展示は、解説を展示台の右端にそろえて内側へ出し、画面の外で切れないようにする */
+  .exhibit:last-child .note {
+    left: auto;
+    right: 0;
+  }
+
+  .exhibit:hover .note {
+    opacity: 1;
+    translate: 0 0;
+    pointer-events: auto;
+  }
+
+  .exhibit:hover .object img {
+    translate: 0 -3px;
+  }
+}
+
+/* hover の無い端末では、解説を最初から置いておく */
+@media (hover: none) {
+  .note {
+    opacity: 1;
+    translate: none;
+    pointer-events: auto;
+  }
+}
+
+/* hover の無い幅の広い端末（タブレット）：全部の解説が同時に出て、列の幅で折り返すので、床の帯を高くする */
+@media (hover: none) and (min-width: 761px) {
+  .hall {
+    --floor-band: clamp(200px, 24svh, 240px);
+  }
+}
+
+/* ---- 順路の案内（文字と線は components/museum/MuseumRoomNavigation）。展示台の手前の床に置く ---- */
+
+.roomNavigation {
+  height: var(--next-floor);
+  padding-top: clamp(32px, 6svh, 64px);
+}
+
+/* 幅の狭い画面：2列に置き、行ごとに床の線を引く。解説は場所を取るので、hover の有無によらず最初から見せる */
+@media (max-width: 760px) {
+  .hall {
+    --plinth-base: clamp(84px, 24vw, 110px);
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 7vw;
+    row-gap: 0;
+    padding-bottom: 96px;
+  }
+
+  .hall::after {
+    display: none;
+  }
+
+  /*
+   * 展示物・展示台・解説を行ごとに同じ高さの段にそろえる（subgrid）。
+   * 解説の行数が違っても、同じ行の展示台の下端がずれない。
+   */
+  .exhibit {
+    display: grid;
+    grid-row: span 3;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    justify-items: center;
+  }
+
+  .object,
+  .plinth {
+    align-self: end;
+  }
+
+  /* 同じ行の展示台は下端がそろうので、線が左右でつながって1本の床になる */
+  .plinth::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: -4vw;
+    right: -4vw;
+    border-top: 1px solid rgb(72 62 52 / 0.22);
+  }
+
+  .note {
+    position: static;
+    justify-self: stretch;
+    margin: 18px 0 56px;
+    padding: 0 0 0 clamp(16px, 2.2vw, 32px);
+    width: auto;
+    max-width: none;
+    font-size: 12px;
+    white-space: normal;
+    opacity: 1;
+    translate: none;
+    pointer-events: auto;
+    word-break: auto-phrase;
+  }
+
+  /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */
+  .roomNavigation {
+    height: auto;
+    /* 左右の余白（--gutter）は案内の側が持つので、上下だけを決める */
+    padding-block: 24px 112px;
+  }
+}
+
+/* 浮きと解説の移動を止め、表示の切り替えだけにする（hover / フォーカス時の指定より強くする） */
+@media (prefers-reduced-motion: reduce) {
+  .exhibit .note,
+  .exhibit .object img,
+  .exhibit:hover .object img,
+  .exhibit:focus-visible .object img {
+    translate: none;
+    transition: none;
+  }
+}

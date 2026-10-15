@@ -4,7 +4,7 @@ import styles from "./Contact.module.css";
 const CONTACT_EMAIL = "contact@masakifujie.com";
 const CONTACT_HREF = `mailto:${CONTACT_EMAIL}`;
 
-export default function Contact() {
+const Contact = () => {
   return (
     <section
       className={styles.section}
@@ -46,4 +46,6 @@ export default function Contact() {
       </div>
     </section>
   );
-}
+};
+
+export default Contact;

@@ -58,7 +58,7 @@ const CAREERS: CareerItem[] = [
   },
 ];
 
-export default function Career() {
+const Career = () => {
   return (
     <section className={styles.section} aria-labelledby="career-title" id="career">
       <div className={styles.inner}>
@@ -96,4 +96,6 @@ export default function Career() {
       </div>
     </section>
   );
-}
+};
+
+export default Career;

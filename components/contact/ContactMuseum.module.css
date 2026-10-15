@@ -1,0 +1,496 @@
+/*
+ * /contact（美術館の海側・裏側）。
+ * 舞台（.stage）は素材と同じ 1672:941 の箱で、建物・植物・案内はこの箱の中に「素材の px / 1672（または 941）」の % で置く。
+ * 画面に対しては TOP と同じく object-fit: cover の考え方で舞台を拡大・中央寄せする。
+ * 文字・札の体系は /about（AboutMuseum.module.css）と同じものを使い、ここでは屋外の置き方だけを決める。
+ */
+
+.contact {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* 館の外は植物と夕方の空の上なので、Menu と順路の案内は TOP の館名と同じ明るい文字にする */
+  --wall-ink: #f4f1ec;
+  --wall-ink-muted: rgb(244 241 236 / 0.84);
+  --gutter: clamp(24px, 7vw, 128px);
+  /* 舞台（.stage）の幅。完成イメージと同じ 1672:941 の箱を、画面に対して cover で置く */
+  --stage-w: max(100vw, calc(max(100svh, 560px) * 1672 / 941));
+
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #1c211b;
+  font-family:
+    var(--font-heading), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+  font-weight: 500;
+  /* 植物や空の上でも Menu・順路の案内が読めるよう、TOP の館名と同じ淡い影を敷く（壁の案内では消す） */
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
+}
+
+/*
+ * 景色と順路の案内は、.contact の大きさの main の中に置く。
+ * 順路の案内から来たときに main ごとずらすため、main を .contact と同じ大きさの箱にしておく
+ * （main 自体には高さが無いので、ずらすと中の absolute の景色がつぶれる）
+ */
+.contact > main {
+  position: absolute;
+  inset: 0;
+}
+
+/* 順路の案内（RoomStepLink）から来たときだけ、進んだ向きの 12px 先から着地する（AboutMuseum.module.css と同じ動き） */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step="next"]) .contact > main {
+    --room-step: 12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+
+  :global(:root[data-room-step="previous"]) .contact > main {
+    --room-step: -12px;
+
+    animation: room-step 1.3s var(--ease-calm) both;
+  }
+}
+
+/*
+ * TOP のアーチを通り抜けて来たとき（ArchPassage）は、景色はこれまでどおり暗がりから現れ、
+ * Menu だけを静かに現す（印は AboutMuseum.module.css と同じ。ArchPassage が名前に passage-arrive を含む動きの終わりで印を外すので、
+ * 動きは薄く現すだけでもこの名前にする）
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-arrival="passage"]) .contact > header {
+    animation: passage-arrive 0.8s var(--ease-calm) both;
+  }
+}
+
+@keyframes passage-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes room-step {
+  from {
+    opacity: 0;
+    translate: var(--room-step) 0;
+  }
+}
+
+/* ---- 景色（海と空・建物・植物・案内）。画像がそろってから一度にフェードインする ---- */
+
+.scene {
+  --px: 0;
+  --py: 0;
+
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.scene[data-ready] {
+  animation: scene-arrive 2.4s var(--ease-calm) both;
+}
+
+/* CSS の保険で表示された後に ready になった場合は、フェードインをやり直さない */
+.scene[data-ready="late"] {
+  opacity: 1;
+  animation: none;
+}
+
+/*
+ * 保険：JS の読み込みや hydration に失敗して data-ready が付かなくても、6 秒たったら CSS だけで表示する。
+ * 表示されるまでは、見えない案内のリンクに Tab でフォーカスが入らないようにする。
+ * 6s は ParallaxStage.tsx の JS_FALLBACK_MS（5 秒）より長くしておく
+ */
+.scene:not([data-ready]) {
+  visibility: hidden;
+  animation: scene-fallback 0.8s var(--ease-calm) 6s forwards;
+}
+
+/*
+ * ただし壁の案内（h1・メール・外部リンク）はこのページの本文なので、画像を待つ間も読み上げと Tab の順には残す。
+ * キーボードでフォーカスが入ったら、景色の到着を待たずにすぐ見せる（見えない場所にフォーカスが残らないように）。
+ */
+.scene:not([data-ready]) .sign {
+  visibility: visible;
+}
+
+.scene:not([data-ready]):has(:focus-visible) {
+  opacity: 1;
+  visibility: visible;
+  animation: none;
+}
+
+/*
+ * 1. 海と空：TOP と同じ画像を左右反転する。反転は .skyFlip にだけかけ、
+ * パララックスの移動（.sky）と画像の切り取り（object-fit / object-position）とは分けておく。
+ * 空の箱は画面ではなく舞台に合わせ（動いても端が見えないよう 4% 大きく）、どの縦横比でも水平線と建物の位置関係を変えない。
+ */
+.sky {
+  /* 箱の中での水平線の高さ。時間帯の光の色（.glaze）を水平線で空と海に分ける */
+  --horizon: 57.2%;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--stage-w) * 1.04);
+  aspect-ratio: 1672 / 941;
+  translate: -50% -50%;
+  transform: translate3d(calc(var(--px) * -0.35%), calc(var(--py) * -0.25%), 0);
+  transition: transform 1.6s var(--ease-calm);
+}
+
+.skyFlip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: scaleX(-1);
+}
+
+.skyFlip img {
+  filter: var(--ambient-sky-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
+  object-fit: cover;
+  /* 水平線を、舞台の上から約 58% に置く（建物の足元より上、アーチの開口部の中ほど） */
+  object-position: 50% 8%;
+}
+
+/* 2〜4. 建物・植物・案内の舞台 */
+.stage {
+  position: absolute;
+  top: 50%;
+  /*
+   * 横は中央に寄せる。ただし正方形に近い窓では中央に寄せるとアーチが左端で切れるので、
+   * 舞台の座標で x = 375（アーチの外形のすぐ左）より右を画面から外に出さない（縦長の構図と同じ基準）
+   */
+  left: max(calc(50% - var(--stage-w) / 2), calc(var(--stage-w) * -375 / 1672));
+  width: var(--stage-w);
+  aspect-ratio: 1672 / 941;
+  translate: 0 -50%;
+  container-type: inline-size;
+}
+
+.stage > * {
+  position: absolute;
+}
+
+/*
+ * 2. 建物：素材（1672 x 941）を 0.68 倍にして、左寄りに置く。
+ * 参考画像より少し大きくし、海より建築と壁の余白を主にする。足元は植物が隠す。固定で、動かさない。
+ */
+.building {
+  left: calc(60 / 1672 * 100%);
+  /* 足元（素材の下端の直線）は、手前の植物の切れ込みより下に沈めて見せない */
+  top: calc(200 / 941 * 100%);
+  width: 68%;
+  height: 68%;
+  /*
+   * 夕方の光の橙を落ち着かせ、TOP の建物（ライトグレーのコンクリート）に寄せる。
+   * 時間帯で変わる（./ambient.ts。夕方は saturate(0.62) brightness(0.97)）
+   */
+  filter: var(--ambient-building-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
+  pointer-events: none;
+}
+
+/*
+ * 建物の画像が読めなかったときの、案内の下地。暗い背景の上に暗い文字だけが残らないよう、コンクリートに近い色を敷く。
+ * 壁の画像が不透明な範囲（案内のまわり）にだけ置くので、画像が読めれば完全に隠れる。
+ */
+.wallFallback {
+  left: calc(680 / 1672 * 100%);
+  top: calc(400 / 941 * 100%);
+  width: calc(380 / 1672 * 100%);
+  height: calc(300 / 941 * 100%);
+  background: #d9d0c4;
+  pointer-events: none;
+}
+
+/*
+ * 建物の足元の地面。植物の葉の間から、建物の下端やその下の海がのぞかないよう、植物の奥に暗い茂みの色を敷く。
+ * 上端は建物の下端に少し重ね、ぼかして境目を見せない。
+ */
+.ground {
+  left: calc(90 / 1672 * 100%);
+  top: calc(770 / 941 * 100%);
+  width: calc(1090 / 1672 * 100%);
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, #20261b 22%, #191d15);
+  mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  pointer-events: none;
+}
+
+/*
+ * 3. 植物・琉球石灰岩：素材は舞台と同寸。花の赤が強く出すぎないよう、TOP の植物と同じ程度に彩度と明るさを落とす。
+ * 植物は静止したまま置く（風の揺れは、枝・葉を自然に分けた素材ができてから改めて考える）。
+ */
+.plants {
+  inset: 0;
+  /* 時間帯で変わる（./ambient.ts。夕方は saturate(0.72) brightness(0.84)） */
+  filter: var(--ambient-plants-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
+  pointer-events: none;
+}
+
+/*
+ * 空気。足元（順路の案内）と左上（Menu）を少しだけ沈め、明るい文字を読ませる。
+ * 最後の層は時間帯の空気の色（TOP と共有。夕方は透明）
+ */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 24%),
+    radial-gradient(ellipse 30% 26% at 0% 0%, rgb(16 18 14 / 0.3), transparent 100%),
+    linear-gradient(to bottom, rgb(40 36 52 / 0.1), transparent 30%),
+    linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
+}
+
+/* ---- 4. 壁の案内 ---- */
+
+/*
+ * 通り抜けてきたアーチの右の壁に置く（葉の影が濃い右端の曲面は避ける）。背景・枠・カードは持たせず、文字と細い線だけ。
+ * 大きさは舞台の幅（cqw）に合わせ、どの画面でも壁の同じ場所に同じ割合で収まるようにする。
+ */
+.sign {
+  left: calc(706 / 1672 * 100%);
+  top: calc(410 / 941 * 100%);
+  width: calc(330 / 1672 * 100%);
+  /* コンクリートの上に直接書いた文字。TOP の部屋名プレート、/about の壁の文字と同じ色 */
+  --wall-ink: rgb(40 34 28);
+  --wall-ink-muted: rgb(58 51 44);
+  --wall-line: rgb(72 64 56 / 0.5);
+
+  color: var(--wall-ink);
+  text-shadow: none;
+}
+
+/*
+ * 夜・深夜は壁が暗くなるので、灯りを受けた淡い色の文字と線にする。
+ * 景色の空気（.atmosphere）が文字の上にも重なって少し沈むので、文字はほぼ白に近づけ、縁に細い影を足す
+ * （1440px 幅で実測し、札・リンクが 3.5:1 だったのを 4.5:1 以上にした）
+ */
+.contact:is([data-ambient="night"], [data-ambient="midnight"]) .sign {
+  --wall-ink: rgb(248 243 234);
+  --wall-ink-muted: rgb(240 233 220);
+  --wall-line: rgb(226 216 200 / 0.46);
+
+  text-shadow: 0 0 3px rgb(0 0 0 / 0.65);
+}
+
+/* 小さいリンクは、ふだん少しだけ落としている濃さを夜・深夜は落とさない */
+.contact:is([data-ambient="night"], [data-ambient="midnight"]) .link {
+  opacity: 1;
+}
+
+/* 建物の画像が読めなかったときの下地も、夜の壁の暗さにそろえる（淡い文字が読めるように） */
+.contact:is([data-ambient="night"], [data-ambient="midnight"]) .wallFallback {
+  background: rgb(92 88 82);
+}
+
+/*
+ * 深夜は景色にかかる空気（.atmosphere）が夜より濃く、文字と下地の両方に重なって、淡い文字のコントラストが下がる。
+ * 下地を一段暗くして、文字の 4.5:1 を保つ
+ */
+.contact[data-ambient="midnight"] .wallFallback {
+  background: rgb(70 67 63);
+}
+
+/* CONTACT の札（/about の .eyebrow と同じ字間。大きさだけ舞台に合わせる） */
+.sign .eyebrow {
+  font-size: max(0.82cqw, 11px);
+}
+
+.title {
+  font-size: max(2.05cqw, 22px);
+  line-height: 1.12;
+  letter-spacing: 0.04em;
+}
+
+/* 題とリンクの間に、壁に引いた目地のような短い線 */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em 2em;
+  margin: max(2.4cqw, 22px) 0 0;
+  padding: max(1.5cqw, 14px) 0 0;
+  border-top: 1px solid var(--wall-line);
+  list-style: none;
+  font-size: max(0.94cqw, 13px);
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  opacity: 0.92;
+  transition: opacity 0.4s var(--ease-calm);
+}
+
+.external {
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  fill: none;
+  stroke: var(--wall-ink-muted);
+  stroke-width: 1;
+  transition: translate 0.4s var(--ease-calm);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    opacity: 1;
+  }
+
+  /* 矢印は、開く向きへ少しだけ動く */
+  .link:hover .external {
+    translate: 1.5px -1.5px;
+  }
+}
+
+.link:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 6px;
+}
+
+.link:focus-visible {
+  opacity: 1;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- 順路の案内（文字と線は components/museum/MuseumRoomNavigation）。手前の植物の上、画面の下端に置く ---- */
+
+.roomNavigation {
+  /* 共通の札の線は壁の上の濃さなので、植物の上では明るい線にする */
+  --route-line: rgb(244 241 236 / 0.4);
+  --route-line-hover: rgb(244 241 236 / 0.7);
+
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(20px, 4svh, 44px);
+  z-index: 1;
+  animation: route-arrive 1.6s var(--ease-calm) 1.2s both;
+}
+
+/*
+ * 縦長・幅の狭い画面：舞台を画面の下に置き、アーチの外形から右の壁の案内までが画面の幅に入る大きさにする。
+ * 舞台の座標で x = 375（アーチの外形のすぐ左）を画面の左端に合わせる。上に余る分は、画面全体に敷いた空が埋める。
+ * 舞台の高さは画面の高さを超えない（タブレットの縦向きで建物の上が切れないように）。
+ */
+@media (max-aspect-ratio: 6/7), (max-width: 700px) {
+  .contact {
+    --stage-w: min(240vw, calc(max(100svh, 560px) * 1672 / 941));
+    --stage-h: calc(var(--stage-w) * 941 / 1672);
+  }
+
+  .stage {
+    top: auto;
+    bottom: 0;
+    left: calc(var(--stage-w) * -375 / 1672);
+    width: var(--stage-w);
+    translate: none;
+  }
+
+  /* アーチの右の柱のすぐ横から、画面の右端の手前までを使う */
+  .sign {
+    left: calc(690 / 1672 * 100%);
+    width: calc(370 / 1672 * 100%);
+  }
+
+  /*
+   * 舞台の上に空が続くので、左上の木の梢は幹から離れて宙に浮いて見える。
+   * 梢は外し、植物は建物の足元の茂みと岩だけにする
+   */
+  .plants {
+    mask-image: linear-gradient(to bottom, transparent 34%, #000 50%);
+  }
+
+  /*
+   * 空は画面の上端から敷き、水平線（画像の上から 44.9%）を、広い画面と同じく舞台の上から約 58% に合わせる。
+   * 舞台の上端は「画面の高さ − 舞台の高さ」、水平線はそこから 0.58 × 舞台の高さ。箱は縦長なので画像は高さで合う
+   */
+  .sky {
+    --horizon: 44.9%;
+
+    top: 0;
+    left: -2%;
+    width: 104%;
+    height: calc((max(100svh, 560px) - 0.42 * var(--stage-h)) / 0.449);
+    aspect-ratio: auto;
+    translate: none;
+    /* 上に余白がないので、パララックス（ポインタのある窓だけ）は横にだけ動かす。縦に動かすと上端に背景色が出る */
+    transform: translate3d(calc(var(--px) * -0.35%), 0, 0);
+  }
+
+  .skyFlip img {
+    object-position: 40% 0%;
+  }
+
+  /* 空の明るい上半分で Menu が埋もれないよう、上も少しだけ沈める */
+  .atmosphere {
+    background:
+      linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 20%),
+      linear-gradient(to bottom, rgb(40 36 52 / 0.22), transparent 30%),
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
+  }
+}
+
+@keyframes scene-arrive {
+  from {
+    opacity: 0;
+    scale: 1.015;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes scene-fallback {
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+@keyframes route-arrive {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/* 動きを止める（フェードインもしない）。リンクの hover の矢印も動かさない */
+@media (prefers-reduced-motion: reduce) {
+  .scene[data-ready] {
+    opacity: 1;
+  }
+
+  .scene[data-ready],
+  .roomNavigation {
+    animation: none;
+  }
+
+  .sky {
+    transition: none;
+  }
+
+  .external,
+  .link:hover .external {
+    translate: none;
+    transition: none;
+  }
+}

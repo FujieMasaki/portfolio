@@ -1,0 +1,114 @@
+/*
+ * 館内案内（左上の Menu）。
+ * 壁に小さく書かれた案内表示として、背景・枠・影・アイコンを持たせず、文字（といまの部屋の下線）だけで置く。
+ * 開いた項目が届く高さは、展示室側の --nav-clearance（AboutMuseum.module.css）がよけておく。項目の大きさや間を変えたら、そちらも見直す。
+ * 色は展示室側の --wall-ink を引き継ぎ、無ければ TOP の部屋名プレートと同じ色にする。
+ */
+
+.bar {
+  --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 64px) 0;
+  font-family: var(--font-heading), serif;
+  /* 壁に小さく書かれた館内案内の大きさ。壁の質感に埋もれないよう、太さではなく濃さ（--wall-ink）で読ませる */
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  color: var(--wall-ink, rgb(62 53 44 / 0.92));
+  pointer-events: none;
+}
+
+.toggle:focus-visible,
+.item:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 6px;
+}
+
+.menu {
+  position: relative;
+  pointer-events: auto;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.5em 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/*
+ * 項目は Menu の真下に縦に並べる。
+ * 閉じている間は visibility: hidden で、見えないリンクを Tab の順から外す。
+ */
+.list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: grid;
+  gap: 0.7em;
+  margin: 0;
+  padding: 1.1em 0 0;
+  list-style: none;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 0 8px;
+  visibility: hidden;
+  transition:
+    opacity 0.32s var(--ease-calm),
+    translate 0.32s var(--ease-calm),
+    visibility 0s linear 0.32s;
+}
+
+/* 開くかどうかは MuseumNav.tsx の state が決める（Escape で閉じられるよう、CSS の :hover では開かない） */
+.menu[data-open] .list {
+  opacity: 1;
+  translate: 0 0;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.item {
+  display: inline-block;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid transparent;
+  opacity: 0.78;
+  transition: opacity 0.4s var(--ease-calm);
+}
+
+.item[aria-current="page"] {
+  opacity: 1;
+  border-bottom-color: currentColor;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .bar {
+    font-size: 13px;
+  }
+}
+
+/* 開閉の動きを止める */
+@media (prefers-reduced-motion: reduce) {
+  .list {
+    translate: none;
+    transition: none;
+  }
+}

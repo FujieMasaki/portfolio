@@ -17,7 +17,7 @@ const notoSansJP = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   title: "Masaki Fujie",
-  description: "Masaki Fujie / 藤江正樹 — Product Engineer",
+  description: "Masaki Fujie / 藤江正樹 — Web Engineer",
   icons: {
     icon: [
       {
@@ -35,18 +35,23 @@ export const metadata: Metadata = {
 
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
-export default function RootLayout({
+const RootLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <html
       lang="ja"
+      // globals.css の smooth scroll を、ページ遷移で先頭へ戻すときだけ Next に外させる
+      // （無いと、順路の案内で前のページの末尾から先頭まで流れるようにスクロールしてしまう）
+      data-scroll-behavior="smooth"
       className={`${shipporiMincho.variable} ${notoSansJP.variable}`}
     >
       {gtmId && <GoogleTagManager gtmId={gtmId} />}
       <body>{children}</body>
     </html>
   );
-}
+};
+
+export default RootLayout;

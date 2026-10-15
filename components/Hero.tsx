@@ -9,7 +9,7 @@ const HERO_IMAGE_PROPS = {
   style: { objectFit: "cover" as const, objectPosition: "50% 40%" },
 };
 
-export default function Hero() {
+const Hero = () => {
   const {
     props: { srcSet: desktopSrcSet, ...desktopImageProps },
   } = getImageProps({
@@ -55,4 +55,6 @@ export default function Hero() {
       </div>
     </section>
   );
-}
+};
+
+export default Hero;

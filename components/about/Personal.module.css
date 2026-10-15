@@ -1,0 +1,275 @@
+/*
+ * ABOUT / Masaki Fujie：人物そのものを見る展示（壁・文章・額装した写真・床に置いた植物だけ）。
+ * 壁・文字・見出し・額・床は AboutMuseum.module.css と共通。ここでは並べ方と現れ方だけを決める。
+ */
+
+/*
+ * Masaki Fujie は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ）。
+ * 順路の案内から来たときは、進んだ向きの 12px 先から現れる（--room-step。AboutMuseum.module.css）
+ */
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: var(--room-step, 0px) 6px;
+  }
+}
+
+/* 床に置かれた植物の現れ方。順路の案内から来たときも横へはずらさない（--room-step を使わない） */
+@keyframes arrive-in-place {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+/* 札の細線を、左から引く */
+@keyframes line-draw {
+  from {
+    scale: 0 1;
+  }
+}
+
+/*
+ * 構図：文章は左、額（主展示）は文章の近く、植物は右端の床に鉢ごと置く。
+ * 文章と写真が1つの展示に見える距離に置き、額の右に植物のための余白を広めに残した非対称の壁にする。
+ * 文章の列は文章の幅より狭くしない（見出しが額に重ならない）。
+ */
+.archive {
+  --portrait-w: clamp(240px, 26vw, 400px);
+  --plant-w: clamp(200px, 24vw, 400px);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(max-content, 1fr) var(--portrait-w) minmax(0, 1.2fr);
+  column-gap: clamp(32px, 5vw, 96px);
+  align-items: center;
+  overflow: clip;
+  min-height: max(100svh, 680px);
+  /*
+   * 背の高い画面では文章の列を縦の中央に置くので、上の余白を館内案内の分（--nav-clearance）まで広げなくても、
+   * Menu を開いたときの項目（左上の約 200px まで）には届かない。広げると額と床が1画面に収まらないので広げない。
+   * 背の低い横長の画面は、下の media query で文章の列だけを下げる
+   */
+  padding: clamp(112px, 16svh, 168px) var(--gutter)
+    calc(var(--floor-h) + clamp(48px, 8svh, 96px));
+}
+
+/* 床。壁の前に立って展示を見ている、ごく浅い奥行きだけをつくる */
+.archive::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: var(--floor-h);
+  background: var(--floor-background);
+  background-blend-mode: var(--floor-blend);
+  mask-image: var(--floor-mask);
+  pointer-events: none;
+}
+
+.archiveText {
+  /* 写真より少し下に置き、2つの展示の高さをずらす */
+  padding-top: clamp(24px, 8svh, 96px);
+}
+
+/*
+ * 札は、ABOUT → Masaki Fujie → WEB ENGINEER → 本文 → 所在地 の順に、ごく短い時間差で現れる。
+ * 間は 90 → 120 → 150ms と少しずつ広げ、読む順に視線が降りていく速さにする。一文字ずつは出さない
+ */
+.archiveText h1 > *,
+.role,
+.introduction,
+.place {
+  animation: arrive 1.6s var(--ease-calm) both;
+}
+
+.archiveText h1 > :first-child {
+  animation-delay: 0.2s;
+}
+
+.archiveText h1 > :nth-child(2) {
+  animation-delay: 0.29s;
+}
+
+.role {
+  animation-delay: 0.41s;
+}
+
+.introduction {
+  animation-delay: 0.56s;
+}
+
+.place {
+  animation-delay: 0.71s;
+}
+
+/* 肩書き（WEB ENGINEER）。名前のすぐ下に、ABOUT の札と同じくらいの小ささで置き、色だけ少し濃くして札より少しだけ強くする */
+.role {
+  margin: 1.1rem 0 0;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--wall-ink);
+}
+
+/*
+ * 何をしている人かの短い文。日本語の字間は詰めて、文章として読ませる。
+ * /about の展示の札の本文（.lead）より、少しだけ大きく、行間は読みやすさを優先する
+ */
+.introduction {
+  display: grid;
+  gap: 1.1em;
+  margin-top: 2.2em;
+  font-size: clamp(14.5px, 1.1vw, 16px);
+  line-height: 2;
+  letter-spacing: 0.05em;
+}
+
+.introduction p {
+  margin: 0;
+}
+
+/* 幅の広い画面では、決めた位置で改行する */
+.line {
+  display: block;
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  margin: 2.8em 0 0;
+  font-size: 14px;
+  letter-spacing: 0.24em;
+  color: var(--wall-ink-muted);
+}
+
+/* 所在地の横の細線。札が現れ終わるころに、館内の案内が置かれたように一度だけ引かれる */
+.place::after {
+  content: "";
+  width: 56px;
+  border-top: 1px solid var(--wall-line);
+  transform-origin: left;
+  animation: line-draw 0.65s var(--ease-calm) 1.5s both;
+}
+
+/* 額は壁の中ほどの高さに掛け、この部屋の主展示にする */
+.portrait {
+  align-self: center;
+  margin: 0;
+  animation: arrive 1.6s var(--ease-calm) 0.5s both;
+}
+
+/* 共通の .frame（AboutMuseum.module.css）より強く指定する */
+.portrait .portraitFrame {
+  --frame: calc(var(--portrait-w) * 0.06);
+
+  /* 額の外形（910 x 1075）と同じ比率。写真（3:4）は上下を少しだけ切って収める */
+  aspect-ratio: 910 / 1075;
+}
+
+/*
+ * クワズイモ。展示物ではなく、展示室の床に置かれている植物として扱う。
+ * 鉢まで全体を見せ、右端に寄せて床の奥行きの中ほどに置く（壁際より少し手前）。
+ * 屋外の光で撮られた葉の彩度を落とし、壁と同じ暖かい室内の光に寄せる。
+ */
+.plant {
+  position: absolute;
+  right: clamp(12px, 3vw, 56px);
+  bottom: calc(var(--floor-h) * 0.3);
+  z-index: 1;
+  width: var(--plant-w);
+  pointer-events: none;
+  /* 床に置かれた植物なので、順路の案内から来たときも横からは現れず、その場で現れる（arrive-in-place） */
+  animation: arrive-in-place 1.6s var(--ease-calm) 0.8s both;
+}
+
+.plant img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: saturate(0.62) brightness(0.93) sepia(0.12);
+}
+
+/* 鉢の真下に落ちる、ごく薄い接地の影（床の上で横に広がる楕円） */
+.plant::before {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: -2.5%;
+  height: 7%;
+  background: radial-gradient(closest-side, rgb(40 30 20 / 0.22), rgb(40 30 20 / 0));
+}
+
+/*
+ * 背の低い横長の画面（1280×680・1366×768 など）：文章の列だけを、左上の館内案内を開いたときの項目（約 200px まで）の下（220px）から始める。
+ * 額と植物の位置はそのままにし、床の上の余白と本文の行間を少し詰めて、壁・額・床に置いた植物を1画面に収める
+ */
+@media (min-width: 761px) and (max-height: 820px) {
+  .archive {
+    padding-bottom: calc(var(--floor-h) + 16px);
+  }
+
+  .archiveText {
+    align-self: start;
+    padding-top: calc(220px - clamp(112px, 16svh, 168px));
+  }
+
+  .introduction {
+    gap: 0.7em;
+    margin-top: 1.6em;
+    line-height: 1.75;
+  }
+
+  .place {
+    margin-top: 1.8em;
+  }
+}
+
+/* 幅の狭い画面：文章 → 写真 → 植物の順に縦に並べる。植物は写真の下、右端の床に置く */
+@media (max-width: 760px) {
+  .archive {
+    --portrait-w: min(62vw, 300px);
+    --plant-w: min(44vw, 200px);
+
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(48px, 9svh, 72px);
+    min-height: auto;
+    /* 文章が上から並ぶ幅なので、左上の館内案内を開いたときの余白（--nav-clearance）より狭くしない */
+    padding-top: max(clamp(104px, 16svh, 132px), var(--nav-clearance));
+    /* 植物の葉が写真に重ならないよう、写真の下に植物の高さ（幅の約 1.19 倍）と床の分の余白を取る */
+    padding-bottom: calc(var(--plant-w) * 1.19 + var(--floor-h) * 0.3 + 24px);
+  }
+
+  .archiveText {
+    padding-top: 0;
+  }
+
+  /* 幅の狭い画面では決めた改行をやめ、語の切れ目で自然に折り返す */
+  .line {
+    display: inline;
+  }
+
+  .introduction p {
+    word-break: auto-phrase;
+  }
+
+  .portrait {
+    justify-self: center;
+    width: var(--portrait-w);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archiveText h1 > *,
+  .role,
+  .introduction,
+  .place,
+  .place::after,
+  .portrait,
+  .plant {
+    animation: none;
+  }
+}
