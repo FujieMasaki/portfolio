@@ -62,7 +62,7 @@ const ArchPassage = () => {
       return ARCHES.find((arch) => arch.href === link.getAttribute("href"));
     };
 
-    // 入口を選びそうな気配（hover・focus・指が触れた）で行き先を決めておき、窓の中の壁の画像を先に読み始める
+    // 入口を選びそうな気配（hover・focus・指が触れた）で行き先を決めておき、遷移先を先に読み始める
     const onIntent = (event: Event) => {
       const arch = archFor(event.target);
       if (!arch || passing || overlay.dataset.to === arch.id) return;

@@ -493,10 +493,10 @@
   pointer-events: none;
 }
 
-/* 館内（/about・/work）へ抜ける通路の暗がり。真っ黒にはせず、暖かいチャコールにする（globals.css の --passage-dark と同じ） */
+/* 館内（/about・/work）へ抜ける通路の暗がり。真っ黒にはせず、暖かいチャコールにする（色は globals.css の --passage-dark） */
 .passage[data-to="about"],
 .passage[data-to="work"] {
-  background: #1f1b18;
+  background: var(--passage-dark);
 }
 
 /* /contact は館の外。景色が現れる前の地（ContactMuseum.module.css の .contact）と同じ色 */

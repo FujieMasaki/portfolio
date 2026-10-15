@@ -12,7 +12,7 @@
   --color-accent-700: #7c5518;
   --color-hero-mist: #dde3e4;
 
-  /* アーチを通り抜けて館内へ入るときの暗がり（TopHero.module.css の .passage と同じ色） */
+  /* アーチを通り抜けて館内へ入るときの暗がり（TopHero.module.css の .passage と、着いた直後の body の地） */
   --passage-dark: #1f1b18;
 
   --header-height: 64px;
