@@ -1,5 +1,6 @@
 import Image from "next/image";
 import AmbientRoot from "@/components/museum/AmbientRoot";
+import LayeredBuilding, { type BuildingLayers } from "@/components/museum/LayeredBuilding";
 import ambientStyles from "@/components/museum/ambient.module.css";
 import MuseumNav from "@/components/museum/MuseumNav";
 import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
@@ -21,6 +22,15 @@ const LINKS = [
   { label: "X", href: "https://x.com/Maski23421424", hint: "（新しいタブで開く）", newTab: true },
 ];
 
+/** 建物を構成する5枚（どれも完成イメージと同じ約 1672 x 941 で、.building の位置に重ねる） */
+const BUILDING_LAYERS: BuildingLayers = {
+  base: "/images/contact/contact-building-base.png",
+  formShadow: "/images/contact/contact-building-form-shadow.png",
+  archDepth: "/images/contact/contact-building-arch-depth.png",
+  plantShadow: "/images/contact/contact-building-plant-shadow.png",
+  lightMask: "/images/contact/contact-building-light-mask.png",
+};
+
 /** TOP の Sky.tsx と同じ指定にし、TOP から来たときに同じ大きさの画像を使い回せるようにする */
 const SKY_SIZES =
   "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 110vw";
@@ -36,7 +46,7 @@ const BUILDING_SIZES =
  *
  * レイヤー（奥 → 手前）:
  *   1. sky      TOP と同じ海と空（top-bg-sea-sky.png）を左右反転して、館の反対側から見ていることにする
- *   2. building 美術館の背面とアーチ（植物の影は画像に含まれる。固定）
+ *   2. building 美術館の背面とアーチ。素地・陰・奥行き・植物の影・夕方の光の5枚を重ねる（LayeredBuilding。固定）
  *   3. plants   植物・琉球石灰岩（1枚の PNG。静止）
  *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / Mail・GitHub・X）
  *
@@ -73,16 +83,7 @@ const ContactMuseum = () => {
           <div className={styles.stage}>
             {/* 建物の画像が読めなかったときだけ見える、案内の下地（読めれば壁がすべて覆う） */}
             <div className={styles.wallFallback} aria-hidden="true" />
-            <div className={styles.building} aria-hidden="true">
-              <Image
-                src="/images/contact/contact-building-back.png"
-                alt=""
-                fill
-                loading="eager"
-                fetchPriority="high"
-                sizes={BUILDING_SIZES}
-              />
-            </div>
+            <LayeredBuilding layers={BUILDING_LAYERS} className={styles.building} sizes={BUILDING_SIZES} />
 
             <div className={styles.ground} aria-hidden="true" />
 
