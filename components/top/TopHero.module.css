@@ -486,8 +486,9 @@
   display: contents;
 }
 
-/* 通り抜けている間は、ほかの入口に反応させない */
-.passageScope[data-passage] .stage {
+/* 通り抜けている間は、ほかの入口に反応させない（部屋名のプレートは自分で pointer-events: auto を持つので、別に止める） */
+.passageScope[data-passage] .stage,
+.passageScope[data-passage] .archPlate {
   pointer-events: none;
 }
 
