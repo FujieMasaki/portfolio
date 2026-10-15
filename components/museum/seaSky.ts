@@ -11,7 +11,10 @@ export type SeaSkyLight = {
   filter: string;
   /** 空と海に重ねる光の色。上空・水平線・海の3点で、夕方は透明 */
   glaze: { sky: string; horizon: string; sea: string };
-  /** 景色全体に画面の上下からかかる空気の色（朝の青み・夜の静けさ）。夕方は透明 */
+  /**
+   * 景色全体に画面の上下からかかる空気の色（朝の青み・夜の静けさ）。夕方は透明。
+   * 朝・昼は空が明るくなるので、上側をわずかに沈め、空の上に置いた明るい文字（館名・Menu）を読ませる
+   */
   air: { top: string; bottom: string };
 };
 
@@ -25,7 +28,7 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
       horizon: "rgb(232 226 222 / 0.55)",
       sea: "rgb(80 104 132 / 0.26)",
     },
-    air: { top: "rgb(140 162 192 / 0.14)", bottom: "rgb(120 140 170 / 0.06)" },
+    air: { top: "rgb(66 80 106 / 0.16)", bottom: "rgb(120 140 170 / 0.06)" },
   },
   day: {
     filter: "saturate(0.4) brightness(1.08) contrast(0.94)",
@@ -34,7 +37,7 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
       horizon: "rgb(222 228 230 / 0.42)",
       sea: "rgb(48 92 128 / 0.16)",
     },
-    air: { top: CLEAR, bottom: CLEAR },
+    air: { top: "rgb(58 72 96 / 0.12)", bottom: CLEAR },
   },
   evening: {
     filter: "saturate(0.6) brightness(0.98) contrast(0.92)",
