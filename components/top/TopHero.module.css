@@ -644,7 +644,6 @@
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
-
   .sky img {
     object-position: 50% 0%;
   }

@@ -142,7 +142,7 @@ const ArchPassage = ({ children }: Props) => {
 
     Promise.all(animations.current.map((animation) => animation.finished))
       .then(() => {
-        // 順路の案内で TOP へ戻った直後なら、その印が残っているので外し、着地の動きを1つにする
+        // 順路の案内の印が残っていれば外し、着地の動きを1つにする（念のため。TOP へ戻る順路の案内は印を付けない）
         clearMark("roomStep");
         setMark("arrival", "passage", "passage-arrive");
         router.push(arch.href);
