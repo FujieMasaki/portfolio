@@ -5,6 +5,8 @@
  * 色と濃さは型を登録した変数にし、外枠（.root）で補間して子のレイヤーへそのまま引き継ぐ。
  * filter は型を登録できないので、各ページの CSS で、filter を持つレイヤーごとに transition を付ける。
  * 時間帯が見えている間に変わったとき（境界の時刻・タブに戻ったとき）は、気づいたら光が変わっていた程度に馴染ませる。
+ * hydration の直後に夕方から実際の時間帯へ移るときは、舞台のフェードインと重ならないよう馴染ませない
+ * （AmbientRoot が描画の落ち着いた後に data-ambient-settled を付ける）。
  */
 
 @property --ambient-glaze-sky {
@@ -57,6 +59,10 @@
     --ambient-air-bottom, --ambient-haze, --ambient-vignette;
   transition-duration: var(--ambient-fade);
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.root:not([data-ambient-settled]) {
+  --ambient-fade: 0s;
 }
 
 /*
