@@ -279,7 +279,7 @@
   text-shadow: 0 0 3px rgb(0 0 0 / 0.65);
 }
 
-/* 小さいリンクは、ふだん少しだけ落としている濃さを夜は落とさない */
+/* 小さいリンクは、ふだん少しだけ落としている濃さを夜・深夜は落とさない */
 .contact:is([data-ambient="night"], [data-ambient="midnight"]) .link {
   opacity: 1;
 }
@@ -287,6 +287,14 @@
 /* 建物の画像が読めなかったときの下地も、夜の壁の暗さにそろえる（淡い文字が読めるように） */
 .contact:is([data-ambient="night"], [data-ambient="midnight"]) .wallFallback {
   background: rgb(92 88 82);
+}
+
+/*
+ * 深夜は景色にかかる空気（.atmosphere）が夜より濃く、文字と下地の両方に重なって、淡い文字のコントラストが下がる。
+ * 下地を一段暗くして、文字の 4.5:1 を保つ
+ */
+.contact[data-ambient="midnight"] .wallFallback {
+  background: rgb(70 67 63);
 }
 
 /* CONTACT の札（/about の .eyebrow と同じ字間。大きさだけ舞台に合わせる） */
