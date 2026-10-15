@@ -45,6 +45,12 @@
   initial-value: 1;
 }
 
+@property --ambient-sky-shade {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 @property --ambient-vignette {
   syntax: "<number>";
   inherits: true;
@@ -56,7 +62,7 @@
 
   transition-property:
     --ambient-glaze-sky, --ambient-glaze-horizon, --ambient-glaze-sea, --ambient-air-top,
-    --ambient-air-bottom, --ambient-haze, --ambient-vignette;
+    --ambient-air-bottom, --ambient-sky-shade, --ambient-haze, --ambient-vignette;
   transition-duration: var(--ambient-fade);
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -79,6 +85,19 @@
     var(--ambient-glaze-horizon) calc(var(--horizon) - 0.3%),
     var(--ambient-glaze-sea) calc(var(--horizon) + 1.5%),
     var(--ambient-glaze-sea)
+  );
+}
+
+/*
+ * 縦長の画面で、空の上端（館名・Menu を置く帯）を沈める層。朝・昼だけ効く（--ambient-sky-shade。夕方・夜は 0）。
+ * 各ページの縦長の .atmosphere が background の1枚として使う
+ */
+.root {
+  --ambient-sky-shade-layer: linear-gradient(
+    to bottom,
+    rgb(30 38 54 / var(--ambient-sky-shade)),
+    rgb(30 38 54 / var(--ambient-sky-shade)) 14%,
+    transparent 28%
   );
 }
 

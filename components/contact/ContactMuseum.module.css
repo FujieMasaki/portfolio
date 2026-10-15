@@ -387,7 +387,8 @@
     background:
       linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 20%),
       linear-gradient(to bottom, rgb(40 36 52 / 0.22), transparent 30%),
-      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
   }
 }
 

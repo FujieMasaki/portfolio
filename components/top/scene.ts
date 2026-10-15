@@ -154,7 +154,10 @@ export type TopAmbient = {
   sceneFilter: string;
   /** About / Work の室内灯。brightness → saturate */
   interiorFilter: string;
-  /** 周辺減光の強さ（夕方 = 1） */
+  /**
+   * 周辺減光の強さ（夕方 = 1）。左下の館名は植物の上で読ませているので、朝・昼も大きくは弱めない
+   * （昼に 0.5 まで弱めると、琉球石灰岩の明るい斑の上でコントラストが 3.5:1 まで下がった）
+   */
   vignette: number;
 };
 
@@ -164,14 +167,14 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
     sceneFilter: "saturate(0.66) brightness(0.8)",
     interiorFilter: "brightness(0.92) saturate(0.8)",
-    vignette: 0.75,
+    vignette: 0.9,
   },
   day: {
     haze: 0.5,
     buildingFilter: "sepia(0) brightness(1.02) contrast(1)",
     sceneFilter: "saturate(0.78) brightness(0.94)",
     interiorFilter: "brightness(0.84) saturate(0.66)",
-    vignette: 0.5,
+    vignette: 0.85,
   },
   evening: {
     haze: 1,

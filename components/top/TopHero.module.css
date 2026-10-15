@@ -519,6 +519,16 @@
   pointer-events: none;
 }
 
+/*
+ * 朝・昼は植物と空が明るくなり、左下の琉球石灰岩の明るい斑や上の空の上で館名が沈むので、
+ * 文字の縁にだけ細い影を足す（夕方・夜は今のまま）
+ */
+.hero:is([data-ambient="morning"], [data-ambient="day"]) .plaque {
+  text-shadow:
+    0 0 3px rgb(0 0 0 / 0.5),
+    0 1px 12px rgb(0 0 0 / 0.4);
+}
+
 .name {
   margin: 0;
   font-family: var(--font-heading), serif;
@@ -709,7 +719,8 @@
         transparent 75%,
         rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
       ),
-      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
   }
 
   /* 舞台の上端で切れる木々の梢を空へ溶かす */
