@@ -27,8 +27,19 @@ type Props = {
   sizes: string;
 };
 
-/** 光のマスクは柔らかい階調だけなので、元の寸法では読まず、この幅に縮めたものを使う */
-const LIGHT_MASK_WIDTH = 1200;
+/**
+ * CSS のマスク（光の範囲・素地の外形）は、元の寸法では読まず、この幅に縮めたものを使う。
+ * getImageProps の src は width の 2 倍の候補になるので、600 で 1200px 幅の画像になる
+ */
+const MASK_WIDTH = 600;
+
+/** CSS の mask-image に渡す、最適化済みの（縮めた WebP / AVIF の）URL */
+const maskUrl = (src: string) => {
+  const {
+    props: { src: optimized },
+  } = getImageProps({ src, alt: "", width: MASK_WIDTH, height: MASK_WIDTH / 2 });
+  return `url("${optimized}")`;
+};
 
 /**
  * 2.5D の建物。5枚を同じ外枠の中で position: absolute; inset: 0 に完全に重ね、
@@ -38,15 +49,16 @@ const LIGHT_MASK_WIDTH = 1200;
  * 外枠は isolation で閉じ、multiply が背後の空や海と混ざらないようにする。
  */
 const LayeredBuilding = ({ layers, className, style, sizes }: Props) => {
-  // CSS の mask-image に、最適化済みの（縮めた WebP / AVIF の）URL を渡す
-  const {
-    props: { src: lightMaskSrc },
-  } = getImageProps({ src: layers.lightMask, alt: "", width: LIGHT_MASK_WIDTH, height: LIGHT_MASK_WIDTH / 2 });
-
   return (
     <div
       className={`${styles.building} ${className}`}
-      style={{ ...style, "--building-light-mask": `url("${lightMaskSrc}")` } as CSSProperties}
+      style={
+        {
+          ...style,
+          "--building-light-mask": maskUrl(layers.lightMask),
+          "--building-base-mask": maskUrl(layers.base),
+        } as CSSProperties
+      }
       aria-hidden="true"
     >
       <Image

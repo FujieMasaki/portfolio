@@ -7,7 +7,7 @@ import { seaSkyVariables } from "@/components/museum/seaSky";
  *
  * TOP と同じ美術館の裏側なので、海と空と空気は TOP と同じ値（components/museum/seaSky.ts）を使い、
  * 建物と植物は TOP の明るさの関係（components/top/scene.ts の TOP_AMBIENTS）にそろえる。
- * 素材が TOP と違い、夕方の基準の値が少し違うので、値はこのページで持つ。夕方は今の見た目のまま。
+ * 素材が TOP と違い、夕方の基準の値が少し違うので、値はこのページで持つ。建物の夕方は素材のまま（何も変えない値）。
  * 壁の案内の文字は、暗いコンクリートの上でも読めるよう夜・深夜に明るくする（ContactMuseum.module.css の [data-ambient="night"] など）。
  *
  * filter は時間帯の間で滑らかに移るよう、どの時間帯も同じ関数を同じ順に並べる。

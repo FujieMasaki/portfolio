@@ -186,13 +186,17 @@
   height: 68%;
   /*
    * 素地・陰・奥行き・植物の影・夕方の光の5枚（components/museum/LayeredBuilding）。
-   * 素地が TOP より冷たいグレーなので、夕方の光と葉影を TOP より少しだけ強める。
+   * 素地が TOP より冷たいグレーなので、夕方の光を TOP より少しだけ強める。
+   * 葉影の素材は壁のほとんどが影に入った暗い絵なので、強く持ち上げて葉の形だけを残し、
+   * 陰の3層は案内の文字が 4.5:1 を保てる濃さに抑える（素材から合成した計算で、案内の範囲の中央値 約 5.2:1）。
    * ほかの時間帯は、その上から filter で暗さを寄せる（./ambient.ts。夕方は何も変えない値）
    */
   filter: var(--ambient-building-filter);
   transition: filter var(--ambient-fade) var(--ease-calm);
-  --building-form-shadow-opacity: 0.38;
-  --building-plant-shadow-opacity: 0.32;
+  --building-form-shadow-opacity: 0.35;
+  --building-arch-depth-opacity: 0.4;
+  --building-plant-shadow-opacity: 0.25;
+  --building-plant-shadow-lift: 2;
   --building-light-color: rgb(214 152 94 / 0.3);
 
   pointer-events: none;
