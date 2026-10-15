@@ -34,7 +34,7 @@ type Props = {
  */
 const MASK_WIDTH = 600;
 
-/** CSS の mask-image に使う、最適化済みの（縮めた WebP / AVIF の）画像の URL */
+/** CSS の mask-image に使う、最適化済みの（縮めた WebP の）画像の URL */
 const maskSrc = (src: string) => {
   return getImageProps({ src, alt: "", width: MASK_WIDTH, height: MASK_WIDTH / 2 }).props.src;
 };
