@@ -28,7 +28,7 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
       horizon: "rgb(232 226 222 / 0.55)",
       sea: "rgb(80 104 132 / 0.26)",
     },
-    air: { top: "rgb(66 80 106 / 0.16)", bottom: "rgb(120 140 170 / 0.06)" },
+    air: { top: "rgb(66 80 106 / 0.22)", bottom: "rgb(120 140 170 / 0.06)" },
   },
   day: {
     filter: "saturate(0.4) brightness(1.08) contrast(0.94)",
@@ -37,7 +37,7 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
       horizon: "rgb(222 228 230 / 0.42)",
       sea: "rgb(48 92 128 / 0.16)",
     },
-    air: { top: "rgb(58 72 96 / 0.12)", bottom: CLEAR },
+    air: { top: "rgb(58 72 96 / 0.18)", bottom: CLEAR },
   },
   evening: {
     filter: "saturate(0.6) brightness(0.98) contrast(0.92)",
