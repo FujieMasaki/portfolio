@@ -1,24 +1,20 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import AmbientRoot from "@/components/museum/AmbientRoot";
+import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
 import ArchEntrance from "./ArchEntrance";
 import ArchSigns from "./ArchSigns";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
 import {
-  AMBIENTS,
   ARCHES,
   BUILDING,
   FOLIAGE_SWAY,
   FOREGROUND,
+  TOP_AMBIENT_VARIABLES,
   toPercentBox,
-  type AmbientId,
 } from "./scene";
 import styles from "./TopHero.module.css";
-
-type Props = {
-  /** 時間帯演出を足すときはここに現在の時間帯を渡す（scene.ts の AMBIENTS を参照） */
-  ambient?: AmbientId;
-};
 
 /**
  * TOP のヒーロー。海辺の小さな私設美術館の入口として、3つのアーチを About / Work / Contact の入口にする。
@@ -30,15 +26,20 @@ type Props = {
  *   4. building   建物本体（開口部は透過）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
  *      sway       風で揺らす枝・葉（scene.ts の FOLIAGE_SWAY。初期実装では空）
- *   6. atmosphere 周辺減光と夕方の光
+ *   6. atmosphere 周辺減光と、時間帯の空気の色
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
+ *
+ * 光・霞・室内灯・空気は訪問者のローカル時刻で変わる（AmbientRoot が scene.ts の TOP_AMBIENT_VARIABLES を
+ * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
  */
-const TopHero = ({ ambient = "evening" }: Props) => {
-  const { background, backgroundFilter, buildingFilter, sceneFilter } =
-    AMBIENTS[ambient];
-
+const TopHero = () => {
   return (
-    <section className={styles.hero} aria-labelledby="top-title">
+    <AmbientRoot
+      as="section"
+      className={styles.hero}
+      labelledBy="top-title"
+      variables={TOP_AMBIENT_VARIABLES}
+    >
       {/* 読み上げ・Tab の順で、館名がメニューより先に来るよう舞台より前に置く（見た目は absolute で左下） */}
       <header className={styles.plaque}>
         <h1 className={styles.name} id="top-title">
@@ -48,11 +49,11 @@ const TopHero = ({ ambient = "evening" }: Props) => {
       </header>
 
       <ParallaxStage className={styles.stage}>
-        <Sky background={background} backgroundFilter={backgroundFilter} />
+        <Sky background={SEA_SKY_BACKGROUND} />
 
         <div
           className={styles.plantsBack}
-          style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
+          style={toPercentBox(FOREGROUND)}
           aria-hidden="true"
         >
           <Image
@@ -70,15 +71,14 @@ const TopHero = ({ ambient = "evening" }: Props) => {
             <ArchEntrance
               key={arch.id}
               arch={arch}
-              background={background}
-              backgroundFilter={backgroundFilter}
+              background={SEA_SKY_BACKGROUND}
             />
           ))}
         </nav>
 
         <div
           className={styles.building}
-          style={{ ...toPercentBox(BUILDING), filter: buildingFilter }}
+          style={toPercentBox(BUILDING)}
           aria-hidden="true"
         >
           <Image
@@ -93,7 +93,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
 
         <div
           className={styles.plantsFront}
-          style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
+          style={toPercentBox(FOREGROUND)}
           aria-hidden="true"
         >
           <Image
@@ -113,7 +113,6 @@ const TopHero = ({ ambient = "evening" }: Props) => {
             style={
               {
                 ...toPercentBox(layer.rect),
-                filter: sceneFilter,
                 transformOrigin: layer.origin,
                 "--sway-angle": `${layer.angle}deg`,
                 "--sway-duration": `${layer.duration}s`,
@@ -135,7 +134,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
         {/* .stage:not([data-ready]) と同じ詳細度にし、後に出るこちらを勝たせる */}
         <style>{`.${styles.stage}:not([data-ready]){opacity:1;visibility:visible;animation:none}`}</style>
       </noscript>
-    </section>
+    </AmbientRoot>
   );
 };
 

@@ -106,24 +106,27 @@
   animation: sea-breathe 11s ease-in-out infinite alternate;
 }
 
-/* 霞：水平線の帯と、建物の左右奥の遠景にだけ。霧と分かるほど白くしない */
+/*
+ * 霞：水平線の帯と、建物の左右奥の遠景にだけ。霧と分かるほど白くしない。
+ * 濃さは時間帯で変わる（--ambient-haze。夕方 = 1 で下の値のまま）
+ */
 .haze {
   background:
     linear-gradient(
       to bottom,
       transparent calc(var(--horizon) - 8%),
-      rgb(238 228 224 / 0.07) calc(var(--horizon) - 0.5%),
-      rgb(238 228 224 / 0.05) calc(var(--horizon) + 2%),
+      rgb(238 228 224 / calc(0.07 * var(--ambient-haze))) calc(var(--horizon) - 0.5%),
+      rgb(238 228 224 / calc(0.05 * var(--ambient-haze))) calc(var(--horizon) + 2%),
       transparent calc(var(--horizon) + 12%)
     ),
     radial-gradient(
       ellipse 16% 12% at 10% var(--horizon),
-      rgb(238 228 224 / 0.06),
+      rgb(238 228 224 / calc(0.06 * var(--ambient-haze))),
       transparent 70%
     ),
     radial-gradient(
       ellipse 16% 12% at 90% var(--horizon),
-      rgb(238 228 224 / 0.06),
+      rgb(238 228 224 / calc(0.06 * var(--ambient-haze))),
       transparent 70%
     );
   animation: haze-drift 120s ease-in-out infinite alternate;
@@ -409,6 +412,32 @@
 }
 
 /*
+ * 夜は建物が暗くなり、濃い文字が沈むので、灯りを受けた淡い色の文字と線にする。
+ * 選ばれた入口だけ少し明るくする関係は昼と同じ
+ */
+.hero[data-ambient="night"] .archPlate {
+  color: rgb(226 216 200 / 0.84);
+  border-color: rgb(214 202 184 / 0.34);
+}
+
+.hero[data-ambient="night"] .stage:has(.arch[data-arch="about"]:focus-visible) .archSign[data-arch="about"] .archPlate,
+.hero[data-ambient="night"] .stage:has(.arch[data-arch="work"]:focus-visible) .archSign[data-arch="work"] .archPlate,
+.hero[data-ambient="night"] .stage:has(.arch[data-arch="contact"]:focus-visible) .archSign[data-arch="contact"] .archPlate {
+  color: rgb(240 232 218 / 0.96);
+  border-color: rgb(226 214 196 / 0.52);
+}
+
+@media (hover: hover) {
+  .hero[data-ambient="night"] .archPlate:hover,
+  .hero[data-ambient="night"] .stage:has(.arch[data-arch="about"]:hover) .archSign[data-arch="about"] .archPlate,
+  .hero[data-ambient="night"] .stage:has(.arch[data-arch="work"]:hover) .archSign[data-arch="work"] .archPlate,
+  .hero[data-ambient="night"] .stage:has(.arch[data-arch="contact"]:hover) .archSign[data-arch="contact"] .archPlate {
+    color: rgb(240 232 218 / 0.96);
+    border-color: rgb(226 214 196 / 0.52);
+  }
+}
+
+/*
  * Contact：アーチの奥、遠くの海の上を時折横切るリュウキュウツバメ。
  * 軌道（位置・向き）は SwallowFlyby.tsx が飛ぶたびに作る。ここでは見え方と羽ばたきだけ。
  * アイコンに見えないよう、真っ黒にせず夕方の海に馴染む濃さにし、輪郭をわずかに霞ませる。
@@ -437,7 +466,10 @@
   animation: foliage-sway var(--sway-duration) ease-in-out infinite alternate;
 }
 
-/* 6. 周辺減光と夕方の光 */
+/*
+ * 6. 周辺減光と空気。周辺減光の強さ（--ambient-vignette）と上下からかかる空気の色（--ambient-air-*。/contact と共有）は
+ * 時間帯で変わる。夕方は減光が下の値のまま、空気の色は透明
+ */
 .atmosphere {
   inset: 0;
   pointer-events: none;
@@ -445,9 +477,10 @@
     radial-gradient(
       ellipse 70% 60% at 50% 52%,
       transparent 55%,
-      rgb(16 18 14 / 0.38) 100%
+      rgb(16 18 14 / calc(0.38 * var(--ambient-vignette))) 100%
     ),
-    linear-gradient(to bottom, rgb(40 36 52 / 0.12), transparent 30%);
+    linear-gradient(to bottom, rgb(40 36 52 / 0.12), transparent 30%),
+    linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
 }
 
 /* 館名のプレート */
@@ -476,6 +509,40 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   opacity: 0.72;
+}
+
+/*
+ * 時間帯の光（値は scene.ts の TOP_AMBIENTS と components/museum/seaSky.ts。AmbientRoot が .hero に CSS 変数として流す）。
+ * 建物・植物・アーチの形は変えず、光の量と色温度だけを filter で寄せる。
+ * 色と濃さの補間、--ambient-fade、prefers-reduced-motion の扱いは components/museum/ambient.module.css
+ */
+.sky img,
+.archView {
+  filter: var(--ambient-sky-filter);
+}
+
+.building {
+  filter: var(--ambient-building-filter);
+}
+
+.plantsBack,
+.plantsFront,
+.sway {
+  filter: var(--ambient-scene-filter);
+}
+
+/* About / Work の室内灯。夜だけ少し存在感が増し、昼はほとんど目立たない */
+.archImage {
+  filter: var(--ambient-interior-filter);
+}
+
+.sky img,
+.archView,
+.building,
+.plantsBack,
+.plantsFront,
+.archImage {
+  transition: filter var(--ambient-fade) var(--ease-calm);
 }
 
 @keyframes stage-arrive {
@@ -596,13 +663,15 @@
 
   .atmosphere {
     top: calc(-1 * var(--sky-above));
-    background: linear-gradient(
-      to bottom,
-      rgb(40 36 52 / 0.16),
-      transparent 40%,
-      transparent 75%,
-      rgb(16 18 14 / 0.35)
-    );
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(40 36 52 / 0.16),
+        transparent 40%,
+        transparent 75%,
+        rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
+      ),
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
   }
 
   /* 舞台の上端で切れる木々の梢を空へ溶かす */
