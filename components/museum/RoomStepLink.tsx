@@ -18,7 +18,16 @@ const EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
  *   leaving   いま退いている展示の動き。途中でページを離れたら取り消す
  */
 let stepping = false;
-let leaving: Animation | null = null;
+let leaving: Animation[] = [];
+
+/**
+ * 退かせる要素。床を持つ箱（data-room-floor。床は ::before / ::after で描く）は動かさず、その中身だけを動かす。
+ * 床を含まない箱は、箱ごと動かす
+ */
+const stepTargets = (container: Element): Element[] =>
+  Array.from(container.children).flatMap((child) =>
+    child.matches("[data-room-floor]") || child.querySelector("[data-room-floor]") ? stepTargets(child) : [child],
+  );
 
 type Props = ComponentProps<typeof Link> & {
   href: string;
@@ -29,11 +38,12 @@ type Props = ComponentProps<typeof Link> & {
 /**
  * 順路の案内（MuseumRoomNavigation）のリンク。隣の展示室へ数歩進んだ感覚だけを出す。
  *
- *   1. いまの展示（main）を、進む向きと逆へ 12px ずらしながら薄くする
+ *   1. いまの展示（文字・額・展示台・案内）を、進む向きと逆へ 12px ずらしながら薄くする。壁と床は動かさない
  *   2. <html data-room-step> に向きを残して遷移する
- *   3. 次の部屋の main は、その向きの 12px 先から静かに着地する（AboutMuseum.module.css・ContactMuseum.module.css）
+ *   3. 次の部屋では、壁と床はそのままで、入ってすぐの札・展示が、その向きの 12px 先から時間差で着地する
+ *      （AboutMuseum.module.css。/contact は ContactMuseum.module.css）
  *
- * 横にスライドするページ送りには見せない（距離は数 px、館内の壁は動かさない）。
+ * 横にスライドするページ送りには見せない（距離は数 px、建物の壁と床は動かさない）。
  * /contact は景色ごと main の中にあるので、景色も一緒に数 px ずれて、館の外の暗い地の上で入れ替わる。
  * 修飾キー付きのクリック・prefers-reduced-motion・Web Animations が無い環境では、通常の Link と同じ。
  */
@@ -44,8 +54,8 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
   // Web Animations は React の外の動きなので、この後片付けだけを effect に置く
   useEffect(
     () => () => {
-      leaving?.cancel();
-      leaving = null;
+      leaving.forEach((animation) => animation.cancel());
+      leaving = [];
       stepping = false;
     },
     [],
@@ -65,26 +75,29 @@ const RoomStepLink = ({ href, direction, onClick, ...props }: Props) => {
     stepping = true;
     const sign = direction === "next" ? -1 : 1;
 
-    leaving = main.animate(
-      { opacity: [1, 0], translate: ["0 0", `${sign * STEP_PX}px 0`] },
-      { duration: EXIT_MS, easing: EASE, fill: "forwards" },
+    // 始まりは今の見え方（まだ現れていない展示は透明のまま）から、薄くなりながら退く
+    leaving = stepTargets(main).map((target) =>
+      target.animate(
+        { opacity: 0, translate: `${sign * STEP_PX}px 0` },
+        { duration: EXIT_MS, easing: EASE, fill: "forwards" },
+      ),
     );
 
     // 退いている途中で「動きを減らす」に変わったら、退く動きをその場で終わらせ、遷移はそのまま続ける
     // （cancel すると finished が reject され、遷移まで止まるので finish する）。見張るのは退いている間だけ
     const finishNow = () => {
-      if (reducedMotion.matches) leaving?.finish();
+      if (reducedMotion.matches) leaving.forEach((animation) => animation.finish());
     };
     reducedMotion.addEventListener("change", finishNow);
 
-    leaving.finished
+    Promise.all(leaving.map((animation) => animation.finished))
       .then(() => {
-        leaving = null;
+        leaving = [];
         if (!main.isConnected) return;
         // 次の部屋に印を残す。入口（TOP）には着地の動きが無いので、印を残さない。
-        // 印を付けてから遷移するまでの間は、退いたこの部屋の main にも着地の動きがかかる（見えない）ので、それの終わりは数えない
+        // 印を付けてから遷移するまでの間は、退いたこの部屋にも着地の動きがかかる（見えない）ので、それの終わりは数えない
         clearMark("roomStep");
-        if (href !== "/") setMark("roomStep", direction, "room-step", main);
+        if (href !== "/") setMark("roomStep", direction, "room-step", main.parentElement ?? main);
         router.push(href);
       })
       // 取り消された（ページを離れた）ときは遷移しない

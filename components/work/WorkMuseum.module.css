@@ -64,10 +64,11 @@
   letter-spacing: 0.06em;
 }
 
+/* 順路の案内から来たときは、進んだ向きの 12px 先から現れる（--room-step。AboutMuseum.module.css） */
 @keyframes arrive {
   from {
     opacity: 0;
-    translate: 0 6px;
+    translate: var(--room-step, 0px) 6px;
   }
 }
 

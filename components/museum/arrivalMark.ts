@@ -23,7 +23,8 @@ export const clearMark = (name: MarkName) => clears[name]?.();
 
 /**
  * 印を付け、名前に animationName を含む着地の動きが終わったら外す。
- * ignore には、印を付けてから遷移するまでの間に着地の動きがかかってしまう、今の部屋の要素を渡す（その終わりは数えない）
+ * ignore には、今の部屋の要素を渡す。印を付けてから遷移するまでの間は、今の部屋にも着地の動きがかかる（見えない）ので、
+ * その中の動きの終わりは数えない
  */
 export const setMark = (name: MarkName, value: string, animationName: string, ignore?: Element) => {
   clearMark(name);
@@ -36,7 +37,8 @@ export const setMark = (name: MarkName, value: string, animationName: string, ig
     if (clears[name] === clear) delete clears[name];
   };
   const onEnd = (end: AnimationEvent) => {
-    if (end.target !== ignore && end.animationName.includes(animationName)) clear();
+    const inIgnored = ignore && end.target instanceof Node && ignore.contains(end.target);
+    if (!inIgnored && end.animationName.includes(animationName)) clear();
   };
   root.dataset[name] = value;
   document.addEventListener("animationend", onEnd);

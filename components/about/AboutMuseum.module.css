@@ -150,20 +150,29 @@
 }
 
 /*
- * 順路の案内（RoomStepLink）から来たときだけ、展示（main）が進んだ向きの 12px 先から静かに着地する。
- * 壁（.museum の背景）は動かさない。印（<html data-room-step>）は、この動きが終わると RoomStepLink が外す。
+ * 順路の案内（RoomStepLink）から来たときは、壁と床は動かさず、入ってすぐの札・展示が、それぞれの現れ方（arrive）の
+ * 時間差のまま、進んだ向きの 12px 先から着地する（--room-step を Personal・WorkMuseum の arrive が使う）。
+ * 印（<html data-room-step>）は、札・展示が現れ終わるころ（room-step-hold の終わり）に RoomStepLink が外す。
+ * それより先に外すと、--room-step が途中で 0 に戻り、現れている途中の札が横に跳ぶ
  */
 @media (prefers-reduced-motion: no-preference) {
-  :global(:root[data-room-step="next"]) .museum > main {
+  :global(:root[data-room-step="next"]) .museum {
     --room-step: 12px;
 
-    animation: room-step 1.3s var(--ease-calm) both;
+    animation: room-step-hold 2.4s linear;
   }
 
-  :global(:root[data-room-step="previous"]) .museum > main {
+  :global(:root[data-room-step="previous"]) .museum {
     --room-step: -12px;
 
-    animation: room-step 1.3s var(--ease-calm) both;
+    animation: room-step-hold 2.4s linear;
+  }
+}
+
+/* 見た目は変えず、札・展示の arrive が終わるまでの時間だけを数える */
+@keyframes room-step-hold {
+  to {
+    --room-step-hold: 1;
   }
 }
 
@@ -182,13 +191,6 @@
   from {
     opacity: 0;
     translate: 0 4px;
-  }
-}
-
-@keyframes room-step {
-  from {
-    opacity: 0;
-    translate: var(--room-step) 0;
   }
 }
 

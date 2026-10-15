@@ -81,7 +81,8 @@ const WorkMuseum = () => {
         <Projects />
         <Studies />
 
-        <div className={styles.floor}>
+        {/* 床（.floor::before）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink） */}
+        <div className={styles.floor} data-room-floor>
           <MuseumRoomNavigation
             previous={{ label: "Previous room", title: "About", href: "/about" }}
             next={{ label: "Next room", title: "Contact", href: "/contact" }}

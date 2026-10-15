@@ -16,7 +16,12 @@ const INTRODUCTION = [
  */
 const Personal = () => {
   return (
-    <section className={styles.archive} aria-labelledby="person-title">
+    <section
+      className={styles.archive}
+      aria-labelledby="person-title"
+      // 床（.archive::after）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink）
+      data-room-floor
+    >
       <div className={styles.archiveText}>
         <h1 className={shared.heading} id="person-title">
           <span className={shared.eyebrow}>About</span>

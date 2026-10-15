@@ -3,11 +3,14 @@
  * 壁・文字・見出し・額・床は AboutMuseum.module.css と共通。ここでは並べ方と現れ方だけを決める。
  */
 
-/* Masaki Fujie は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ） */
+/*
+ * Masaki Fujie は入った直後に見える展示なので、読み込み時に一度だけ現す（TOP の館名プレートと同じ速さ）。
+ * 順路の案内から来たときは、進んだ向きの 12px 先から現れる（--room-step。AboutMuseum.module.css）
+ */
 @keyframes arrive {
   from {
     opacity: 0;
-    translate: 0 6px;
+    translate: var(--room-step, 0px) 6px;
   }
 }
 
