@@ -127,6 +127,9 @@
  * 空の箱は画面ではなく舞台に合わせ（動いても端が見えないよう 4% 大きく）、どの縦横比でも水平線と建物の位置関係を変えない。
  */
 .sky {
+  /* 箱の中での水平線の高さ。時間帯の光の色（.glaze）を水平線で空と海に分ける */
+  --horizon: 57.2%;
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -145,6 +148,8 @@
 }
 
 .skyFlip img {
+  filter: var(--ambient-sky-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
   object-fit: cover;
   /* 水平線を、舞台の上から約 58% に置く（建物の足元より上、アーチの開口部の中ほど） */
   object-position: 50% 8%;
@@ -179,8 +184,12 @@
   top: calc(200 / 941 * 100%);
   width: 68%;
   height: 68%;
-  /* 夕方の光の橙を落ち着かせ、TOP の建物（ライトグレーのコンクリート）に寄せる */
-  filter: saturate(0.62) brightness(0.97);
+  /*
+   * 夕方の光の橙を落ち着かせ、TOP の建物（ライトグレーのコンクリート）に寄せる。
+   * 時間帯で変わる（./ambient.ts。夕方は saturate(0.62) brightness(0.97)）
+   */
+  filter: var(--ambient-building-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
   pointer-events: none;
 }
 
@@ -217,11 +226,16 @@
  */
 .plants {
   inset: 0;
-  filter: saturate(0.72) brightness(0.84);
+  /* 時間帯で変わる（./ambient.ts。夕方は saturate(0.72) brightness(0.84)） */
+  filter: var(--ambient-plants-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
   pointer-events: none;
 }
 
-/* 夕方の空気。足元（順路の案内）と左上（Menu）を少しだけ沈め、明るい文字を読ませる */
+/*
+ * 空気。足元（順路の案内）と左上（Menu）を少しだけ沈め、明るい文字を読ませる。
+ * 最後の層は時間帯の空気の色（TOP と共有。夕方は透明）
+ */
 .atmosphere {
   position: absolute;
   inset: 0;
@@ -229,7 +243,8 @@
   background:
     linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 24%),
     radial-gradient(ellipse 30% 26% at 0% 0%, rgb(16 18 14 / 0.3), transparent 100%),
-    linear-gradient(to bottom, rgb(40 36 52 / 0.1), transparent 30%);
+    linear-gradient(to bottom, rgb(40 36 52 / 0.1), transparent 30%),
+    linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom));
 }
 
 /* ---- 4. 壁の案内 ---- */
@@ -249,6 +264,29 @@
 
   color: var(--wall-ink);
   text-shadow: none;
+}
+
+/*
+ * 夜は壁が暗くなるので、灯りを受けた淡い色の文字と線にする。
+ * 景色の空気（.atmosphere）が文字の上にも重なって少し沈むので、文字はほぼ白に近づけ、縁に細い影を足す
+ * （1440px 幅で実測し、札・リンクが 3.5:1 だったのを 4.5:1 以上にした）
+ */
+.contact[data-ambient="night"] .sign {
+  --wall-ink: rgb(248 243 234);
+  --wall-ink-muted: rgb(240 233 220);
+  --wall-line: rgb(226 216 200 / 0.46);
+
+  text-shadow: 0 0 3px rgb(0 0 0 / 0.65);
+}
+
+/* 小さいリンクは、ふだん少しだけ落としている濃さを夜は落とさない */
+.contact[data-ambient="night"] .link {
+  opacity: 1;
+}
+
+/* 建物の画像が読めなかったときの下地も、夜の壁の暗さにそろえる（淡い文字が読めるように） */
+.contact[data-ambient="night"] .wallFallback {
+  background: rgb(92 88 82);
 }
 
 /* CONTACT の札（/about の .eyebrow と同じ字間。大きさだけ舞台に合わせる） */
@@ -376,6 +414,8 @@
    * 舞台の上端は「画面の高さ − 舞台の高さ」、水平線はそこから 0.58 × 舞台の高さ。箱は縦長なので画像は高さで合う
    */
   .sky {
+    --horizon: 44.9%;
+
     top: 0;
     left: -2%;
     width: 104%;
@@ -394,7 +434,9 @@
   .atmosphere {
     background:
       linear-gradient(to top, rgb(16 18 14 / 0.5), transparent 20%),
-      linear-gradient(to bottom, rgb(40 36 52 / 0.22), transparent 30%);
+      linear-gradient(to bottom, rgb(40 36 52 / 0.22), transparent 30%),
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
   }
 }
 
