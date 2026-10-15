@@ -170,6 +170,14 @@
   inset: 0;
 }
 
+/*
+ * 植物と同じ色調（TopHero.tsx が --scene-filter に渡す）は、回る部品の画像そのものにかける。
+ * 親の箱にかけると、中の部品が動くたびに箱全体へ掛け直すことになる
+ */
+.swayShift img {
+  filter: var(--scene-filter);
+}
+
 .plantsFront {
   mask-image: url("/images/top/top-foreground-front-mask.svg");
   mask-size: 100% 100%;

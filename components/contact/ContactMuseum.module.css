@@ -219,8 +219,13 @@
 .plants,
 .sway {
   inset: 0;
-  filter: saturate(0.72) brightness(0.84);
   pointer-events: none;
+}
+
+/* 色調は、回る部品の画像そのものにかける（.sway にかけると、部品が動くたびに箱全体へ掛け直すことになる） */
+.plants,
+.sway img {
+  filter: saturate(0.72) brightness(0.84);
 }
 
 /* 夕方の空気。足元（順路の案内）と左上（Menu）を少しだけ沈め、明るい文字を読ませる */

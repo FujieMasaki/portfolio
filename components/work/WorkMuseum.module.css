@@ -101,8 +101,11 @@
   height: auto;
 }
 
-/* 屋外の光で撮られた葉を、/about の植物と同じく壁の暖かい光に寄せる */
-.leaves {
+/*
+ * 屋外の光で撮られた葉を、/about の植物と同じく壁の暖かい光に寄せる。
+ * 色調・ぼかしは、揺れる部品の画像そのものにかける（層の箱にかけると、葉が動くたびに箱全体へ掛け直すことになる）
+ */
+.leaves img {
   filter: saturate(0.7) brightness(0.94) sepia(0.1);
 }
 
@@ -113,8 +116,11 @@
 .leafShadow {
   translate: -16% 20%;
   scale: 1.12;
-  filter: brightness(0) blur(6px);
   opacity: 0.1;
+}
+
+.leafShadow img {
+  filter: brightness(0) blur(6px);
 }
 
 /* ---- 3つの展示に共通の並べ方（左に札、右に展示） ---- */

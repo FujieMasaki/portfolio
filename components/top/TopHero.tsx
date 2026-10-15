@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import WindSway from "@/components/museum/WindSway";
 import ArchEntrance from "./ArchEntrance";
@@ -76,7 +77,8 @@ const TopHero = ({ ambient = "evening" }: Props) => {
 
         <div
           className={styles.swayBack}
-          style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
+          // 色調は回る部品の画像そのものにかける（.swayShift img）。親にかけると、揺れるたびに掛け直しになる
+          style={{ ...toPercentBox(FOREGROUND), "--scene-filter": sceneFilter } as CSSProperties}
           aria-hidden="true"
         >
           <div className={styles.swayShift}>
@@ -127,7 +129,7 @@ const TopHero = ({ ambient = "evening" }: Props) => {
 
         <div
           className={styles.swayFront}
-          style={{ ...toPercentBox(FOREGROUND), filter: sceneFilter }}
+          style={{ ...toPercentBox(FOREGROUND), "--scene-filter": sceneFilter } as CSSProperties}
           aria-hidden="true"
         >
           <div className={styles.swayShift}>
