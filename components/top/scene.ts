@@ -106,7 +106,8 @@ export const ARCHES: Arch[] = [
     body: { x: 1023, y: 340, width: 307, height: 300 },
     // 海の切り取りは一旦外している。戻すときは次を指定する:
     // interior: { kind: "view", objectPosition: "60% 30%" },
-    // そのときは、周りの空と同じ時間帯の色になるよう、.archScene にも components/museum の .glaze を重ねる
+    // そのときは、周りの空と同じ時間帯の色になるよう、.archScene にも components/museum の .glaze を重ね、
+    // .archScene 側で --horizon（その箱の中での水平線の高さ）も指定する（.sky の値は引き継がれない）
     flyby: true,
   },
 ];
