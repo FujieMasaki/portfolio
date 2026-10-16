@@ -61,7 +61,7 @@
 /*
  * パララックス（ParallaxStage.tsx が流すポインタ位置 --px / --py は -1〜1）。
  * 動かすのは奥の空だけで、建物・アーチ・部屋名・植物は止めておく。
- * 植物は建物の奥の木立と手前の茂みが1枚の大きな PNG なので、動かすと植物全体が一緒にスライドして見え、
+ * 植物の層（ベースと揺らす葉）は建物の奥の木立と手前の茂みを含むので、動かすと植物全体が一緒にスライドして見え、
  * 固定の手前用のマスク（top-foreground-front-mask.svg）や建物との重なりもずれる。
  *
  *   sky        -0.3%   奥。ポインタと逆の向き
@@ -157,6 +157,124 @@
   mask-image: url("/images/top/top-foreground-front-mask.svg");
   mask-size: 100% 100%;
   mask-repeat: no-repeat;
+}
+
+/*
+ * 風で揺れる葉（ForegroundPlants）。傾きは --wind × 植物ごとの係数（--sway-gain）× --sway-reach × 各コマの割合。
+ * 昼（--wind 0.55）の最大（形ごとの最大の割合を掛けた値）は、アダンの冠 約 0.31deg・中ほど 約 0.5deg・
+ * 垂れた葉先 約 0.83deg、ソテツ 約 0.45deg、クワズイモ 約 0.83deg / 約 0.74deg。
+ * 支点は葉の付け根・茎の根元（transform-origin は ForegroundPlants が scene.ts の pivot から決める）。
+ * 揺れの形は data-shape、周期・開始位置は葉ごとに style で渡し、そろって揺れないようにする。
+ * .swayGroup は、葉をまとめて株や木ごと傾ける入れ物（中の葉の揺れはその上に重なる。scene.ts の PLANT_SWAY_GROUPS）。
+ * アダンは幹の分かれ目を支点に、昼の最大 約 0.74deg
+ */
+.sway,
+.swayGroup {
+  position: absolute;
+  --sway-reach: 1.5deg;
+  --sway-tilt: calc(var(--wind) * var(--sway-gain) * var(--sway-reach));
+  animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  animation-iteration-count: infinite;
+}
+
+/* 動きを減らす設定では揺らさない（下の reduce の animation: none より詳細度が高いので、ここで条件を付ける） */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.sway, .swayGroup)[data-shape="gust"] {
+    animation-name: sway-gust;
+  }
+
+  :is(.sway, .swayGroup)[data-shape="lull"] {
+    animation-name: sway-lull;
+  }
+
+  :is(.sway, .swayGroup)[data-shape="eddy"] {
+    animation-name: sway-eddy;
+  }
+}
+
+/* 押されて、ゆっくり戻り、しばらく静かにしてから、ごく弱く反対へ */
+@keyframes sway-gust {
+  0%,
+  10% {
+    rotate: 0deg;
+  }
+  24% {
+    rotate: calc(var(--sway-tilt) * 0.8);
+  }
+  31% {
+    rotate: var(--sway-tilt);
+  }
+  52% {
+    rotate: calc(var(--sway-tilt) * 0.12);
+  }
+  64%,
+  76% {
+    rotate: calc(var(--sway-tilt) * 0.02);
+  }
+  85% {
+    rotate: calc(var(--sway-tilt) * -0.3);
+  }
+  93%,
+  100% {
+    rotate: 0deg;
+  }
+}
+
+/* 長く静かにしてから、弱めに押されて戻り、反対側で少し留まる */
+@keyframes sway-lull {
+  0%,
+  18% {
+    rotate: 0deg;
+  }
+  36% {
+    rotate: calc(var(--sway-tilt) * 0.7);
+  }
+  45% {
+    rotate: calc(var(--sway-tilt) * 0.9);
+  }
+  63% {
+    rotate: calc(var(--sway-tilt) * 0.1);
+  }
+  72% {
+    rotate: 0deg;
+  }
+  81% {
+    rotate: calc(var(--sway-tilt) * -0.2);
+  }
+  88% {
+    rotate: calc(var(--sway-tilt) * -0.26);
+  }
+  97%,
+  100% {
+    rotate: 0deg;
+  }
+}
+
+/* 先に反対へわずかに揺らいでから、押されて戻る */
+@keyframes sway-eddy {
+  0% {
+    rotate: 0deg;
+  }
+  9% {
+    rotate: calc(var(--sway-tilt) * -0.15);
+  }
+  19%,
+  30% {
+    rotate: calc(var(--sway-tilt) * -0.03);
+  }
+  45% {
+    rotate: calc(var(--sway-tilt) * 0.75);
+  }
+  53% {
+    rotate: var(--sway-tilt);
+  }
+  73% {
+    rotate: calc(var(--sway-tilt) * 0.1);
+  }
+  86%,
+  100% {
+    rotate: 0deg;
+  }
 }
 
 /* 3. アーチ */
@@ -678,8 +796,8 @@
 }
 
 /*
- * Contact の半屋外の場所。朝〜夕方は建物と同じ外光に寄せ、夜・深夜は About / Work の室内灯と同じ明るさにする（scene.ts）。
- * 天井とデスクのライトも今は画像ごと同じ明るさになる。時間帯でライトだけを強めるときは、
+ * Contact の通路。About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
+ * 天井のライトも今は画像ごと同じ明るさになる。時間帯でライトだけを強めるときは、
  * ライトの範囲のマスクを用意し、建物の夕方の光（LayeredBuilding の .light）と同じ形で暖色を足す
  */
 .archImage[data-light="outdoor"] {
@@ -849,7 +967,9 @@
   .plaque,
   .clouds,
   .sea,
-  .haze {
+  .haze,
+  .sway,
+  .swayGroup {
     animation: none;
   }
 
