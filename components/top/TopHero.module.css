@@ -6,6 +6,8 @@
 
 .hero {
   --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* ゆっくり動き出し、ゆっくり止まる（アーチの奥を覗き込む動き） */
+  --ease-lean: cubic-bezier(0.45, 0, 0.2, 1);
   --hero-ink: #f4f1ec;
 
   position: relative;
@@ -51,7 +53,8 @@
   animation: stage-fallback 0.8s var(--ease-calm) 6s forwards;
 }
 
-.stage > * {
+.stage > *,
+.lens > * {
   position: absolute;
 }
 
@@ -352,6 +355,27 @@
 
   .arches:has(.arch:hover) .arch:not(:hover, :focus-visible) .archScene {
     filter: contrast(0.96);
+  }
+}
+
+/*
+ * hover：カードが拡大するのではなく、その入口へ身体がほんの少し近づく。
+ * 舞台の全レイヤー（.lens。空・海・植物・建物・アーチの奥・部屋名）をまとめて、わずかに拡大する。
+ * どのアーチでも支点は同じ（舞台の中央・目の高さ）にし、まっすぐ前へ近づくだけにする
+ * （アーチごとに支点を変えると、横へ寄って見えた）。
+ * 舞台（.stage）自体の scale は、表示時のフェードインと、アーチを選んだときの通り抜け（ArchPassage）が使うので、
+ * 内側の .lens で拡大し、互いに打ち消し合わないようにする。
+ * 離れたときも同じ時間をかけて戻る。タッチ端末と「動きを減らす」設定では近づかない
+ */
+.lens {
+  inset: 0;
+  transform-origin: 50% 58%;
+  transition: scale 1.6s var(--ease-lean);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .lens:has(.arch:hover) {
+    scale: 1.02;
   }
 }
 

@@ -30,6 +30,8 @@ import styles from "./TopHero.module.css";
  *   6. atmosphere 周辺減光と、時間帯の空気の色
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  *
+ * 1〜7 は .lens にまとめ、アーチの hover で、景色ごとまっすぐ前へわずかに近づく（館名は動かさない）。
+ *
  * 光・霞・室内灯・空気は訪問者のローカル時刻で変わる（AmbientRoot が scene.ts の TOP_AMBIENT_VARIABLES を
  * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
  *
@@ -54,58 +56,61 @@ const TopHero = () => {
         </header>
 
         <ParallaxStage className={styles.stage}>
-          <Sky background={SEA_SKY_BACKGROUND} />
+          {/* 舞台の全レイヤーを1枚にまとめ、アーチの hover で景色ごとまっすぐ前へわずかに近づける */}
+          <div className={styles.lens}>
+            <Sky background={SEA_SKY_BACKGROUND} />
 
-          <div
-            className={styles.plantsBack}
-            style={toPercentBox(FOREGROUND)}
-            aria-hidden="true"
-          >
-            <Image
-              src="/images/top/top-foreground-tropical-plants.png"
-              alt=""
-              fill
-              loading="eager"
-              fetchPriority="high"
-              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-            />
-          </div>
-
-          <nav className={styles.arches} aria-label="メインメニュー">
-            {ARCHES.map((arch) => (
-              <ArchEntrance
-                key={arch.id}
-                arch={arch}
-                background={SEA_SKY_BACKGROUND}
+            <div
+              className={styles.plantsBack}
+              style={toPercentBox(FOREGROUND)}
+              aria-hidden="true"
+            >
+              <Image
+                src="/images/top/top-foreground-tropical-plants.png"
+                alt=""
+                fill
+                loading="eager"
+                fetchPriority="high"
+                sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
               />
-            ))}
-          </nav>
+            </div>
 
-          <LayeredBuilding
-            layers={BUILDING_LAYERS}
-            className={styles.building}
-            style={toPercentBox(BUILDING)}
-            sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
-          />
+            <nav className={styles.arches} aria-label="メインメニュー">
+              {ARCHES.map((arch) => (
+                <ArchEntrance
+                  key={arch.id}
+                  arch={arch}
+                  background={SEA_SKY_BACKGROUND}
+                />
+              ))}
+            </nav>
 
-          <div
-            className={styles.plantsFront}
-            style={toPercentBox(FOREGROUND)}
-            aria-hidden="true"
-          >
-            <Image
-              src="/images/top/top-foreground-tropical-plants.png"
-              alt=""
-              fill
-              loading="eager"
-              fetchPriority="high"
-              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
+            <LayeredBuilding
+              layers={BUILDING_LAYERS}
+              className={styles.building}
+              style={toPercentBox(BUILDING)}
+              sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
             />
+
+            <div
+              className={styles.plantsFront}
+              style={toPercentBox(FOREGROUND)}
+              aria-hidden="true"
+            >
+              <Image
+                src="/images/top/top-foreground-tropical-plants.png"
+                alt=""
+                fill
+                loading="eager"
+                fetchPriority="high"
+                sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
+              />
+            </div>
+
+            <div className={styles.atmosphere} aria-hidden="true" />
+
+            <ArchSigns />
           </div>
-
-          <div className={styles.atmosphere} aria-hidden="true" />
-
-          <ArchSigns />
         </ParallaxStage>
       </ArchPassage>
 
