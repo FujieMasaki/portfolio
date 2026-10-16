@@ -141,6 +141,11 @@
 }
 
 .skyFlip {
+  /* 背景画像の object-position（0〜1）。雲の層（components/museum/seaMotion.module.css）も同じ位置に合わせる */
+  --sky-x: 0.5;
+  /* 水平線を、舞台の上から約 58% に置く（建物の足元より上、アーチの開口部の中ほど） */
+  --sky-y: 0.08;
+
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -151,8 +156,7 @@
   filter: var(--ambient-sky-filter);
   transition: filter var(--ambient-fade) var(--ease-calm);
   object-fit: cover;
-  /* 水平線を、舞台の上から約 58% に置く（建物の足元より上、アーチの開口部の中ほど） */
-  object-position: 50% 8%;
+  object-position: calc(var(--sky-x) * 100%) calc(var(--sky-y) * 100%);
 }
 
 /* 2〜4. 建物・植物・案内の舞台 */
@@ -434,8 +438,10 @@
     transform: translate3d(calc(var(--px) * -0.35%), 0, 0);
   }
 
-  .skyFlip img {
-    object-position: 40% 0%;
+  .skyFlip {
+    --sky-x: 0.4;
+    /* 画像の水平線の割合（488 / 1086）。箱の縦横比によらず、画像の水平線が --horizon（44.9%）に来る */
+    --sky-y: 0.449;
   }
 
   /* 空の明るい上半分で Menu が埋もれないよう、上も少しだけ沈める */
