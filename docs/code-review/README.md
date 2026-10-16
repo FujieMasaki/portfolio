@@ -105,3 +105,6 @@
   - 陰の素材が素地の外にはみ出した画素が、multiplyにならず灰色の縁として描かれていた（サブエージェント）。
   - CSSのマスクで読む画像が舞台の待ち合わせに入っておらず、舞台が出た後に陰と光が遅れて乗るおそれがあった（サブエージェント）。
   - 陰の層だけを素地の外形で切り抜き、光の層を切り抜いていなかったため、/contact の建物の右の輪郭の外に暖色が乗っていた（Codex）。
+- 2026-10-17: 関数を const とアロー関数で書く決まりを、`eslint.config.mjs`の`no-restricted-syntax`で class・オブジェクトのメソッド記法・getter / setter まで広げた。
+  これまでは`function`の宣言と式だけを捕まえ、class とメソッド記法は対象外だったため、PR #33 の写真の読み込みに`TextureLoader`を継承した class が入った（人間のレビュー）。
+  class は、`getDerivedStateFromError`か`componentDidCatch`を持つ React の error boundary だけ許す（class でしか作れないため）。捕まえる範囲は`scripts/lint-rules.test.mjs`で確かめる。
