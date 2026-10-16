@@ -9,7 +9,7 @@ import { WATER, WATER_MAX_DPR } from "./waterConfig";
 type Props = {
   /** 最初の1枚を描けたとき（ここから手前の静止画の海が薄くなる） */
   onReady: () => void;
-  /** shader のエラー・WebGL の context の喪失。静止画だけに戻す */
+  /** shader のエラー・WebGL の context の喪失・反射を描けない環境。静止画だけに戻す */
   onError: () => void;
 };
 
@@ -63,6 +63,10 @@ const SeaWaterCanvas = ({ onReady, onError }: Props) => {
           }
           fail();
         };
+        // 反射の render target は HalfFloat。色として描けない環境では反射が黒くなるので、始めずに静止画へ戻す
+        if (!gl.extensions.has("EXT_color_buffer_half_float") && !gl.extensions.has("EXT_color_buffer_float")) {
+          fail();
+        }
       }}
     >
       <SeaWaterScene
