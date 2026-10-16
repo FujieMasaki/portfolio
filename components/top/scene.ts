@@ -178,7 +178,7 @@ type ImageInterior = {
   height: number;
   /**
    * どの光の中にあるか。indoor は室内灯の灯る展示室（--ambient-interior-filter）、
-   * outdoor は外光の入る半屋外（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える
+   * outdoor は外光の入る窓辺（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える
    */
   light: "indoor" | "outdoor";
   /**
@@ -296,7 +296,7 @@ export type TopAmbient = {
   /** About / Work の室内灯。brightness → saturate */
   interiorFilter: string;
   /**
-   * Contact の半屋外の場所（画像は夕方の光で描いてある）。sepia → brightness → contrast。
+   * Contact の窓辺（画像は夕方の光で描いてある）。sepia → brightness → contrast。
    * 朝〜夕方は建物と同じ外光に寄せ、夜・深夜は天井の灯りがあるので、About / Work の室内灯（interiorFilter）と同じ明るさにする
    * （建物と同じ深夜の brightness(0.33) や、中間の 0.6 では、灯りの点いた場所に見えず暗く感じた）
    */
