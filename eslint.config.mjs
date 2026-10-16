@@ -7,7 +7,9 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     // 関数は const とアロー関数で書く（function 宣言・function 式・class・オブジェクトのメソッド記法・getter / setter を使わない）。
-    // class は React の error boundary（getDerivedStateFromError か componentDidCatch を持つもの）だけ許す。
+    // class は React の error boundary（継承していて、getDerivedStateFromError か componentDidCatch を持つもの）だけ許す。
+    // そのメソッドは、メソッドの書き方でもアロー関数のフィールドでもよい。
+    // （esquery の :has は「直下の子」に限れず、中に入れ子の class を持つ場合も通るが、継承していない class は捕まえる）
     // error boundary は class でしか作れず（受け止める hook がない）、その中のメソッドも class の書き方のままにする。
     // .claude/skills/ は外部から取り込んだ skill で、出典の commit のまま保つため対象にしない
     ignores: [".claude/skills/**"],
@@ -25,7 +27,7 @@ const eslintConfig = defineConfig([
         },
         {
           selector:
-            ":matches(ClassDeclaration, ClassExpression):not(:has(MethodDefinition[key.name=/^(getDerivedStateFromError|componentDidCatch)$/]))",
+            ":matches(ClassDeclaration, ClassExpression):not([superClass]:has(ClassBody > :matches(MethodDefinition, PropertyDefinition)[key.name=/^(getDerivedStateFromError|componentDidCatch)$/]))",
           message:
             "class ではなく、const とアロー関数で書く（class にしてよいのは、getDerivedStateFromError か componentDidCatch を持つ React の error boundary だけ）",
         },

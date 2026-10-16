@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { ESLint } from "eslint";
 
 /**
  * eslint.config.mjs の「関数は const とアロー関数で書く」ルールが、狙った書き方だけを捕まえるかを確かめる。
  * ルールは no-restricted-syntax なので、エラーの message の書き出しで、どの決まりに当たったかを見分ける。
  */
-const eslint = new ESLint();
+// どこから実行しても、リポジトリの eslint.config.mjs を読む
+const eslint = new ESLint({ cwd: fileURLToPath(new URL("..", import.meta.url)) });
 
 const restricted = async (code) => {
   const [result] = await eslint.lintText(code, { filePath: "components/lint-rules-probe.tsx" });
@@ -62,6 +64,41 @@ test("React の error boundary の class は通す（中のメソッドも）", 
       }
     `),
     [],
+  );
+});
+
+test("アロー関数のフィールドで書いた error boundary も通す", async () => {
+  assert.deepEqual(
+    await restricted(`
+      import { Component, type ReactNode } from "react";
+      export class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+        state = { failed: false };
+        static getDerivedStateFromError = () => ({ failed: true });
+        componentDidCatch = () => {};
+        render() {
+          return this.state.failed ? null : this.props.children;
+        }
+      }
+    `),
+    [],
+  );
+});
+
+test("継承していない class は、error boundary のメソッド名を持っていても捕まえる（入れ子の中だけに持つ外側の class も）", async () => {
+  startsWithEach(
+    await restricted(`
+      export class NotBoundary {
+        componentDidCatch() {}
+      }
+      export class Outer {
+        make() {
+          return class Inner extends Object {
+            componentDidCatch() {}
+          };
+        }
+      }
+    `),
+    ["class ではなく", "class ではなく"],
   );
 });
 
