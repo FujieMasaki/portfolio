@@ -80,8 +80,6 @@ export type Arch = {
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
   interior?: ImageInterior | ViewInterior;
-  /** アーチの奥を、時折リュウキュウツバメ（夜・深夜はコウモリ）が横切る（ArchFlyby） */
-  flyby?: boolean;
 };
 
 export const ARCHES: Arch[] = [
@@ -121,7 +119,6 @@ export const ARCHES: Arch[] = [
     // interior: { kind: "view", objectPosition: "60% 30%" },
     // そのときは、周りの空と同じ時間帯の色になるよう、.archScene にも components/museum の .glaze を重ね、
     // .archScene 側で --horizon（その箱の中での水平線の高さ）も指定する（.sky の値は引き継がれない）
-    flyby: true,
   },
 ];
 
