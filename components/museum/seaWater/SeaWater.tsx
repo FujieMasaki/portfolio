@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import styles from "../seaMotion.module.css";
 import { SeaErrorBoundary, supportsWebGL, useReducedMotion, whenIdle } from "./seaWaterSupport";
 
@@ -33,11 +33,17 @@ const SeaWater = () => {
   return (
     <div ref={layer} className={styles.water} aria-hidden="true">
       <SeaErrorBoundary onError={() => setPhase("failed")}>
-        <SeaWaterCanvas
-          // 静止画の切り替えは state を介さず属性で始める（描画ループの中から呼ばれるため）
-          onReady={() => layer.current?.setAttribute("data-sea-ready", "")}
-          onError={() => setPhase("failed")}
-        />
+        {/*
+         * 読み込み中（three の chunk・空のタイル）はここで受け止め、何も描かない。
+         * R3F の Canvas は中の読み込み待ちを外へ投げるので、ページ全体の境界まで上げない
+         */}
+        <Suspense fallback={null}>
+          <SeaWaterCanvas
+            // 静止画の切り替えは state を介さず属性で始める（描画ループの中から呼ばれるため）
+            onReady={() => layer.current?.setAttribute("data-sea-ready", "")}
+            onError={() => setPhase("failed")}
+          />
+        </Suspense>
       </SeaErrorBoundary>
     </div>
   );
