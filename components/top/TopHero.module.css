@@ -6,6 +6,8 @@
 
 .hero {
   --ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+  /* ゆっくり動き出し、ゆっくり止まる（アーチの奥を覗き込む動き） */
+  --ease-lean: cubic-bezier(0.45, 0, 0.2, 1);
   --hero-ink: #f4f1ec;
 
   position: relative;
@@ -51,14 +53,15 @@
   animation: stage-fallback 0.8s var(--ease-calm) 6s forwards;
 }
 
-.stage > * {
+.stage > *,
+.lens > * {
   position: absolute;
 }
 
 /*
  * パララックス（ParallaxStage.tsx が流すポインタ位置 --px / --py は -1〜1）。
  * 動かすのは奥の空だけで、建物・アーチ・部屋名・植物は止めておく。
- * 植物は建物の奥の木立と手前の茂みが1枚の大きな PNG なので、動かすと植物全体が一緒にスライドして見え、
+ * 植物の層（ベースと揺らす葉）は建物の奥の木立と手前の茂みを含むので、動かすと植物全体が一緒にスライドして見え、
  * 固定の手前用のマスク（top-foreground-front-mask.svg）や建物との重なりもずれる。
  *
  *   sky        -0.3%   奥。ポインタと逆の向き
@@ -156,6 +159,124 @@
   mask-repeat: no-repeat;
 }
 
+/*
+ * 風で揺れる葉（ForegroundPlants）。傾きは --wind × 植物ごとの係数（--sway-gain）× --sway-reach × 各コマの割合。
+ * 昼（--wind 0.55）の最大（形ごとの最大の割合を掛けた値）は、アダンの冠 約 0.31deg・中ほど 約 0.5deg・
+ * 垂れた葉先 約 0.83deg、ソテツ 約 0.45deg、クワズイモ 約 0.83deg / 約 0.74deg。
+ * 支点は葉の付け根・茎の根元（transform-origin は ForegroundPlants が scene.ts の pivot から決める）。
+ * 揺れの形は data-shape、周期・開始位置は葉ごとに style で渡し、そろって揺れないようにする。
+ * .swayGroup は、葉をまとめて株や木ごと傾ける入れ物（中の葉の揺れはその上に重なる。scene.ts の PLANT_SWAY_GROUPS）。
+ * アダンは幹の分かれ目を支点に、昼の最大 約 0.74deg
+ */
+.sway,
+.swayGroup {
+  position: absolute;
+  --sway-reach: 1.5deg;
+  --sway-tilt: calc(var(--wind) * var(--sway-gain) * var(--sway-reach));
+  animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  animation-iteration-count: infinite;
+}
+
+/* 動きを減らす設定では揺らさない（下の reduce の animation: none より詳細度が高いので、ここで条件を付ける） */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.sway, .swayGroup)[data-shape="gust"] {
+    animation-name: sway-gust;
+  }
+
+  :is(.sway, .swayGroup)[data-shape="lull"] {
+    animation-name: sway-lull;
+  }
+
+  :is(.sway, .swayGroup)[data-shape="eddy"] {
+    animation-name: sway-eddy;
+  }
+}
+
+/* 押されて、ゆっくり戻り、しばらく静かにしてから、ごく弱く反対へ */
+@keyframes sway-gust {
+  0%,
+  10% {
+    rotate: 0deg;
+  }
+  24% {
+    rotate: calc(var(--sway-tilt) * 0.8);
+  }
+  31% {
+    rotate: var(--sway-tilt);
+  }
+  52% {
+    rotate: calc(var(--sway-tilt) * 0.12);
+  }
+  64%,
+  76% {
+    rotate: calc(var(--sway-tilt) * 0.02);
+  }
+  85% {
+    rotate: calc(var(--sway-tilt) * -0.3);
+  }
+  93%,
+  100% {
+    rotate: 0deg;
+  }
+}
+
+/* 長く静かにしてから、弱めに押されて戻り、反対側で少し留まる */
+@keyframes sway-lull {
+  0%,
+  18% {
+    rotate: 0deg;
+  }
+  36% {
+    rotate: calc(var(--sway-tilt) * 0.7);
+  }
+  45% {
+    rotate: calc(var(--sway-tilt) * 0.9);
+  }
+  63% {
+    rotate: calc(var(--sway-tilt) * 0.1);
+  }
+  72% {
+    rotate: 0deg;
+  }
+  81% {
+    rotate: calc(var(--sway-tilt) * -0.2);
+  }
+  88% {
+    rotate: calc(var(--sway-tilt) * -0.26);
+  }
+  97%,
+  100% {
+    rotate: 0deg;
+  }
+}
+
+/* 先に反対へわずかに揺らいでから、押されて戻る */
+@keyframes sway-eddy {
+  0% {
+    rotate: 0deg;
+  }
+  9% {
+    rotate: calc(var(--sway-tilt) * -0.15);
+  }
+  19%,
+  30% {
+    rotate: calc(var(--sway-tilt) * -0.03);
+  }
+  45% {
+    rotate: calc(var(--sway-tilt) * 0.75);
+  }
+  53% {
+    rotate: var(--sway-tilt);
+  }
+  73% {
+    rotate: calc(var(--sway-tilt) * 0.1);
+  }
+  86%,
+  100% {
+    rotate: 0deg;
+  }
+}
+
 /* 3. アーチ */
 .arches {
   inset: 0;
@@ -167,7 +288,7 @@
   overflow: hidden;
   cursor: pointer;
   outline: none;
-  /* Safari で、合成レイヤーになった燕が角丸の外へはみ出さないようにする */
+  /* Safari で、合成レイヤーになった展示室の画像が角丸の外へはみ出さないようにする */
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
 }
@@ -355,6 +476,27 @@
   }
 }
 
+/*
+ * hover：カードが拡大するのではなく、その入口へ身体がほんの少し近づく。
+ * 舞台の全レイヤー（.lens。空・海・植物・建物・アーチの奥・部屋名）をまとめて、わずかに拡大する。
+ * どのアーチでも支点は同じ（舞台の中央・目の高さ）にし、まっすぐ前へ近づくだけにする
+ * （アーチごとに支点を変えると、横へ寄って見えた）。
+ * 舞台（.stage）自体の scale は、表示時のフェードインと、アーチを選んだときの通り抜け（ArchPassage）が使うので、
+ * 内側の .lens で拡大し、互いに打ち消し合わないようにする。
+ * 離れたときも同じ時間をかけて戻る。タッチ端末と「動きを減らす」設定では近づかない
+ */
+.lens {
+  inset: 0;
+  transform-origin: 50% 58%;
+  transition: scale 1.6s var(--ease-lean);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .lens:has(.arch:hover) {
+    scale: 1.02;
+  }
+}
+
 /* 7. 部屋名のプレート（ArchSigns） */
 .archSigns {
   inset: 0;
@@ -454,25 +596,31 @@
 }
 
 /*
- * Contact：アーチの奥、少し奥の海の上を時折横切るリュウキュウツバメ（夜・深夜はコウモリ）。
- * 軌道（位置・向き）は ArchFlyby.tsx が飛ぶたびに作る。ここでは大きさ・見え方と羽ばたきだけ。
+ * 空：建物と植物の向こうの遠い空を、時折横切るリュウキュウツバメ（夜・深夜はコウモリ）。
+ * 空のレイヤー（.sky）の中に置き、空と一緒にパララックスで動く。建物・植物より手前には出ない。
+ * 軌道・遠近による大きさと濃さは SkyFlyby.tsx が flight.ts で飛ぶたびに作る。ここでは基準の大きさ・色と羽ばたきだけ。
  *
- * 真横から見たシルエットで、大きさは翼と尾の形が分かる程度にする。黒い点にはせず、建物より手前に見えるほど大きくもしない。
- * くちばし（鼻先）から尾・翼の先までを、アーチの開口幅（% の基準）の約 1/4（1440px 幅で約 35〜37px、画面幅の約 2.5%）にする。
- * スマホ幅でも鳥・コウモリと分かるよう、下限を px で確保する（390px 幅では開口幅の約 1/3〜1/2 になるが、
- * 「何かが飛んだ」ではなく燕・コウモリと分かることを優先する）。
- * アイコンに見えないよう、真っ黒にせず海に馴染む濃さにし、輪郭をわずかに霞ませる。
+ * 真横から見たシルエットで、大きさは遠くでも燕・コウモリと分かる程度にする。
+ * くちばし（鼻先）から尾・翼の先までを、空の幅の約 1.9%（1440px 幅で約 28px）にし、
+ * 遠い位置ではさらに 2 割まで小さくなる。スマホ幅でも形が分かるよう、下限を px で確保する。
+ * アイコンに見えないよう、真っ黒にせず空に馴染む濃さにし、輪郭をわずかに霞ませる（濃さは flight.ts）。
  */
+.flyby {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
 .swallow,
 .bat {
   position: absolute;
   top: 0;
   left: 0;
-  width: clamp(32px, 38%, 66px);
+  width: clamp(20px, 1.9%, 34px);
   color: rgb(36 31 33);
-  opacity: 0.86;
   filter: blur(0.3px);
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .swallow svg,
@@ -501,13 +649,12 @@
 }
 
 /*
- * コウモリは暗い夜の海の上を飛ぶ。シルエットが箱の中で燕より短いので、箱の幅を少し広げてそろえる。
+ * コウモリは暗い夜の空を飛ぶ。シルエットが箱の中で燕より短いので、箱の幅を少し広げてそろえる。
  * 月明かりのような演出はせず、背景に完全には沈まない程度に、ごく弱い輪郭の差だけを付ける
  */
 .bat {
-  width: clamp(30px, 36%, 64px);
+  width: clamp(20px, 2%, 36px);
   color: rgb(10 10 16);
-  opacity: 0.9;
   filter: drop-shadow(0 0 0.5px rgb(150 160 190 / 0.3));
 }
 
@@ -644,8 +791,17 @@
 }
 
 /* About / Work の室内灯。夜・深夜は少し存在感が増し（深夜がいちばん目立つ）、昼はほとんど目立たない */
-.archImage {
+.archImage[data-light="indoor"] {
   filter: var(--ambient-interior-filter);
+}
+
+/*
+ * Contact の通路。About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
+ * 天井のライトも今は画像ごと同じ明るさになる。時間帯でライトだけを強めるときは、
+ * ライトの範囲のマスクを用意し、建物の夕方の光（LayeredBuilding の .light）と同じ形で暖色を足す
+ */
+.archImage[data-light="outdoor"] {
+  filter: var(--ambient-outdoor-room-filter);
 }
 
 .sky img,
@@ -811,7 +967,9 @@
   .plaque,
   .clouds,
   .sea,
-  .haze {
+  .haze,
+  .sway,
+  .swayGroup {
     animation: none;
   }
 

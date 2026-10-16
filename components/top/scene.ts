@@ -7,7 +7,7 @@
  * ここを基準にすると完成イメージとレイヤーがずれない。
  */
 
-import type { AmbientId } from "@/components/museum/ambient";
+import { WIND_STRENGTH, type AmbientId } from "@/components/museum/ambient";
 import type { AmbientVariables } from "@/components/museum/AmbientRoot";
 import type { BuildingLayers } from "@/components/museum/LayeredBuilding";
 import { seaSkyVariables } from "@/components/museum/seaSky";
@@ -43,11 +43,146 @@ export const BUILDING_LAYERS: BuildingLayers = {
 /** 前景植物 PNG はキャンバスと同寸 */
 export const FOREGROUND: Rect = { x: 0, y: 0, ...CANVAS };
 
+/**
+ * 前景植物は、動かないベースと、風で揺らす枝と葉の7枚に分けてある。
+ * ベースからは揺らす部分が抜いてあり、8枚を重ねると元の top-foreground-tropical-plants.png と同じ見た目に戻る。
+ * 素材はどれもキャンバスと同寸・同位置で作り、揺らす7枚は、それぞれの box の範囲だけを画素を変えずに切り出して置く
+ * （box の外は透明なので失うものはない。素材を差し替えるときも、同じ範囲で切り出し直す）。
+ */
+export const PLANTS_BASE = "/images/top/top-plants-base.png";
+
+/** 揺れの形（TopHero.module.css の data-shape と @keyframes sway-*）。どれも「ほぼ静止 → 押される → 戻る → 静か → 弱く反対へ」 */
+export type SwayShape = "gust" | "lull" | "eddy";
+
+export type PlantSway = {
+  id: string;
+  src: string;
+  /** 葉が揺れても切れないよう、葉の外接矩形に余白を足した範囲。この範囲だけを1枚の層として回す（src はこの範囲を切り出した画像） */
+  box: Rect;
+  /** 回転の支点（葉の付け根・茎の根元） */
+  pivot: { x: number; y: number };
+  /** --wind に掛ける係数。傾きは --wind × gain × --sway-reach（TopHero.module.css） */
+  gain: number;
+  /** 省くと、それ自体は揺れない（まとめた木ごと傾くだけ） */
+  shape?: SwayShape;
+  /** 周期と開始位置（秒）。そろって揺れないよう、どれも互いに割り切れない値にする */
+  duration: number;
+  delay: number;
+};
+
+/**
+ * いくつかの葉をまとめて、株や木ごと傾ける入れ物。中の葉はそれぞれの揺れを保ったまま一緒に傾く。
+ * box は中の葉の box をすべて含む範囲。
+ */
+export type PlantSwayGroup = Omit<PlantSway, "src"> & { members: string[] };
+
+export const PLANT_SWAY_GROUPS: PlantSwayGroup[] = [
+  {
+    // 左上のアダンの、幹の分かれ目から上（枝・冠・中ほど・垂れた葉先）。支点は幹の分かれ目。
+    // 幹はベースに残るので、継ぎ目は支点のすぐそばの1か所になる
+    id: "pandanus",
+    box: { x: 0, y: 0, width: 430, height: 345 },
+    pivot: { x: 20, y: 295 },
+    gain: 1,
+    shape: "lull",
+    duration: 13.3,
+    delay: -5.2,
+    members: ["pandanus-branches", "pandanus-crown", "pandanus-cluster", "pandanus-bundle"],
+  },
+];
+
+export const PLANT_SWAYS: PlantSway[] = [
+  {
+    // 左上のアダンの、幹の分かれ目から上の2本の枝。枝そのものは揺らさず、木ごと傾く（PLANT_SWAY_GROUPS）だけ
+    id: "pandanus-branches",
+    src: "/images/top/top-sway-pandanus-branches.png",
+    box: { x: 0, y: 150, width: 226, height: 158 },
+    pivot: { x: 20, y: 295 },
+    gain: 0,
+    duration: 0,
+    delay: 0,
+  },
+  {
+    // 左上のアダン。いちばん上の葉の冠（2本の枝先に載る）
+    id: "pandanus-crown",
+    src: "/images/top/top-sway-pandanus-crown.png",
+    box: { x: 0, y: 0, width: 415, height: 186 },
+    pivot: { x: 160, y: 165 },
+    gain: 0.42,
+    shape: "lull",
+    duration: 21.3,
+    delay: -13.6,
+  },
+  {
+    // 左上のアダン。中ほどの葉のまとまりと実（枝先から下がる）
+    id: "pandanus-cluster",
+    src: "/images/top/top-sway-pandanus-cluster.png",
+    box: { x: 0, y: 96, width: 406, height: 247 },
+    pivot: { x: 155, y: 150 },
+    gain: 0.6,
+    shape: "eddy",
+    duration: 15.7,
+    delay: -4.9,
+  },
+  {
+    // 左上のアダン。房の右下に垂れる葉先
+    id: "pandanus-bundle",
+    src: "/images/top/top-sway-pandanus-bundle.png",
+    box: { x: 216, y: 24, width: 188, height: 308 },
+    pivot: { x: 245, y: 42 },
+    gain: 1,
+    shape: "gust",
+    duration: 9.4,
+    delay: -3.1,
+  },
+  {
+    // 左下のソテツ。上へ弓なりに伸びる葉（支点は株の中心）
+    id: "sotetsu",
+    src: "/images/top/top-sway-sotetsu.png",
+    box: { x: 324, y: 633, width: 196, height: 171 },
+    pivot: { x: 340, y: 788 },
+    gain: 0.6,
+    shape: "lull",
+    duration: 16.2,
+    delay: -9.7,
+  },
+  {
+    // 右下のクワズイモ。手前の大きな葉
+    id: "alocasia-01",
+    src: "/images/top/top-sway-alocasia-01.png",
+    box: { x: 1561, y: 688, width: 111, height: 253 },
+    pivot: { x: 1606, y: 941 },
+    gain: 1,
+    shape: "eddy",
+    duration: 12.6,
+    delay: -1.4,
+  },
+  {
+    // 右下のクワズイモ。その左下の小さな葉
+    id: "alocasia-02",
+    src: "/images/top/top-sway-alocasia-02.png",
+    box: { x: 1516, y: 803, width: 119, height: 138 },
+    pivot: { x: 1558, y: 941 },
+    gain: 0.9,
+    shape: "gust",
+    duration: 14.1,
+    delay: -6.8,
+  },
+];
+
 export type ArchId = "about" | "work" | "contact";
 
 type ImageInterior = {
   kind: "image";
   src: string;
+  /** 画像の寸法（読み込む前の縦横比に使う） */
+  width: number;
+  height: number;
+  /**
+   * どの光の中にあるか。indoor は室内灯の灯る展示室（--ambient-interior-filter）、
+   * outdoor は外光の入る窓辺（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える
+   */
+  light: "indoor" | "outdoor";
   /**
    * 開口部（arch.opening）に対する画像の位置。
    * 奥の壁・額・ベンチが開口の見える範囲に収まるよう、開口より広く置いて左右を建物に隠させる。
@@ -80,8 +215,6 @@ export type Arch = {
   opening: Rect;
   /** 未指定のアーチは中に何も置かず、奥の背景・植物がそのまま見える */
   interior?: ImageInterior | ViewInterior;
-  /** アーチの奥を、時折リュウキュウツバメ（夜・深夜はコウモリ）が横切る（ArchFlyby） */
-  flyby?: boolean;
 };
 
 export const ARCHES: Arch[] = [
@@ -95,6 +228,9 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/top-arch-about-gallery.png",
+      width: 1122,
+      height: 1402,
+      light: "indoor",
       frame: { left: "-43%", top: "0%", width: "186%" },
     },
   },
@@ -108,6 +244,9 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/top-arch-work-single-frame.png",
+      width: 1122,
+      height: 1402,
+      light: "indoor",
       frame: { left: "-61%", top: "-10%", width: "223%" },
     },
   },
@@ -117,11 +256,21 @@ export const ARCHES: Arch[] = [
     title: "Contact",
     opening: { x: 1083, y: 418, width: 149, height: 404 },
     body: { x: 1023, y: 340, width: 307, height: 300 },
-    // 海の切り取りは一旦外している。戻すときは次を指定する:
-    // interior: { kind: "view", objectPosition: "60% 30%" },
-    // そのときは、周りの空と同じ時間帯の色になるよう、.archScene にも components/museum の .glaze を重ね、
-    // .archScene 側で --horizon（その箱の中での水平線の高さ）も指定する（.sky の値は引き継がれない）
-    flyby: true,
+    /*
+     * 展示を見終えて外とつながる、奥が海へ開いた通路（灯りのある天井・突き当たりのアーチ形の窓・床）。
+     * 画像は窓の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
+     * 画像は縦長（約 1:2.2）で描いてあり、通路の左右の壁・天井の灯り・床まで開口部に収める。
+     * 上を少し切って天井の灯りを頂点に寄せ、下端が開口部の下まで届く 126% にする。窓は中央より少し右に置く
+     * （はみ出しはアーチ形のリンク（overflow: hidden）が切り抜く）
+     */
+    interior: {
+      kind: "image",
+      src: "/images/top/contact-arch-space.png",
+      width: 839,
+      height: 1875,
+      light: "outdoor",
+      frame: { left: "-11%", top: "-3%", width: "126%" },
+    },
   },
 ];
 
@@ -150,6 +299,12 @@ export type TopAmbient = {
   /** About / Work の室内灯。brightness → saturate */
   interiorFilter: string;
   /**
+   * Contact の通路（画像は夕方の光で描いてある）。brightness → saturate。
+   * About / Work の室内灯（interiorFilter）と同じ色の寄せ方にし、明るさは各時間帯でその約 0.82 倍にする
+   * （通路の画像は About / Work の画像より約 2 割明るく描いてあり、同じ値では Contact だけが明るく見えた）
+   */
+  outdoorRoomFilter: string;
+  /**
    * 周辺減光の強さ（夕方 = 1）。左下の館名は植物の上で読ませているので、朝・昼も大きくは弱めない
    * （昼に 0.5 まで弱めると、琉球石灰岩の明るい斑の上でコントラストが 3.5:1 まで下がった）
    */
@@ -162,6 +317,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
     sceneFilter: "saturate(0.66) brightness(0.8)",
     interiorFilter: "brightness(0.92) saturate(0.8)",
+    outdoorRoomFilter: "brightness(0.75) saturate(0.8)",
     vignette: 0.9,
   },
   day: {
@@ -169,6 +325,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0) brightness(1.02) contrast(1)",
     sceneFilter: "saturate(0.78) brightness(0.94)",
     interiorFilter: "brightness(0.84) saturate(0.66)",
+    outdoorRoomFilter: "brightness(0.69) saturate(0.66)",
     vignette: 0.85,
   },
   evening: {
@@ -176,6 +333,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0) brightness(1) contrast(1)",
     sceneFilter: "saturate(0.72) brightness(0.8)",
     interiorFilter: "brightness(1) saturate(1)",
+    outdoorRoomFilter: "brightness(0.82) saturate(1)",
     vignette: 1,
   },
   night: {
@@ -183,6 +341,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.05) brightness(0.52) contrast(0.98)",
     sceneFilter: "saturate(0.5) brightness(0.42)",
     interiorFilter: "brightness(1.06) saturate(1)",
+    outdoorRoomFilter: "brightness(0.87) saturate(1)",
     vignette: 1,
   },
   /*
@@ -194,18 +353,22 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.04) brightness(0.33) contrast(0.98)",
     sceneFilter: "saturate(0.3) brightness(0.2)",
     interiorFilter: "brightness(1.12) saturate(1)",
+    outdoorRoomFilter: "brightness(0.92) saturate(1)",
     vignette: 1,
   },
 };
 
 const topVariables = (ambient: AmbientId) => {
-  const { haze, buildingFilter, sceneFilter, interiorFilter, vignette } = TOP_AMBIENTS[ambient];
+  const { haze, buildingFilter, sceneFilter, interiorFilter, outdoorRoomFilter, vignette } = TOP_AMBIENTS[ambient];
   return {
     ...seaSkyVariables(ambient),
+    // 外の植物に沖縄の風を感じる場所なので、共通の風の強さをそのまま使う（前景植物の揺れ、TopHero.module.css の .sway / .swayGroup が読む）
+    "--wind": WIND_STRENGTH[ambient],
     "--ambient-haze": haze,
     "--ambient-building-filter": buildingFilter,
     "--ambient-scene-filter": sceneFilter,
     "--ambient-interior-filter": interiorFilter,
+    "--ambient-outdoor-room-filter": outdoorRoomFilter,
     "--ambient-vignette": vignette,
   };
 };

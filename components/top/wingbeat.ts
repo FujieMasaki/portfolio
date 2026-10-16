@@ -1,5 +1,5 @@
 /**
- * 燕・コウモリの翼の動き（ArchFlyby が Web Animations のキーフレームとして使う）。
+ * 燕・コウモリの翼の動き（SkyFlyby が Web Animations のキーフレームとして使う。いつ・どう飛ぶかは flight.ts）。
  * React にも DOM にも依存しない純粋関数だけを置き、scripts/wingbeat.test.mjs で確かめる。
  *
  * 鳥は真横（右向き）から見たシルエットで、胴体は動かさず、翼だけを関節（肩・手首）を支点に回す。
@@ -10,22 +10,7 @@
  * 奥の翼は手前の翼よりわずかに遅れ、振れ幅も少し小さい（左右の翼がぴったりそろって見えないように）。
  */
 
-import type { AmbientId } from "../museum/ambient";
-
 export type Flyer = "swallow" | "bat";
-
-/** 時間帯ごとに、アーチの奥を横切るもの。夜（night）と深夜（midnight）はコウモリ、それ以外は燕 */
-export const flyerFor = (ambient: AmbientId): Flyer =>
-  ambient === "night" || ambient === "midnight" ? "bat" : "swallow";
-
-/**
- * 次の1羽を出すまでの間（ミリ秒の [最小, 最大]）。first は、ページを開いてから最初の1羽。
- * 深夜は静けさを優先し、かなり長く見ていたら、たまに1匹飛ぶ程度に間を空ける
- */
-export const flybyDelayRange = (ambient: AmbientId, first: boolean): [number, number] => {
-  if (ambient === "midnight") return first ? [10000, 25000] : [20000, 45000];
-  return first ? [3000, 6000] : [10000, 22000];
-};
 
 export type WingSegment = {
   kind: "beat" | "glide";

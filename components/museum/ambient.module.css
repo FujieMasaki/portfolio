@@ -57,12 +57,19 @@
   initial-value: 1;
 }
 
+/* 風の強さ（components/museum/ambient.ts の WIND_STRENGTH）。時間帯が変わっても、風は急に変わらず移ろう */
+@property --wind {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 .root {
   --ambient-fade: 2s;
 
   transition-property:
     --ambient-glaze-sky, --ambient-glaze-horizon, --ambient-glaze-sea, --ambient-air-top,
-    --ambient-air-bottom, --ambient-sky-shade, --ambient-haze, --ambient-vignette;
+    --ambient-air-bottom, --ambient-sky-shade, --ambient-haze, --ambient-vignette, --wind;
   transition-duration: var(--ambient-fade);
   transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
 }

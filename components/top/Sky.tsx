@@ -1,5 +1,6 @@
 import Image from "next/image";
 import ambientStyles from "@/components/museum/ambient.module.css";
+import SkyFlyby from "./SkyFlyby";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -17,6 +18,7 @@ const SIZES = "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-asp
  *   sea    水平線より下だけの写し。水平線を支点にわずかに伸縮させ、呼吸するような揺らぎにする
  *   glaze  時間帯の光の色（朝の青み・昼の空色・夜の濃紺）。夕方は透明で、背景の色をそのまま見せる
  *   haze   水平線付近と建物の左右奥にだけ、ごく薄くかかる湿った空気
+ *   flyby  ときどき遠くを横切る燕・コウモリ（SkyFlyby）。空の一部として、建物と植物の向こうを飛ぶ
  *
  * 時間帯による色調補正（filter）・glaze の色・haze の濃さは、AmbientRoot が流す CSS 変数で決まる
  * （海と空の光は /contact と共有。components/museum/seaSky.ts）。
@@ -41,6 +43,7 @@ const Sky = ({ background }: Props) => {
       <div className={styles.sea}>{image}</div>
       <div className={ambientStyles.glaze} />
       <div className={styles.haze} />
+      <SkyFlyby />
     </div>
   );
 };

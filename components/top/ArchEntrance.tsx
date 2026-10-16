@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import ArchFlyby from "./ArchFlyby";
 import { CANVAS, toPercentBox, type Arch } from "./scene";
 import styles from "./TopHero.module.css";
 
@@ -19,6 +18,7 @@ type Props = {
  * ここでは hover / focus のときだけ、開口部の内側に薄い黒のスモークをかけ、
  * アーチの中央付近に「GO TO・カテゴリ名・説明」を浮かび上がらせる。
  * スモークはリンク自体の切り抜き（アーチ形）の内側にあるので、コンクリートや植物にはかからない。
+ * マウスの hover では、舞台全体（TopHero の .lens）がゆっくりわずかに近づく（TopHero.module.css）。
  */
 /**
  * アーチ内の画像の sizes。表示幅は「開口部の幅 × 画像の拡大率 × 舞台の幅」で、
@@ -50,12 +50,12 @@ const ArchEntrance = ({ arch, background }: Props) => {
     >
       <span className={styles.archScene} aria-hidden="true">
         {interior?.kind === "image" && (
-          <span className={styles.archImage} style={interior.frame}>
+          <span className={styles.archImage} data-light={interior.light} style={interior.frame}>
             <Image
               src={interior.src}
               alt=""
-              width={1122}
-              height={1402}
+              width={interior.width}
+              height={interior.height}
               // 最初から見える位置にあるので遅延させない（舞台の表示はこの画像を待たない）
               loading="eager"
               sizes={interiorSizes(opening.width, interior.frame.width)}
@@ -72,7 +72,6 @@ const ArchEntrance = ({ arch, background }: Props) => {
             style={{ objectPosition: interior.objectPosition }}
           />
         )}
-        {arch.flyby && <ArchFlyby />}
       </span>
 
       <span className={styles.archSmoke} aria-hidden="true" />

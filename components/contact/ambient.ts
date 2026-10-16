@@ -1,4 +1,4 @@
-import type { AmbientId } from "@/components/museum/ambient";
+import { WIND_STRENGTH, type AmbientId } from "@/components/museum/ambient";
 import type { AmbientVariables } from "@/components/museum/AmbientRoot";
 import { seaSkyVariables } from "@/components/museum/seaSky";
 
@@ -47,10 +47,15 @@ const CONTACT_AMBIENTS: Record<AmbientId, ContactAmbient> = {
   },
 };
 
+/** 夕方の庭に少しだけ風が抜ける程度にする。TOP（外の植物）より弱い */
+const CONTACT_WIND = 0.6;
+
 const contactVariables = (ambient: AmbientId) => {
   const { buildingFilter, plantsFilter } = CONTACT_AMBIENTS[ambient];
   return {
     ...seaSkyVariables(ambient),
+    // 今はまだ読むレイヤーはない（植物の揺れの素材がそろったら使う）
+    "--wind": Number((WIND_STRENGTH[ambient] * CONTACT_WIND).toFixed(3)),
     "--ambient-building-filter": buildingFilter,
     "--ambient-plants-filter": plantsFilter,
   };
