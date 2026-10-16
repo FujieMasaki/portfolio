@@ -23,7 +23,8 @@ import styles from "./TopHero.module.css";
  * レイヤー（奥 → 手前）:
  *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞・ときどき遠くを横切る燕とコウモリを含む。Sky.tsx）
  *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）
- *   3. arch       アーチ内の展示室（＋ hover のスモークと GO TO の案内）
+ *   3. arch       アーチ内の展示室と、Contact の半屋外の場所（＋ hover のスモークと GO TO の案内）。
+ *                 Contact の画像は空と海を透過していて、1 の空と海がそのまま覗く
  *   4. building   建物本体（開口部は透過）。素地・陰・奥行き・植物の影・夕方の光の5枚を重ねる（LayeredBuilding）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
  *   6. atmosphere 周辺減光と、時間帯の空気の色

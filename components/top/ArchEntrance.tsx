@@ -49,12 +49,12 @@ const ArchEntrance = ({ arch, background }: Props) => {
     >
       <span className={styles.archScene} aria-hidden="true">
         {interior?.kind === "image" && (
-          <span className={styles.archImage} style={interior.frame}>
+          <span className={styles.archImage} data-light={interior.light} style={interior.frame}>
             <Image
               src={interior.src}
               alt=""
-              width={1122}
-              height={1402}
+              width={interior.width}
+              height={interior.height}
               // 最初から見える位置にあるので遅延させない（舞台の表示はこの画像を待たない）
               loading="eager"
               sizes={interiorSizes(opening.width, interior.frame.width)}

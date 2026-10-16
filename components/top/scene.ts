@@ -48,6 +48,14 @@ export type ArchId = "about" | "work" | "contact";
 type ImageInterior = {
   kind: "image";
   src: string;
+  /** 画像の寸法（読み込む前の縦横比に使う） */
+  width: number;
+  height: number;
+  /**
+   * どの光の中にあるか。indoor は室内灯の灯る展示室（--ambient-interior-filter）、
+   * outdoor は外光の入る半屋外（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える
+   */
+  light: "indoor" | "outdoor";
   /**
    * 開口部（arch.opening）に対する画像の位置。
    * 奥の壁・額・ベンチが開口の見える範囲に収まるよう、開口より広く置いて左右を建物に隠させる。
@@ -93,6 +101,9 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/top-arch-about-gallery.png",
+      width: 1122,
+      height: 1402,
+      light: "indoor",
       frame: { left: "-43%", top: "0%", width: "186%" },
     },
   },
@@ -106,6 +117,9 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/top-arch-work-single-frame.png",
+      width: 1122,
+      height: 1402,
+      light: "indoor",
       frame: { left: "-61%", top: "-10%", width: "223%" },
     },
   },
@@ -115,10 +129,20 @@ export const ARCHES: Arch[] = [
     title: "Contact",
     opening: { x: 1083, y: 418, width: 149, height: 404 },
     body: { x: 1023, y: 340, width: 307, height: 300 },
-    // 海の切り取りは一旦外している。戻すときは次を指定する:
-    // interior: { kind: "view", objectPosition: "60% 30%" },
-    // そのときは、周りの空と同じ時間帯の色になるよう、.archScene にも components/museum の .glaze を重ね、
-    // .archScene 側で --horizon（その箱の中での水平線の高さ）も指定する（.sky の値は引き継がれない）
+    /*
+     * 展示を見終えて外とつながる、半屋外の小さな場所（デスク・椅子・植物）。
+     * 画像は空と海の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
+     * 開口部の高さを下端の植物まで覆う倍率にし、デスクとライトが入るよう少し右寄りを切り取る。
+     * 上端は画像自身のアーチの頂点より少し上へずらし、開口部の頂点に隙間（奥の空）が覗かないようにする
+     */
+    interior: {
+      kind: "image",
+      src: "/images/top/contact-arch-space.png",
+      width: 1116,
+      height: 1410,
+      light: "outdoor",
+      frame: { left: "-64%", top: "-3%", width: "220%" },
+    },
   },
 ];
 
@@ -147,6 +171,12 @@ export type TopAmbient = {
   /** About / Work の室内灯。brightness → saturate */
   interiorFilter: string;
   /**
+   * Contact の半屋外の場所（画像は夕方の光で描いてある）。sepia → brightness → contrast。
+   * 朝〜夕方は建物と同じ外光に寄せ、夜・深夜は天井とデスクの灯りがあるので、About / Work の室内灯（interiorFilter）と同じ明るさにする
+   * （建物と同じ深夜の brightness(0.33) や、中間の 0.6 では、灯りの点いた場所に見えず暗く感じた）
+   */
+  outdoorRoomFilter: string;
+  /**
    * 周辺減光の強さ（夕方 = 1）。左下の館名は植物の上で読ませているので、朝・昼も大きくは弱めない
    * （昼に 0.5 まで弱めると、琉球石灰岩の明るい斑の上でコントラストが 3.5:1 まで下がった）
    */
@@ -159,6 +189,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
     sceneFilter: "saturate(0.66) brightness(0.8)",
     interiorFilter: "brightness(0.92) saturate(0.8)",
+    outdoorRoomFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
     vignette: 0.9,
   },
   day: {
@@ -166,6 +197,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0) brightness(1.02) contrast(1)",
     sceneFilter: "saturate(0.78) brightness(0.94)",
     interiorFilter: "brightness(0.84) saturate(0.66)",
+    outdoorRoomFilter: "sepia(0) brightness(1.02) contrast(1)",
     vignette: 0.85,
   },
   evening: {
@@ -173,6 +205,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0) brightness(1) contrast(1)",
     sceneFilter: "saturate(0.72) brightness(0.8)",
     interiorFilter: "brightness(1) saturate(1)",
+    outdoorRoomFilter: "sepia(0) brightness(1) contrast(1)",
     vignette: 1,
   },
   night: {
@@ -180,6 +213,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.05) brightness(0.52) contrast(0.98)",
     sceneFilter: "saturate(0.5) brightness(0.42)",
     interiorFilter: "brightness(1.06) saturate(1)",
+    outdoorRoomFilter: "sepia(0) brightness(1.06) contrast(1)",
     vignette: 1,
   },
   /*
@@ -191,12 +225,13 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.04) brightness(0.33) contrast(0.98)",
     sceneFilter: "saturate(0.3) brightness(0.2)",
     interiorFilter: "brightness(1.12) saturate(1)",
+    outdoorRoomFilter: "sepia(0) brightness(1.12) contrast(1)",
     vignette: 1,
   },
 };
 
 const topVariables = (ambient: AmbientId) => {
-  const { haze, buildingFilter, sceneFilter, interiorFilter, vignette } = TOP_AMBIENTS[ambient];
+  const { haze, buildingFilter, sceneFilter, interiorFilter, outdoorRoomFilter, vignette } = TOP_AMBIENTS[ambient];
   return {
     ...seaSkyVariables(ambient),
     // 外の植物に沖縄の風を感じる場所なので、共通の風の強さをそのまま使う（今はまだ読むレイヤーはない）
@@ -205,6 +240,7 @@ const topVariables = (ambient: AmbientId) => {
     "--ambient-building-filter": buildingFilter,
     "--ambient-scene-filter": sceneFilter,
     "--ambient-interior-filter": interiorFilter,
+    "--ambient-outdoor-room-filter": outdoorRoomFilter,
     "--ambient-vignette": vignette,
   };
 };
