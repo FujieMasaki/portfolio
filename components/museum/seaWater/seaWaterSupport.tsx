@@ -29,11 +29,14 @@ export class SeaErrorBoundary extends Component<ErrorBoundaryProps, { failed: bo
   }
 }
 
-/** three を読み込む前に、WebGL2 の context を作れるかだけを確かめる（three r163 以降は WebGL1 で動かない） */
+/**
+ * three を読み込む前に、WebGL2 の context を作れるかだけを確かめる（three r163 以降は WebGL1 で動かない）。
+ * ソフトウェア描画など遅い環境で作れないことは、本番の Canvas と同じ条件（failIfMajorPerformanceCaveat）で確かめる
+ */
 export const supportsWebGL = () => {
   try {
     const canvas = document.createElement("canvas");
-    const gl = canvas.getContext("webgl2");
+    const gl = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: true });
     gl?.getExtension("WEBGL_lose_context")?.loseContext();
     return gl !== null;
   } catch {
