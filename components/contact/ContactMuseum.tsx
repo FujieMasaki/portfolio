@@ -4,6 +4,7 @@ import LayeredBuilding, { type BuildingLayers } from "@/components/museum/Layere
 import ambientStyles from "@/components/museum/ambient.module.css";
 import MuseumNav from "@/components/museum/MuseumNav";
 import MuseumRoomNavigation from "@/components/museum/MuseumRoomNavigation";
+import SeaSkyMotion from "@/components/museum/SeaSkyMotion";
 import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
 import ParallaxStage from "@/components/top/ParallaxStage";
 import shared from "@/components/about/AboutMuseum.module.css";
@@ -45,7 +46,7 @@ const BUILDING_SIZES =
  * 見えている建物は、TOP の3アーチの美術館を裏から見たもので、通り抜けてきたアーチが1つだけ見える。
  *
  * レイヤー（奥 → 手前）:
- *   1. sky      TOP と同じ海と空（top-bg-sea-sky.png）を左右反転して、館の反対側から見ていることにする
+ *   1. sky      TOP と同じ海と空（top-bg-sea-sky.png と、流れる雲・揺らぐ海）を左右反転して、館の反対側から見ていることにする
  *   2. building 美術館の背面とアーチ。素地・陰・奥行き・植物の影・夕方の光の5枚を重ねる（LayeredBuilding。固定）
  *   3. plants   植物・琉球石灰岩（1枚の PNG。静止）
  *   4. sign     壁に置いた小さな案内（CONTACT / Email & Links / Mail・GitHub・X）
@@ -68,13 +69,17 @@ const ContactMuseum = () => {
           {/* 反転は wrapper にだけかけ、画像の object-fit / object-position の計算には触れない */}
           <div className={styles.sky} aria-hidden="true">
             <div className={styles.skyFlip}>
-              <Image
-                src={SEA_SKY_BACKGROUND}
-                alt=""
-                fill
-                loading="eager"
-                fetchPriority="high"
-                sizes={SKY_SIZES}
+              <SeaSkyMotion
+                image={
+                  <Image
+                    src={SEA_SKY_BACKGROUND}
+                    alt=""
+                    fill
+                    loading="eager"
+                    fetchPriority="high"
+                    sizes={SKY_SIZES}
+                  />
+                }
               />
             </div>
             <div className={ambientStyles.glaze} />

@@ -74,8 +74,12 @@
  * 雲・海・霞の動きはどれも「気づかなくてもよい」程度に留め、建築より目立たせない。
  */
 .sky {
-  /* .sky の箱の中での水平線の高さ。雲と海の写しはここで上下に切り分ける */
+  /* .sky の箱の中での水平線の高さ。空と海の層はここで上下に切り分ける（components/museum/seaMotion.module.css） */
   --horizon: 42.2%;
+  /* 背景画像の object-position（0〜1）。雲の層（components/museum/seaMotion.module.css）も同じ位置に合わせる */
+  --sky-x: 0.5;
+  /* 水平線を完成イメージと同じ高さ（舞台の上から約 42%）に合わせる */
+  --sky-y: 0.53;
 
   inset: -2%;
   transform: translate3d(calc(var(--px) * -0.3%), calc(var(--py) * -0.2%), 0);
@@ -84,40 +88,12 @@
 
 .sky img {
   object-fit: cover;
-  /* 水平線を完成イメージと同じ高さ（舞台の上から約 42%）に合わせる */
-  object-position: 50% 53%;
+  object-position: calc(var(--sky-x) * 100%) calc(var(--sky-y) * 100%);
 }
 
-.clouds,
-.sea,
 .haze {
   position: absolute;
   inset: 0;
-}
-
-/* 雲：水平線より上の写しを、片道 90 秒かけて横へ往復させる（往復なのでループの継ぎ目が出ない） */
-.clouds {
-  mask-image: linear-gradient(
-    to bottom,
-    #000 calc(var(--horizon) - 2.5%),
-    transparent calc(var(--horizon) - 0.3%)
-  );
-  animation: cloud-drift 90s ease-in-out infinite alternate;
-}
-
-/*
- * 海：水平線より下の写しを、水平線を支点にわずかに縦へ伸縮させる。
- * 手前ほど大きく、遠くほど動かないので遠近が崩れない。半透明で元の画像と重ね、揺らぎだけを残す。
- */
-.sea {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent calc(var(--horizon) + 0.4%),
-    #000 calc(var(--horizon) + 5%)
-  );
-  opacity: 0.7;
-  transform-origin: 50% var(--horizon);
-  animation: sea-breathe 11s ease-in-out infinite alternate;
 }
 
 /*
@@ -838,24 +814,6 @@
   }
 }
 
-@keyframes cloud-drift {
-  from {
-    transform: translate3d(-1.2%, 0, 0);
-  }
-  to {
-    transform: translate3d(1.2%, 0, 0);
-  }
-}
-
-@keyframes sea-breathe {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.003, 1.012);
-  }
-}
-
 @keyframes haze-drift {
   from {
     transform: translate3d(-1.5%, 0, 0);
@@ -882,7 +840,7 @@
     /*
      * 空を伸ばす高さは 0 で止める。横向きのスマホなど高さの低い画面では --above が負になり、
      * そのままだと空の箱が舞台の下まで届かず、背景の暗色が見えていた。
-     * 0 で止めても水平線の位置合わせは成り立ち、届かないのは舞台の下端 6% ほど（手前の植物と岩が覆う）。
+     * 0 で止めても水平線の位置合わせは成り立ち（.sky の --sky-y）、届かないのは舞台の下端 6% ほど（手前の植物と岩が覆う）。
      */
     --sky-above: max(var(--above), 0px);
 
@@ -898,15 +856,17 @@
    */
   .sky {
     --horizon: 44.9%;
+    /*
+     * object-position の y を画像の水平線の割合（488 / 1086）にすると、画像が高さで合っても幅で合っても、
+     * 画像の水平線が箱の 44.9%（--horizon）に来る。0 だと、横向きのスマホなど箱が画像より横長になる幅で、
+     * 画像の水平線が --horizon より下にずれ、水面と静止画の空の境目に帯が出る
+     */
+    --sky-y: 0.449;
 
     top: calc(-1 * var(--sky-above));
     bottom: auto;
     height: calc((var(--sky-above) + 0.423 * var(--stage-h)) / 0.449);
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
-  }
-
-  .sky img {
-    object-position: 50% 0%;
   }
 
   .atmosphere {
@@ -965,8 +925,6 @@
 
   .stage[data-ready],
   .plaque,
-  .clouds,
-  .sea,
   .haze,
   .sway,
   .swayGroup {
