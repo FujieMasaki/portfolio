@@ -181,16 +181,19 @@
   animation-iteration-count: infinite;
 }
 
-:is(.sway, .swayGroup)[data-shape="gust"] {
-  animation-name: sway-gust;
-}
+/* 動きを減らす設定では揺らさない（下の reduce の animation: none より詳細度が高いので、ここで条件を付ける） */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.sway, .swayGroup)[data-shape="gust"] {
+    animation-name: sway-gust;
+  }
 
-:is(.sway, .swayGroup)[data-shape="lull"] {
-  animation-name: sway-lull;
-}
+  :is(.sway, .swayGroup)[data-shape="lull"] {
+    animation-name: sway-lull;
+  }
 
-:is(.sway, .swayGroup)[data-shape="eddy"] {
-  animation-name: sway-eddy;
+  :is(.sway, .swayGroup)[data-shape="eddy"] {
+    animation-name: sway-eddy;
+  }
 }
 
 .swayCanvas {
