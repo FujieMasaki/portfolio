@@ -49,5 +49,11 @@ export const WATER = {
 /** 描画の解像度の上限。タッチ端末（スマホ・タブレット）は 1 */
 export const WATER_MAX_DPR = 1.5;
 
+/**
+ * 描く間隔の下限（秒）。1回の描画で反射と本体の2回描くので、120Hz の画面で倍描かないよう 60fps で止める。
+ * タッチ端末は電池と発熱を考えて 30fps（水面の動きはとても遅いので、間引いても滑らかに見える）
+ */
+export const WATER_FRAME_INTERVAL = { default: 1 / 60, touch: 1 / 30 };
+
 /** タブを離れていた後などに、時間が一気に進んで揺らぎが飛ばないようにする、1フレームの上限（秒） */
 export const WATER_MAX_DELTA = 0.1;

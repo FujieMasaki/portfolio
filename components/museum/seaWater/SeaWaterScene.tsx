@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Mesh, MeshBasicMaterial, PlaneGeometry, RepeatWrapping, Vector3, type Texture } from "three";
 import { Water } from "three/examples/jsm/objects/Water.js";
 import { PhotoTextureLoader } from "./photoTextureLoader";
-import { WATER, WATER_MAX_DELTA } from "./waterConfig";
+import { WATER, WATER_FRAME_INTERVAL, WATER_MAX_DELTA } from "./waterConfig";
 import { createWaterNormals } from "./waterNormals";
 
 type Props = {
@@ -93,11 +93,21 @@ const SeaWaterScene = ({ onContextLost, onFirstFrame }: Props) => {
     return () => canvas.removeEventListener("webglcontextlost", onContextLost);
   }, [gl, onContextLost]);
 
+  const [frameInterval] = useState(() =>
+    window.matchMedia("(pointer: coarse)").matches ? WATER_FRAME_INTERVAL.touch : WATER_FRAME_INTERVAL.default,
+  );
+
   // 優先度 1 にすると R3F の自動描画が止まるので、ここで描き、最初の1枚の後に1回だけ知らせる。
-  // 反射の描画は Water.js が onBeforeRender の中で行う
+  // 反射の描画は Water.js が onBeforeRender の中で行う。
+  // 前に描いてから frameInterval たつまでは描かない（描かないフレームは、前の絵がそのまま見える）
   const firstFrameDone = useRef(false);
+  const sinceRender = useRef(Infinity);
   useFrame(({ gl, scene, camera }, delta) => {
-    advanceTime(water, Math.min(delta, WATER_MAX_DELTA) * WATER.speed);
+    sinceRender.current += delta;
+    // 60Hz の rAF の揺れで 1/60 秒にわずかに届かず、1フレーム飛ばすことがないよう、少しだけ余裕を持たせる
+    if (sinceRender.current < frameInterval * 0.9) return;
+    advanceTime(water, Math.min(sinceRender.current, WATER_MAX_DELTA) * WATER.speed);
+    sinceRender.current = 0;
     gl.render(scene, camera);
     if (!firstFrameDone.current) {
       firstFrameDone.current = true;
