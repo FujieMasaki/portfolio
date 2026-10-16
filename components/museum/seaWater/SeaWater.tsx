@@ -8,13 +8,17 @@ import { SeaErrorBoundary, supportsWebGL, useReducedMotion, whenIdle } from "./s
 /** three と R3F は、Water.js の海を始めるときだけ読み込む */
 const SeaWaterCanvas = dynamic(() => import("./SeaWaterCanvas"), { ssr: false });
 
+/** データ節約モードでは three を読み込まない。Save-Data は Chromium 系だけが持つ */
+const prefersSavingData = () =>
+  (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+
 /**
  * three の Water.js で描く穏やかな海（progressive enhancement）。空の箱の水平線より下にだけ canvas を置き、
  * 手前の静止画の海の奥に敷く。最初の1枚を描けたら data-sea-ready を付け、それを合図に静止画の海が
  * 薄くなる（seaMotion.module.css）。写真の質感を残したまま、水面の動きだけを足すため。
  *
  * 次のときは何も描かず、静止画の海のままにする。
- * prefers-reduced-motion・サーバーでの描画・WebGL が使えない・初期化／shader の失敗・context の喪失。
+ * prefers-reduced-motion・データ節約モード・サーバーでの描画・WebGL が使えない・初期化／shader の失敗・context の喪失。
  */
 const SeaWater = () => {
   const reducedMotion = useReducedMotion();
@@ -22,7 +26,7 @@ const SeaWater = () => {
   const layer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || prefersSavingData()) return;
     return whenIdle(() =>
       setPhase((current) => (current === "waiting" ? (supportsWebGL() ? "running" : "failed") : current)),
     );

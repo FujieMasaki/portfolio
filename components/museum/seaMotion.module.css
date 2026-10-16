@@ -61,6 +61,8 @@
 [data-sea-ready] ~ .seaStill .breath {
   opacity: 0;
   visibility: hidden;
+  /* その時点の伸びのまま止めてから薄くする（見えない層を動かし続けない） */
+  animation-play-state: paused;
   transition:
     opacity 1.2s var(--ease-calm),
     visibility 0s 1.2s;
