@@ -62,7 +62,7 @@ export type PlantSway = {
   /** --wind に掛ける係数。傾きは --wind × gain × --sway-reach（TopHero.module.css） */
   gain: number;
   shape: SwayShape;
-  /** 周期と開始位置（秒）。6つがそろって揺れないよう、どれも互いに割り切れない値にする */
+  /** 周期と開始位置（秒）。そろって揺れないよう、どれも互いに割り切れない値にする */
   duration: number;
   delay: number;
 };
@@ -78,7 +78,7 @@ export const PLANT_SWAY_GROUPS: PlantSwayGroup[] = [
     // 左上のアダンの、幹の分かれ目から上（枝・冠・中ほど・垂れた葉先）。支点は幹の分かれ目。
     // 幹はベースに残るので、継ぎ目は支点のすぐそばの1か所になる
     id: "pandanus",
-    box: { x: 0, y: 0, width: 430, height: 320 },
+    box: { x: 0, y: 0, width: 430, height: 345 },
     pivot: { x: 20, y: 295 },
     gain: 1,
     shape: "lull",

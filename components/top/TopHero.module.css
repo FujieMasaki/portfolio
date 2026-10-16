@@ -164,7 +164,7 @@
  * 昼（--wind 0.55）の最大は、アダンの冠 約 0.35deg・中ほど 約 0.5deg・垂れた葉先 約 0.83deg、
  * ソテツ 約 0.45deg、クワズイモ 約 0.83deg / 約 0.74deg。
  * 支点は葉の付け根・茎の根元（transform-origin は ForegroundPlants が scene.ts の pivot から決める）。
- * 揺れの形は data-shape、周期・開始位置は葉ごとに style で渡し、6つがそろって揺れないようにする。
+ * 揺れの形は data-shape、周期・開始位置は葉ごとに style で渡し、そろって揺れないようにする。
  */
 .sway {
   overflow: hidden;
