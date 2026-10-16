@@ -23,6 +23,20 @@ const AMBIENT_STARTS: { id: AmbientId; hour: number }[] = [
 
 const AMBIENT_IDS = AMBIENT_STARTS.map((start) => start.id);
 
+/**
+ * 時間帯ごとの風の強さ（windStrength。0 = 無風、1 = この美術館で想定するいちばん強い風）。
+ * 植物・海面・木漏れ日・光が同じ風を参照できるよう、各ページが CSS 変数 --wind として流す
+ * （ページごとの場所の違いは、ページ側で係数を掛ける）。
+ * 昼がいちばん風があり、朝・夕方は弱く、夜は凪に近い
+ */
+export const WIND_STRENGTH: Record<AmbientId, number> = {
+  midnight: 0.15,
+  morning: 0.4,
+  day: 0.55,
+  evening: 0.4,
+  night: 0.2,
+};
+
 export const getAmbientFromHour = (hour: number): AmbientId => {
   return AMBIENT_STARTS.findLast((start) => hour >= start.hour)?.id ?? "midnight";
 };

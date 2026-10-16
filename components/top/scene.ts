@@ -7,7 +7,7 @@
  * ここを基準にすると完成イメージとレイヤーがずれない。
  */
 
-import type { AmbientId } from "@/components/museum/ambient";
+import { WIND_STRENGTH, type AmbientId } from "@/components/museum/ambient";
 import type { AmbientVariables } from "@/components/museum/AmbientRoot";
 import type { BuildingLayers } from "@/components/museum/LayeredBuilding";
 import { seaSkyVariables } from "@/components/museum/seaSky";
@@ -202,6 +202,8 @@ const topVariables = (ambient: AmbientId) => {
   const { haze, buildingFilter, sceneFilter, interiorFilter, vignette } = TOP_AMBIENTS[ambient];
   return {
     ...seaSkyVariables(ambient),
+    // 外の植物に沖縄の風を感じる場所なので、共通の風の強さをそのまま使う（今はまだ読むレイヤーはない）
+    "--wind": WIND_STRENGTH[ambient],
     "--ambient-haze": haze,
     "--ambient-building-filter": buildingFilter,
     "--ambient-scene-filter": sceneFilter,

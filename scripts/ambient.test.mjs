@@ -4,6 +4,7 @@ import {
   getAmbientFromHour,
   msUntilNextAmbient,
   parseAmbientOverride,
+  WIND_STRENGTH,
 } from "../components/museum/ambient.ts";
 
 test("各時間帯の始まりと終わりの時刻で、時間帯が切り替わる", () => {
@@ -57,4 +58,10 @@ test("確認用の ambient の指定は、5つの時間帯だけを受け付け�
 test("ambient の指定がないときは、知らない値と区別する", () => {
   assert.equal(parseAmbientOverride(""), undefined);
   assert.equal(parseAmbientOverride("?foo=1"), undefined);
+});
+
+test("風は昼がいちばん強く、朝・夕方は弱く、夜・深夜は凪に近い（どれも 0〜1）", () => {
+  for (const value of Object.values(WIND_STRENGTH)) assert.ok(value >= 0 && value <= 1);
+  assert.ok(WIND_STRENGTH.day > WIND_STRENGTH.morning && WIND_STRENGTH.day > WIND_STRENGTH.evening);
+  assert.ok(WIND_STRENGTH.evening > WIND_STRENGTH.night && WIND_STRENGTH.night > WIND_STRENGTH.midnight);
 });
