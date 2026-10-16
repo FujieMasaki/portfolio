@@ -708,7 +708,6 @@
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
-
   .atmosphere {
     top: calc(-1 * var(--sky-above));
     background:
