@@ -1,10 +1,10 @@
-import Image from "next/image";
 import AmbientRoot from "@/components/museum/AmbientRoot";
 import LayeredBuilding from "@/components/museum/LayeredBuilding";
 import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
 import ArchEntrance from "./ArchEntrance";
 import ArchPassage from "./ArchPassage";
 import ArchSigns from "./ArchSigns";
+import ForegroundPlants from "./ForegroundPlants";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
 import {
@@ -21,13 +21,16 @@ import styles from "./TopHero.module.css";
  * TOP のヒーロー。海辺の小さな私設美術館の入口として、3つのアーチを About / Work / Contact の入口にする。
  *
  * レイヤー（奥 → 手前）:
- *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞を含む。Sky.tsx）
- *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）
- *   3. arch       アーチ内の展示室・ツバメ（＋ hover のスモークと GO TO の案内）
+ *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞・ときどき遠くを横切る燕とコウモリを含む。Sky.tsx）
+ *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）。アダン・ソテツ・クワズイモの葉が風で揺れる（ForegroundPlants）
+ *   3. arch       アーチ内の展示室と、Contact の窓辺（＋ hover のスモークと GO TO の案内）。
+ *                 Contact の画像は窓を透過していて、1 の空と海がそのまま覗く
  *   4. building   建物本体（開口部は透過）。素地・陰・奥行き・植物の影・夕方の光の5枚を重ねる（LayeredBuilding）
  *   5. plantsFront 前景植物のうち建物より手前の茂みだけ（マスクで切り出し）
  *   6. atmosphere 周辺減光と、時間帯の空気の色
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
+ *
+ * 1〜7 は .lens にまとめ、アーチの hover で、景色ごとまっすぐ前へわずかに近づく（館名は動かさない）。
  *
  * 光・霞・室内灯・空気は訪問者のローカル時刻で変わる（AmbientRoot が scene.ts の TOP_AMBIENT_VARIABLES を
  * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
@@ -53,58 +56,47 @@ const TopHero = () => {
         </header>
 
         <ParallaxStage className={styles.stage}>
-          <Sky background={SEA_SKY_BACKGROUND} />
+          {/* 舞台の全レイヤーを1枚にまとめ、アーチの hover で景色ごとまっすぐ前へわずかに近づける */}
+          <div className={styles.lens}>
+            <Sky background={SEA_SKY_BACKGROUND} />
 
-          <div
-            className={styles.plantsBack}
-            style={toPercentBox(FOREGROUND)}
-            aria-hidden="true"
-          >
-            <Image
-              src="/images/top/top-foreground-tropical-plants.png"
-              alt=""
-              fill
-              loading="eager"
-              fetchPriority="high"
-              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
+            <div
+              className={styles.plantsBack}
+              style={toPercentBox(FOREGROUND)}
+              aria-hidden="true"
+            >
+              <ForegroundPlants />
+            </div>
+
+            <nav className={styles.arches} aria-label="メインメニュー">
+              {ARCHES.map((arch) => (
+                <ArchEntrance
+                  key={arch.id}
+                  arch={arch}
+                  background={SEA_SKY_BACKGROUND}
+                />
+              ))}
+            </nav>
+
+            <LayeredBuilding
+              layers={BUILDING_LAYERS}
+              className={styles.building}
+              style={toPercentBox(BUILDING)}
+              sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
             />
+
+            <div
+              className={styles.plantsFront}
+              style={toPercentBox(FOREGROUND)}
+              aria-hidden="true"
+            >
+              <ForegroundPlants />
+            </div>
+
+            <div className={styles.atmosphere} aria-hidden="true" />
+
+            <ArchSigns />
           </div>
-
-          <nav className={styles.arches} aria-label="メインメニュー">
-            {ARCHES.map((arch) => (
-              <ArchEntrance
-                key={arch.id}
-                arch={arch}
-                background={SEA_SKY_BACKGROUND}
-              />
-            ))}
-          </nav>
-
-          <LayeredBuilding
-            layers={BUILDING_LAYERS}
-            className={styles.building}
-            style={toPercentBox(BUILDING)}
-            sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
-          />
-
-          <div
-            className={styles.plantsFront}
-            style={toPercentBox(FOREGROUND)}
-            aria-hidden="true"
-          >
-            <Image
-              src="/images/top/top-foreground-tropical-plants.png"
-              alt=""
-              fill
-              loading="eager"
-              fetchPriority="high"
-              sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-            />
-          </div>
-
-          <div className={styles.atmosphere} aria-hidden="true" />
-
-          <ArchSigns />
         </ParallaxStage>
       </ArchPassage>
 
