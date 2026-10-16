@@ -267,7 +267,7 @@ export const ARCHES: Arch[] = [
       kind: "image",
       src: "/images/top/contact-arch-space.png",
       width: 839,
-      height: 1874,
+      height: 1875,
       light: "outdoor",
       frame: { left: "-11%", top: "0%", width: "122%" },
     },
