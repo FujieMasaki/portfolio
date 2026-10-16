@@ -54,9 +54,16 @@
   opacity: 0.4;
 }
 
-/* 水面が動き出したら、静止画の海の揺らぎは止める（重ねると二重に動いて見える） */
+/*
+ * 水面が動き出したら、静止画の海の揺らぎは消して止める（重ねると二重に動いて見える）。
+ * 一度に消すと、伸びていた分だけ海が縮んで見えるので、静止画の海と同じ時間をかけて消す
+ */
 [data-sea-ready] ~ .seaStill .breath {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 1.2s var(--ease-calm),
+    visibility 0s 1.2s;
 }
 
 /*
