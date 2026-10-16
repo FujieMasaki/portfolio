@@ -63,10 +63,10 @@ const SeaWaterCanvas = ({ onReady, onError }: Props) => {
           }
           fail();
         };
-        gl.domElement.addEventListener("webglcontextlost", fail, { once: true });
       }}
     >
       <SeaWaterScene
+        onContextLost={fail}
         onFirstFrame={() => {
           // shader のエラーは最初の描画の中で同期的に知らされるので、その後に確かめる
           if (!failed.current) onReady();

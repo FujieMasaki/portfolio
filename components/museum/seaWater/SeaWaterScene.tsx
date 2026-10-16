@@ -1,6 +1,6 @@
 "use client";
 
-import { useFrame, useLoader } from "@react-three/fiber";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import { Mesh, MeshBasicMaterial, PlaneGeometry, RepeatWrapping, Vector3, type Texture } from "three";
 import { Water } from "three/examples/jsm/objects/Water.js";
@@ -9,6 +9,8 @@ import { WATER, WATER_MAX_DELTA } from "./waterConfig";
 import { createWaterNormals } from "./waterNormals";
 
 type Props = {
+  /** WebGL の context を失ったとき（静止画だけに戻す） */
+  onContextLost: () => void;
   /** 最初の1枚を描いた直後に1回だけ呼ぶ */
   onFirstFrame: () => void;
 };
@@ -65,7 +67,7 @@ const advanceTime = (water: Water, seconds: number) => {
  * 毎フレームの更新は time の書き換えだけで、React の state もオブジェクトの生成も使わない。
  * 外したときは、R3F が破棄しない水面・空の板・テクスチャを、ここで破棄する。
  */
-const SeaWaterScene = ({ onFirstFrame }: Props) => {
+const SeaWaterScene = ({ onContextLost, onFirstFrame }: Props) => {
   // 読み込めないと例外になり、SeaWater の error boundary が静止画だけに戻す
   const sky = useLoader(PhotoTextureLoader, WATER.backdrop.src);
   const [water] = useState(createWater);
@@ -81,6 +83,15 @@ const SeaWaterScene = ({ onFirstFrame }: Props) => {
     },
     [water, backdrop, sky],
   );
+
+  // context の喪失を見張る。外したときは R3F が renderer を破棄して context を自分で手放す（forceContextLoss）ので、
+  // その前に cleanup で見張りを外す（外さないと、reduced-motion で外しただけで「失敗」と扱い、設定を戻しても水面が戻らない）
+  const gl = useThree((state) => state.gl);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    return () => canvas.removeEventListener("webglcontextlost", onContextLost);
+  }, [gl, onContextLost]);
 
   // 優先度 1 にすると R3F の自動描画が止まるので、ここで描き、最初の1枚の後に1回だけ知らせる。
   // 反射の描画は Water.js が onBeforeRender の中で行う
