@@ -36,11 +36,12 @@ const swayStyle = (sway: Omit<PlantSway, "src">, outer: Rect) => {
 
 /**
  * 舞台の幅のうち ratio の割合で描く画像の sizes。
- * 舞台の幅は、縦長（縦横比 6/7 以下か幅 700px 以下）と縦横比 4/3 以下の横長で 200vw、それより横長で 100vw
+ * 舞台の幅は、縦長（縦横比 6/7 以下か幅 700px 以下）と縦横比 4/3 以下の横長で 200vw、
+ * それより横長では画面の比率により 100〜約135vw になる（ArchEntrance の interiorSizes と同じ）
  */
 const sizes = (ratio: number) => {
   const narrow = `${Math.ceil(ratio * 200)}vw`;
-  return `(max-aspect-ratio: 6/7) ${narrow}, (max-width: 700px) ${narrow}, (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 100)}vw`;
+  return `(max-aspect-ratio: 6/7) ${narrow}, (max-width: 700px) ${narrow}, (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 135)}vw`;
 };
 
 /**

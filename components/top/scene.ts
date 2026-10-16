@@ -361,7 +361,7 @@ const topVariables = (ambient: AmbientId) => {
   const { haze, buildingFilter, sceneFilter, interiorFilter, outdoorRoomFilter, vignette } = TOP_AMBIENTS[ambient];
   return {
     ...seaSkyVariables(ambient),
-    // 外の植物に沖縄の風を感じる場所なので、共通の風の強さをそのまま使う（今はまだ読むレイヤーはない）
+    // 外の植物に沖縄の風を感じる場所なので、共通の風の強さをそのまま使う（前景植物の揺れ、TopHero.module.css の .sway / .swayGroup が読む）
     "--wind": WIND_STRENGTH[ambient],
     "--ambient-haze": haze,
     "--ambient-building-filter": buildingFilter,
