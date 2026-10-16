@@ -61,7 +61,8 @@ export type PlantSway = {
   pivot: { x: number; y: number };
   /** --wind に掛ける係数。傾きは --wind × gain × --sway-reach（TopHero.module.css） */
   gain: number;
-  shape: SwayShape;
+  /** 省くと、それ自体は揺れない（まとめた木ごと傾くだけ） */
+  shape?: SwayShape;
   /** 周期と開始位置（秒）。そろって揺れないよう、どれも互いに割り切れない値にする */
   duration: number;
   delay: number;
@@ -96,8 +97,7 @@ export const PLANT_SWAYS: PlantSway[] = [
     box: { x: 0, y: 150, width: 226, height: 158 },
     pivot: { x: 20, y: 295 },
     gain: 0,
-    shape: "lull",
-    duration: 13.3,
+    duration: 0,
     delay: 0,
   },
   {
