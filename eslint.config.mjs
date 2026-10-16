@@ -6,8 +6,11 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    // 関数は const とアロー関数で書く（function 宣言・function 式を使わない）。
-    // クラス・オブジェクトのメソッド記法（foo() {}）と getter / setter（get foo() {}）は、アロー関数で書けないので対象にしない。
+    // 関数は const とアロー関数で書く（function 宣言・function 式・class・オブジェクトのメソッド記法・getter / setter を使わない）。
+    // class は React の error boundary（継承していて、getDerivedStateFromError か componentDidCatch を持つもの）だけ許す。
+    // そのメソッドは、メソッドの書き方でもアロー関数のフィールドでもよい。
+    // （esquery の :has は「直下の子」に限れず、中に入れ子の class を持つ場合も通るが、継承していない class は捕まえる）
+    // error boundary は class でしか作れず（受け止める hook がない）、その中のメソッドも class の書き方のままにする。
     // .claude/skills/ は外部から取り込んだ skill で、出典の commit のまま保つため対象にしない
     ignores: [".claude/skills/**"],
     rules: {
@@ -21,6 +24,20 @@ const eslintConfig = defineConfig([
           selector:
             "FunctionExpression:not(MethodDefinition > FunctionExpression):not(Property[method=true] > FunctionExpression):not(Property[kind=/^(get|set)$/] > FunctionExpression)",
           message: "function 式ではなく、アロー関数で書く",
+        },
+        {
+          selector:
+            ":matches(ClassDeclaration, ClassExpression):not([superClass]:has(ClassBody > :matches(MethodDefinition, PropertyDefinition)[key.name=/^(getDerivedStateFromError|componentDidCatch)$/]))",
+          message:
+            "class ではなく、const とアロー関数で書く（class にしてよいのは、getDerivedStateFromError か componentDidCatch を持つ React の error boundary だけ）",
+        },
+        {
+          selector: "Property[method=true]",
+          message: "オブジェクトのメソッド記法（foo() {}）ではなく、アロー関数のプロパティ（foo: () => {}）で書く",
+        },
+        {
+          selector: "Property[kind=/^(get|set)$/]",
+          message: "getter / setter ではなく、値かアロー関数のプロパティで書く",
         },
         {
           // Next.js（16.2）は、fetch のキャッシュを期限切れで取り直すときに signal を外す。タイムアウトなどが再生成で効かなくなる。

@@ -113,3 +113,6 @@
   - 縦長のルールの`object-position`の y を 0 にしていたため、横向きのスマホなど静止画が幅で合う画面で、静止画の水平線が水面の始まり（`--horizon`）からずれていた（サブエージェント）。
   - 共有の部品のファイルに three を使う loader を同居させ、three が最初のbundleに入っていた（実装中に build で見つけた）。
   - 雲のタイル（CSSの背景）が、舞台を出す前の待ち合わせに入っていなかった（サブエージェント）。
+- 2026-10-17: 関数を const とアロー関数で書く決まりを、`eslint.config.mjs`の`no-restricted-syntax`で class・オブジェクトのメソッド記法・getter / setter まで広げた。
+  これまでは`function`の宣言と式だけを捕まえ、class とメソッド記法は対象外だったため、PR #33 の写真の読み込みに`TextureLoader`を継承した class が入った（人間のレビュー）。
+  class は、`getDerivedStateFromError`か`componentDidCatch`を持つ React の error boundary だけ許す（class でしか作れないため）。捕まえる範囲は`scripts/lint-rules.test.mjs`で確かめる。
