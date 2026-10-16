@@ -130,18 +130,18 @@ export const ARCHES: Arch[] = [
     opening: { x: 1083, y: 418, width: 149, height: 404 },
     body: { x: 1023, y: 340, width: 307, height: 300 },
     /*
-     * 展示を見終えて外とつながる、半屋外の小さな場所（デスク・椅子・植物）。
-     * 画像は空と海の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
-     * 開口部の高さを下端の植物まで覆う倍率にし、デスクとライトが入るよう少し右寄りを切り取る。
+     * 展示を見終えて外とつながる、小さな窓辺（天井の灯り・窓を縁取る葉・腰掛けられる台）。
+     * 画像は窓の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
+     * 開口部の高さを覆う倍率にし、窓が開口部の中央に来るよう左右を均等に切り取る。
      * 上端は画像自身のアーチの頂点より少し上へずらし、開口部の頂点に隙間（奥の空）が覗かないようにする
      */
     interior: {
       kind: "image",
       src: "/images/top/contact-arch-space.png",
-      width: 1116,
-      height: 1410,
+      width: 1122,
+      height: 1402,
       light: "outdoor",
-      frame: { left: "-64%", top: "-3%", width: "220%" },
+      frame: { left: "-59%", top: "-2%", width: "220%" },
     },
   },
 ];
@@ -172,7 +172,7 @@ export type TopAmbient = {
   interiorFilter: string;
   /**
    * Contact の半屋外の場所（画像は夕方の光で描いてある）。sepia → brightness → contrast。
-   * 朝〜夕方は建物と同じ外光に寄せ、夜・深夜は天井とデスクの灯りがあるので、About / Work の室内灯（interiorFilter）と同じ明るさにする
+   * 朝〜夕方は建物と同じ外光に寄せ、夜・深夜は天井の灯りがあるので、About / Work の室内灯（interiorFilter）と同じ明るさにする
    * （建物と同じ深夜の brightness(0.33) や、中間の 0.6 では、灯りの点いた場所に見えず暗く感じた）
    */
   outdoorRoomFilter: string;
