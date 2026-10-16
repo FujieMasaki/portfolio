@@ -1,10 +1,10 @@
-import Image from "next/image";
 import AmbientRoot from "@/components/museum/AmbientRoot";
 import LayeredBuilding from "@/components/museum/LayeredBuilding";
 import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
 import ArchEntrance from "./ArchEntrance";
 import ArchPassage from "./ArchPassage";
 import ArchSigns from "./ArchSigns";
+import ForegroundPlants from "./ForegroundPlants";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
 import {
@@ -22,7 +22,7 @@ import styles from "./TopHero.module.css";
  *
  * レイヤー（奥 → 手前）:
  *   1. sky        海と空（雲の流れ・海の揺らぎ・水平線の霞・ときどき遠くを横切る燕とコウモリを含む。Sky.tsx）
- *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）
+ *   2. plantsBack 前景植物の全体（建物の背後に回る木立をここで見せる）。アダン・ソテツ・クワズイモの葉が風で揺れる（ForegroundPlants）
  *   3. arch       アーチ内の展示室と、Contact の半屋外の場所（＋ hover のスモークと GO TO の案内）。
  *                 Contact の画像は空と海を透過していて、1 の空と海がそのまま覗く
  *   4. building   建物本体（開口部は透過）。素地・陰・奥行き・植物の影・夕方の光の5枚を重ねる（LayeredBuilding）
@@ -65,14 +65,7 @@ const TopHero = () => {
               style={toPercentBox(FOREGROUND)}
               aria-hidden="true"
             >
-              <Image
-                src="/images/top/top-foreground-tropical-plants.png"
-                alt=""
-                fill
-                loading="eager"
-                fetchPriority="high"
-                sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-              />
+              <ForegroundPlants />
             </div>
 
             <nav className={styles.arches} aria-label="メインメニュー">
@@ -97,14 +90,7 @@ const TopHero = () => {
               style={toPercentBox(FOREGROUND)}
               aria-hidden="true"
             >
-              <Image
-                src="/images/top/top-foreground-tropical-plants.png"
-                alt=""
-                fill
-                loading="eager"
-                fetchPriority="high"
-                sizes="(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw"
-              />
+              <ForegroundPlants />
             </div>
 
             <div className={styles.atmosphere} aria-hidden="true" />

@@ -43,6 +43,131 @@ export const BUILDING_LAYERS: BuildingLayers = {
 /** 前景植物 PNG はキャンバスと同寸 */
 export const FOREGROUND: Rect = { x: 0, y: 0, ...CANVAS };
 
+/**
+ * 前景植物は、動かないベースと、風で揺らす枝と葉の7枚に分けてある（どれもキャンバスと同寸・同位置）。
+ * ベースからは揺らす部分が抜いてあり、8枚を重ねると元の top-foreground-tropical-plants.png と同じ見た目に戻る。
+ */
+export const PLANTS_BASE = "/images/top/top-plants-base.png";
+
+/** 揺れの形（TopHero.module.css の data-shape と @keyframes sway-*）。どれも「ほぼ静止 → 押される → 戻る → 静か → 弱く反対へ」 */
+export type SwayShape = "gust" | "lull" | "eddy";
+
+export type PlantSway = {
+  id: string;
+  src: string;
+  /** 葉が揺れても切れないよう、葉の外接矩形に余白を足した範囲。この範囲だけを1枚の層として回す */
+  box: Rect;
+  /** 回転の支点（葉の付け根・茎の根元） */
+  pivot: { x: number; y: number };
+  /** --wind に掛ける係数。傾きは --wind × gain × --sway-reach（TopHero.module.css） */
+  gain: number;
+  shape: SwayShape;
+  /** 周期と開始位置（秒）。6つがそろって揺れないよう、どれも互いに割り切れない値にする */
+  duration: number;
+  delay: number;
+};
+
+/**
+ * いくつかの葉をまとめて、株や木ごと傾ける入れ物。中の葉はそれぞれの揺れを保ったまま一緒に傾く。
+ * box は中の葉の box をすべて含む範囲。
+ */
+export type PlantSwayGroup = Omit<PlantSway, "src"> & { members: string[] };
+
+export const PLANT_SWAY_GROUPS: PlantSwayGroup[] = [
+  {
+    // 左上のアダンの、幹の分かれ目から上（枝・冠・中ほど・垂れた葉先）。支点は幹の分かれ目。
+    // 幹はベースに残るので、継ぎ目は支点のすぐそばの1か所になる
+    id: "pandanus",
+    box: { x: 0, y: 0, width: 430, height: 320 },
+    pivot: { x: 20, y: 295 },
+    gain: 1,
+    shape: "lull",
+    duration: 13.3,
+    delay: -5.2,
+    members: ["pandanus-branches", "pandanus-crown", "pandanus-cluster", "pandanus-bundle"],
+  },
+];
+
+export const PLANT_SWAYS: PlantSway[] = [
+  {
+    // 左上のアダンの、幹の分かれ目から上の2本の枝。枝そのものは揺らさず、木ごと傾く（PLANT_SWAY_GROUPS）だけ
+    id: "pandanus-branches",
+    src: "/images/top/top-sway-pandanus-branches.png",
+    box: { x: 0, y: 150, width: 226, height: 158 },
+    pivot: { x: 20, y: 295 },
+    gain: 0,
+    shape: "lull",
+    duration: 13.3,
+    delay: 0,
+  },
+  {
+    // 左上のアダン。いちばん上の葉の冠（2本の枝先に載る）
+    id: "pandanus-crown",
+    src: "/images/top/top-sway-pandanus-crown.png",
+    box: { x: 0, y: 0, width: 415, height: 186 },
+    pivot: { x: 160, y: 165 },
+    gain: 0.42,
+    shape: "lull",
+    duration: 21.3,
+    delay: -13.6,
+  },
+  {
+    // 左上のアダン。中ほどの葉のまとまりと実（枝先から下がる）
+    id: "pandanus-cluster",
+    src: "/images/top/top-sway-pandanus-cluster.png",
+    box: { x: 0, y: 96, width: 406, height: 247 },
+    pivot: { x: 155, y: 150 },
+    gain: 0.6,
+    shape: "eddy",
+    duration: 15.7,
+    delay: -4.9,
+  },
+  {
+    // 左上のアダン。房の右下に垂れる葉先
+    id: "pandanus-bundle",
+    src: "/images/top/top-sway-pandanus-bundle.png",
+    box: { x: 216, y: 24, width: 188, height: 308 },
+    pivot: { x: 245, y: 42 },
+    gain: 1,
+    shape: "gust",
+    duration: 9.4,
+    delay: -3.1,
+  },
+  {
+    // 左下のソテツ。上へ弓なりに伸びる葉（支点は株の中心）
+    id: "sotetsu",
+    src: "/images/top/top-sway-sotetsu.png",
+    box: { x: 324, y: 633, width: 196, height: 171 },
+    pivot: { x: 340, y: 788 },
+    gain: 0.6,
+    shape: "lull",
+    duration: 16.2,
+    delay: -9.7,
+  },
+  {
+    // 右下のクワズイモ。手前の大きな葉
+    id: "alocasia-01",
+    src: "/images/top/top-sway-alocasia-01.png",
+    box: { x: 1561, y: 688, width: 111, height: 253 },
+    pivot: { x: 1606, y: 941 },
+    gain: 1,
+    shape: "eddy",
+    duration: 12.6,
+    delay: -1.4,
+  },
+  {
+    // 右下のクワズイモ。その左下の小さな葉
+    id: "alocasia-02",
+    src: "/images/top/top-sway-alocasia-02.png",
+    box: { x: 1516, y: 803, width: 119, height: 138 },
+    pivot: { x: 1558, y: 941 },
+    gain: 0.9,
+    shape: "gust",
+    duration: 14.1,
+    delay: -6.8,
+  },
+];
+
 export type ArchId = "about" | "work" | "contact";
 
 type ImageInterior = {
