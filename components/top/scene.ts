@@ -263,10 +263,10 @@ export const ARCHES: Arch[] = [
     interior: {
       kind: "image",
       src: "/images/top/contact-arch-space.png",
-      width: 1122,
-      height: 1402,
+      width: 1199,
+      height: 1312,
       light: "outdoor",
-      frame: { left: "-59%", top: "-2%", width: "220%" },
+      frame: { left: "-80.5%", top: "-5%", width: "264%" },
     },
   },
 ];
