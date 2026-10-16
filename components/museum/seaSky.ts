@@ -41,7 +41,8 @@ export const SEA_SKY_LIGHT: Record<AmbientId, SeaSkyLight> = {
     glaze: {
       sky: "rgb(150 184 214 / 0.6)",
       horizon: "rgb(222 228 230 / 0.42)",
-      sea: "rgb(48 92 128 / 0.16)",
+      // 色調補正で彩度を落とした海に、少しだけ青みを足す
+      sea: "rgb(35 104 160 / 0.27)",
     },
     air: { top: "rgb(58 72 96 / 0.18)", bottom: CLEAR },
     skyShade: 0.32,
