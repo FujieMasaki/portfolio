@@ -44,8 +44,10 @@ export const BUILDING_LAYERS: BuildingLayers = {
 export const FOREGROUND: Rect = { x: 0, y: 0, ...CANVAS };
 
 /**
- * 前景植物は、動かないベースと、風で揺らす枝と葉の7枚に分けてある（どれもキャンバスと同寸・同位置）。
+ * 前景植物は、動かないベースと、風で揺らす枝と葉の7枚に分けてある。
  * ベースからは揺らす部分が抜いてあり、8枚を重ねると元の top-foreground-tropical-plants.png と同じ見た目に戻る。
+ * 素材はどれもキャンバスと同寸・同位置で作り、揺らす7枚は、それぞれの box の範囲だけを画素を変えずに切り出して置く
+ * （box の外は透明なので失うものはない。素材を差し替えるときも、同じ範囲で切り出し直す）。
  */
 export const PLANTS_BASE = "/images/top/top-plants-base.png";
 
@@ -55,7 +57,7 @@ export type SwayShape = "gust" | "lull" | "eddy";
 export type PlantSway = {
   id: string;
   src: string;
-  /** 葉が揺れても切れないよう、葉の外接矩形に余白を足した範囲。この範囲だけを1枚の層として回す */
+  /** 葉が揺れても切れないよう、葉の外接矩形に余白を足した範囲。この範囲だけを1枚の層として回す（src はこの範囲を切り出した画像） */
   box: Rect;
   /** 回転の支点（葉の付け根・茎の根元） */
   pivot: { x: number; y: number };

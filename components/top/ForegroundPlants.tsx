@@ -34,16 +34,20 @@ const swayStyle = (sway: Omit<PlantSway, "src">, outer: Rect) => {
   } as CSSProperties;
 };
 
-/** 植物の画像はどれも舞台の全幅で描く */
-const SIZES =
-  "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 100vw";
+/**
+ * 舞台の幅のうち ratio の割合で描く画像の sizes。
+ * 舞台の幅は、縦長（縦横比 6/7 以下か幅 700px 以下）と縦横比 4/3 以下の横長で 200vw、それより横長で 100vw
+ */
+const sizes = (ratio: number) => {
+  const narrow = `${Math.ceil(ratio * 200)}vw`;
+  return `(max-aspect-ratio: 6/7) ${narrow}, (max-width: 700px) ${narrow}, (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 100)}vw`;
+};
 
 /**
- * 揺らす葉1枚。葉のまわりの範囲（box）だけを層にして回し、
- * その中にキャンバス全体の画像を元の位置に合わせて置く（透明な余白ごと回すと、層が舞台の全面になって重い）。
+ * 揺らす葉1枚。画像は葉のまわりの範囲（box）だけを切り出したもので、その範囲を層にして回す
+ * （キャンバス全体の画像を透明な余白ごと回すと、層が舞台の全面になり、decode したメモリも大きい）。
  */
 const Sway = ({ sway, outer }: { sway: PlantSway; outer: Rect }) => {
-  const { box } = sway;
   return (
     <div
       className={styles.sway}
@@ -51,18 +55,15 @@ const Sway = ({ sway, outer }: { sway: PlantSway; outer: Rect }) => {
       data-shape={sway.shape}
       style={swayStyle(sway, outer)}
     >
-      <span
-        className={styles.swayCanvas}
-        style={{
-          left: `${(-box.x / box.width) * 100}%`,
-          top: `${(-box.y / box.height) * 100}%`,
-          width: `${(CANVAS.width / box.width) * 100}%`,
-          height: `${(CANVAS.height / box.height) * 100}%`,
-        }}
-      >
-        {/* 葉が抜けたベースだけが先に見えないよう、舞台はこの画像も待ってから現れる（ParallaxStage） */}
-        <Image src={sway.src} alt="" fill loading="eager" fetchPriority="high" sizes={SIZES} />
-      </span>
+      {/* 葉が抜けたベースだけが先に見えないよう、舞台はこの画像も待ってから現れる（ParallaxStage） */}
+      <Image
+        src={sway.src}
+        alt=""
+        fill
+        loading="eager"
+        fetchPriority="high"
+        sizes={sizes(sway.box.width / CANVAS.width)}
+      />
     </div>
   );
 };
@@ -101,7 +102,7 @@ const ForegroundPlants = () => {
         fill
         loading="eager"
         fetchPriority="high"
-        sizes={SIZES}
+        sizes={sizes(1)}
       />
       {PLANT_SWAY_GROUPS.map((group) => (
         <SwayGroup key={group.id} group={group} />

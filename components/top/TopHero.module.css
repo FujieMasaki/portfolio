@@ -165,13 +165,9 @@
  * 垂れた葉先 約 0.83deg、ソテツ 約 0.45deg、クワズイモ 約 0.83deg / 約 0.74deg。
  * 支点は葉の付け根・茎の根元（transform-origin は ForegroundPlants が scene.ts の pivot から決める）。
  * 揺れの形は data-shape、周期・開始位置は葉ごとに style で渡し、そろって揺れないようにする。
+ * .swayGroup は、葉をまとめて株や木ごと傾ける入れ物（中の葉の揺れはその上に重なる。scene.ts の PLANT_SWAY_GROUPS）。
+ * アダンは幹の分かれ目を支点に、昼の最大 約 0.74deg
  */
-.sway {
-  overflow: hidden;
-}
-
-/* .swayGroup は、葉をまとめて株や木ごと傾ける入れ物（中の葉の揺れはその上に重なる。scene.ts の PLANT_SWAY_GROUPS）。
-   アダンは幹の分かれ目を支点に、昼の最大 約 0.74deg */
 .sway,
 .swayGroup {
   position: absolute;
@@ -194,10 +190,6 @@
   :is(.sway, .swayGroup)[data-shape="eddy"] {
     animation-name: sway-eddy;
   }
-}
-
-.swayCanvas {
-  position: absolute;
 }
 
 /* 押されて、ゆっくり戻り、しばらく静かにしてから、ごく弱く反対へ */
