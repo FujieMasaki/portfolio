@@ -9,7 +9,11 @@ import { Component, useSyncExternalStore, type ReactNode } from "react";
 
 type ErrorBoundaryProps = { onError: () => void; children: ReactNode };
 
-/** WebGL の初期化失敗・three の読み込み失敗・空の画像の読み込み失敗を受け止め、何も描かずに静止画だけに戻す */
+/**
+ * WebGL の初期化失敗・three の読み込み失敗・空の画像の読み込み失敗を受け止め、何も描かずに静止画だけに戻す。
+ * 関数は const とアロー関数で書く決まりだが、これだけは class にする。React の error boundary は
+ * class の getDerivedStateFromError / componentDidCatch でしか作れない（受け止める hook がない）ため
+ */
 export class SeaErrorBoundary extends Component<ErrorBoundaryProps, { failed: boolean }> {
   state = { failed: false };
 
