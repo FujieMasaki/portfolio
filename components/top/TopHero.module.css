@@ -71,8 +71,12 @@
  * 雲・海・霞の動きはどれも「気づかなくてもよい」程度に留め、建築より目立たせない。
  */
 .sky {
-  /* .sky の箱の中での水平線の高さ。雲と海の写しはここで上下に切り分ける */
+  /* .sky の箱の中での水平線の高さ。空と海の層はここで上下に切り分ける（components/museum/seaMotion.module.css） */
   --horizon: 42.2%;
+  /* 背景画像の object-position（0〜1）。雲の層（components/museum/seaMotion.module.css）も同じ位置に合わせる */
+  --sky-x: 0.5;
+  /* 水平線を完成イメージと同じ高さ（舞台の上から約 42%）に合わせる */
+  --sky-y: 0.53;
 
   inset: -2%;
   transform: translate3d(calc(var(--px) * -0.3%), calc(var(--py) * -0.2%), 0);
@@ -81,40 +85,12 @@
 
 .sky img {
   object-fit: cover;
-  /* 水平線を完成イメージと同じ高さ（舞台の上から約 42%）に合わせる */
-  object-position: 50% 53%;
+  object-position: calc(var(--sky-x) * 100%) calc(var(--sky-y) * 100%);
 }
 
-.clouds,
-.sea,
 .haze {
   position: absolute;
   inset: 0;
-}
-
-/* 雲：水平線より上の写しを、片道 90 秒かけて横へ往復させる（往復なのでループの継ぎ目が出ない） */
-.clouds {
-  mask-image: linear-gradient(
-    to bottom,
-    #000 calc(var(--horizon) - 2.5%),
-    transparent calc(var(--horizon) - 0.3%)
-  );
-  animation: cloud-drift 90s ease-in-out infinite alternate;
-}
-
-/*
- * 海：水平線より下の写しを、水平線を支点にわずかに縦へ伸縮させる。
- * 手前ほど大きく、遠くほど動かないので遠近が崩れない。半透明で元の画像と重ね、揺らぎだけを残す。
- */
-.sea {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent calc(var(--horizon) + 0.4%),
-    #000 calc(var(--horizon) + 5%)
-  );
-  opacity: 0.7;
-  transform-origin: 50% var(--horizon);
-  animation: sea-breathe 11s ease-in-out infinite alternate;
 }
 
 /*
@@ -682,24 +658,6 @@
   }
 }
 
-@keyframes cloud-drift {
-  from {
-    transform: translate3d(-1.2%, 0, 0);
-  }
-  to {
-    transform: translate3d(1.2%, 0, 0);
-  }
-}
-
-@keyframes sea-breathe {
-  from {
-    transform: scale(1, 1);
-  }
-  to {
-    transform: scale(1.003, 1.012);
-  }
-}
-
 @keyframes haze-drift {
   from {
     transform: translate3d(-1.5%, 0, 0);
@@ -742,6 +700,7 @@
    */
   .sky {
     --horizon: 44.9%;
+    --sky-y: 0;
 
     top: calc(-1 * var(--sky-above));
     bottom: auto;
@@ -749,9 +708,6 @@
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
-  .sky img {
-    object-position: 50% 0%;
-  }
 
   .atmosphere {
     top: calc(-1 * var(--sky-above));
@@ -809,8 +765,6 @@
 
   .stage[data-ready],
   .plaque,
-  .clouds,
-  .sea,
   .haze {
     animation: none;
   }

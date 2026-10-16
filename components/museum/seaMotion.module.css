@@ -1,0 +1,153 @@
+/*
+ * 海と空（TOP と /contact で共有。SeaSkyMotion.tsx）。
+ * 置く箱は、海と空の静止画（object-fit: cover）を敷く箱にする。ページ側の CSS が次の変数を渡す。
+ *
+ *   --horizon  箱の中での水平線の高さ（%）
+ *   --sky-x / --sky-y  静止画の object-position（0〜1 の数。ページの object-position もこの変数から作る）
+ *
+ * 静止画の切り取りと色（時間帯の filter）は、ページ側の img の指定がそのままかかる。
+ * 雲と水面（canvas）には、同じ時間帯の filter（--ambient-sky-filter）をここで掛ける。
+ */
+
+.water,
+.skyStill,
+.seaStill,
+.breath,
+.clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * 水面（Water.js）：いちばん奥に、水平線から下にだけ置く。canvas の上端がちょうど水平線になる。
+ * 描き始めるまでは手前の静止画の海に隠れている
+ */
+.water {
+  top: var(--horizon);
+}
+
+/* 水面は、静止画と同じ時間帯の色調補正を canvas ごとに掛ける */
+.water canvas {
+  filter: var(--ambient-sky-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
+}
+
+/* 静止画の空。水平線の線までを見せ、その下で水面へなじませる */
+.skyStill {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--horizon) + 0.4%),
+    transparent calc(var(--horizon) + 2%)
+  );
+}
+
+/*
+ * 静止画の海。水面が描き始めたら、ゆっくり薄くして奥の水面を見せる。
+ * 消し切らずに残し、写真の質感（夕日の照り返し・波の模様）を保ったまま、水面の動きだけを足す
+ */
+.seaStill {
+  transition: opacity 1.2s var(--ease-calm);
+}
+
+[data-sea-ready] ~ .seaStill {
+  opacity: 0.4;
+}
+
+/* 水面が動き出したら、静止画の海の揺らぎは止める（重ねると二重に動いて見える） */
+[data-sea-ready] ~ .seaStill .breath {
+  display: none;
+}
+
+/*
+ * 水面が使えないときの揺らぎ：水平線より下の写しを、水平線を支点にわずかに縦へ伸縮させる。
+ * 手前ほど大きく、遠くほど動かないので遠近が崩れない。半透明で下の静止画と重ね、揺らぎだけを残す
+ */
+.breath {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent calc(var(--horizon) + 0.4%),
+    #000 calc(var(--horizon) + 5%)
+  );
+  opacity: 0.7;
+  transform-origin: 50% var(--horizon);
+  animation: sea-breathe 11s ease-in-out infinite alternate;
+}
+
+/* 雲：水平線より上を、左右がつながる空のタイルで敷き詰め、一方向へごくゆっくり流し続ける */
+.clouds {
+  overflow: hidden;
+  /* 子の大きさを、この箱の幅と高さ（cqw / cqh）から決める */
+  container-type: size;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--horizon) - 2.5%),
+    transparent calc(var(--horizon) - 0.3%)
+  );
+}
+
+/*
+ * 静止画（1448 x 1086）を object-fit: cover で敷いたときと同じ大きさ・位置の枠。
+ * タイルはこの枠の大きさに合わせるので、雲の大きさと高さは静止画と一致する
+ */
+.cloudFrame {
+  --frame-w: max(100cqw, 100cqh * 1448 / 1086);
+  --frame-h: max(100cqh, 100cqw * 1086 / 1448);
+  /* タイルは元画像の左から 1088px（右端の 360px を左端に重ねて、左右をつないだもの） */
+  --tile-w: calc(var(--frame-w) * 1088 / 1448);
+
+  position: absolute;
+  left: calc((100cqw - var(--frame-w)) * var(--sky-x, 0.5));
+  top: calc((100cqh - var(--frame-h)) * var(--sky-y, 0.5));
+  width: var(--frame-w);
+  height: var(--frame-h);
+}
+
+.cloudStrip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* タイルは元画像の上から 520px（水平線は 488px） */
+  height: calc(var(--frame-h) * 520 / 1086);
+  /* 1枚分ずらしても右端が空かないよう、枠の幅にタイル1枚分を足す（幅 = 枠 × 2536 / 1448） */
+  width: calc(var(--frame-w) + var(--tile-w));
+  background: url("/images/top/sea-sky-cloud-tile.jpg") 0 0 / var(--tile-w) 100% repeat-x;
+  filter: var(--ambient-sky-filter);
+  transition: filter var(--ambient-fade) var(--ease-calm);
+  /* 最初から GPU の層にしておき、1px 未満ずつの移動を画素に丸めずに描かせる */
+  will-change: transform;
+  animation: cloud-flow 600s linear infinite;
+}
+
+/*
+ * ごくわずかに回しておく（0.01deg。端から端で 1px 未満）。平行移動だけの層は、
+ * ブラウザによっては位置を画素に丸めて描くため、ゆっくり動かすと 1px ずつ跳んで見える
+ */
+@keyframes cloud-flow {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0.01deg);
+  }
+  to {
+    /*
+     * タイル1枚分 = 自分の幅の 1088 / 2536。keyframes に変数や cq の長さを使うと、
+     * ブラウザによっては GPU で動かせずメインスレッドの描画になり、カクつく
+     */
+    transform: translate3d(-42.9022%, 0, 0) rotate(0.01deg);
+  }
+}
+
+@keyframes sea-breathe {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.003, 1.012);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloudStrip,
+  .breath {
+    animation: none;
+  }
+}
