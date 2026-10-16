@@ -2,9 +2,17 @@
 
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
-import { Mesh, MeshBasicMaterial, PlaneGeometry, RepeatWrapping, Vector3, type Texture } from "three";
+import {
+  Mesh,
+  MeshBasicMaterial,
+  PlaneGeometry,
+  RepeatWrapping,
+  SRGBColorSpace,
+  TextureLoader,
+  Vector3,
+  type Texture,
+} from "three";
 import { Water } from "three/examples/jsm/objects/Water.js";
-import { PhotoTextureLoader } from "./photoTextureLoader";
 import { WATER, WATER_FRAME_INTERVAL, WATER_MAX_DELTA } from "./waterConfig";
 import { createWaterNormals } from "./waterNormals";
 
@@ -35,6 +43,8 @@ const createWater = () => {
 /** 水面に映す空。遠くに立てた板に、空のタイルを左右に敷き詰めて貼る（下端を水平線に合わせる） */
 const createBackdrop = (sky: Texture) => {
   const { tileWidth, tileHeight, tileHorizon, distance, height, width } = WATER.backdrop;
+  // 写真なので sRGB の色として扱う（GPU に送る最初の描画より前に決める）
+  sky.colorSpace = SRGBColorSpace;
   sky.wrapS = RepeatWrapping;
   // 板の高さ = タイルの高さ。タイルの横の長さを保つよう、板の横幅に合わせてくり返す
   sky.repeat.set(width / ((height * tileWidth) / tileHeight), 1);
@@ -69,7 +79,7 @@ const advanceTime = (water: Water, seconds: number) => {
  */
 const SeaWaterScene = ({ onContextLost, onFirstFrame }: Props) => {
   // 読み込めないと例外になり、SeaWater の error boundary が静止画だけに戻す
-  const sky = useLoader(PhotoTextureLoader, WATER.backdrop.src);
+  const sky = useLoader(TextureLoader, WATER.backdrop.src);
   const [water] = useState(createWater);
   const [backdrop] = useState(() => createBackdrop(sky));
 
@@ -79,7 +89,7 @@ const SeaWaterScene = ({ onContextLost, onFirstFrame }: Props) => {
       backdrop.geometry.dispose();
       backdrop.material.dispose();
       sky.dispose();
-      useLoader.clear(PhotoTextureLoader, WATER.backdrop.src);
+      useLoader.clear(TextureLoader, WATER.backdrop.src);
     },
     [water, backdrop, sky],
   );

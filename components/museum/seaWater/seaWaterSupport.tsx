@@ -4,7 +4,7 @@ import { Component, useSyncExternalStore, type ReactNode } from "react";
 
 /**
  * Water.js の海を始める前に使う部品。three を読む前に使うので、ここでは three を import しない
- * （import すると three が最初の bundle に入る。three を使う部品は photoTextureLoader.ts など）
+ * （import すると three が最初の bundle に入る。three を使う部品は SeaWaterCanvas.tsx・SeaWaterScene.tsx など）
  */
 
 type ErrorBoundaryProps = { onError: () => void; children: ReactNode };
