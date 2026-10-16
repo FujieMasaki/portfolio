@@ -260,7 +260,7 @@ export const ARCHES: Arch[] = [
      * 展示を見終えて外とつながる、奥が海へ開いた通路（灯りのある天井・突き当たりのアーチ形の窓・床）。
      * 画像は窓の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
      * 画像は縦長（約 1:2.2）で描いてあり、通路の左右の壁・天井の灯り・床まで開口部に収める。
-     * 開口部（約 1:2.7）より横長なので、幅を 122% にして下端を開口部の下まで届かせ、左右を均等に切る
+     * 上を少し切って天井の灯りを頂点に寄せ、下端が開口部の下まで届く 126% にする。窓は中央より少し右に置く
      * （はみ出しはアーチ形のリンク（overflow: hidden）が切り抜く）
      */
     interior: {
@@ -269,7 +269,7 @@ export const ARCHES: Arch[] = [
       width: 839,
       height: 1875,
       light: "outdoor",
-      frame: { left: "-11%", top: "0%", width: "122%" },
+      frame: { left: "-11%", top: "-3%", width: "126%" },
     },
   },
 ];
@@ -299,9 +299,9 @@ export type TopAmbient = {
   /** About / Work の室内灯。brightness → saturate */
   interiorFilter: string;
   /**
-   * Contact の窓辺（画像は夕方の光で描いてある）。sepia → brightness → contrast。
-   * 朝〜夕方は建物と同じ外光に寄せ、夜・深夜は天井の灯りがあるので、About / Work の室内灯（interiorFilter）と同じ明るさにする
-   * （建物と同じ深夜の brightness(0.33) や、中間の 0.6 では、灯りの点いた場所に見えず暗く感じた）
+   * Contact の通路（画像は夕方の光で描いてある）。brightness → saturate。
+   * About / Work の室内灯（interiorFilter）と同じ色の寄せ方にし、明るさは各時間帯でその約 0.82 倍にする
+   * （通路の画像は About / Work の画像より約 2 割明るく描いてあり、同じ値では Contact だけが明るく見えた）
    */
   outdoorRoomFilter: string;
   /**
@@ -317,7 +317,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
     sceneFilter: "saturate(0.66) brightness(0.8)",
     interiorFilter: "brightness(0.92) saturate(0.8)",
-    outdoorRoomFilter: "sepia(0.02) brightness(0.92) contrast(0.9)",
+    outdoorRoomFilter: "brightness(0.75) saturate(0.8)",
     vignette: 0.9,
   },
   day: {
@@ -325,7 +325,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0) brightness(1.02) contrast(1)",
     sceneFilter: "saturate(0.78) brightness(0.94)",
     interiorFilter: "brightness(0.84) saturate(0.66)",
-    outdoorRoomFilter: "sepia(0) brightness(1.02) contrast(1)",
+    outdoorRoomFilter: "brightness(0.69) saturate(0.66)",
     vignette: 0.85,
   },
   evening: {
@@ -333,7 +333,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0) brightness(1) contrast(1)",
     sceneFilter: "saturate(0.72) brightness(0.8)",
     interiorFilter: "brightness(1) saturate(1)",
-    outdoorRoomFilter: "sepia(0) brightness(1) contrast(1)",
+    outdoorRoomFilter: "brightness(0.82) saturate(1)",
     vignette: 1,
   },
   night: {
@@ -341,7 +341,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.05) brightness(0.52) contrast(0.98)",
     sceneFilter: "saturate(0.5) brightness(0.42)",
     interiorFilter: "brightness(1.06) saturate(1)",
-    outdoorRoomFilter: "sepia(0) brightness(1.06) contrast(1)",
+    outdoorRoomFilter: "brightness(0.87) saturate(1)",
     vignette: 1,
   },
   /*
@@ -353,7 +353,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
     buildingFilter: "sepia(0.04) brightness(0.33) contrast(0.98)",
     sceneFilter: "saturate(0.3) brightness(0.2)",
     interiorFilter: "brightness(1.12) saturate(1)",
-    outdoorRoomFilter: "sepia(0) brightness(1.12) contrast(1)",
+    outdoorRoomFilter: "brightness(0.92) saturate(1)",
     vignette: 1,
   },
 };

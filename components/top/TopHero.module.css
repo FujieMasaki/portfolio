@@ -796,7 +796,7 @@
 }
 
 /*
- * Contact の窓辺。朝〜夕方は建物と同じ外光に寄せ、夜・深夜は About / Work の室内灯と同じ明るさにする（scene.ts）。
+ * Contact の通路。About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
  * 天井のライトも今は画像ごと同じ明るさになる。時間帯でライトだけを強めるときは、
  * ライトの範囲のマスクを用意し、建物の夕方の光（LayeredBuilding の .light）と同じ形で暖色を足す
  */
