@@ -157,4 +157,10 @@
   .breath {
     animation: none;
   }
+
+  /* 閲覧中に設定を切り替えて水面を外したとき、静止画の海をフェードさせずに戻す */
+  .seaStill,
+  .breath {
+    transition: none;
+  }
 }
