@@ -1,10 +1,10 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { MathUtils } from "three";
 import SeaWaterScene from "./SeaWaterScene";
-import { WATER, WATER_MAX_DPR } from "./waterConfig";
+import { WATER, WATER_DPR } from "./waterConfig";
 
 type Props = {
   /** 最初の1枚を描けたとき（ここから手前の静止画の海が薄くなる） */
@@ -23,11 +23,6 @@ type Props = {
  * - resize の offsetSize：舞台のフェードイン（scale）中に測っても、拡大前の箱の大きさで描く
  */
 const SeaWaterCanvas = ({ onReady, onError }: Props) => {
-  // タッチ端末は 1、それ以外は端末の解像度を 1.5 までで止める
-  const dpr = useMemo<number | [number, number]>(
-    () => (window.matchMedia("(pointer: coarse)").matches ? 1 : [1, WATER_MAX_DPR]),
-    [],
-  );
   const failed = useRef(false);
   const fail = () => {
     if (failed.current) return;
@@ -38,7 +33,7 @@ const SeaWaterCanvas = ({ onReady, onError }: Props) => {
   return (
     <Canvas
       flat
-      dpr={dpr}
+      dpr={WATER_DPR}
       resize={{ offsetSize: true }}
       camera={{
         fov: WATER.fov,
