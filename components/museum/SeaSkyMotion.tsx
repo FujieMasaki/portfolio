@@ -2,6 +2,9 @@ import type { ReactNode } from "react";
 import SeaWater from "./seaWater/SeaWater";
 import styles from "./seaMotion.module.css";
 
+/** 雲のタイル（seaMotion.module.css の .cloudStrip の背景と同じ URL） */
+const CLOUD_TILE = "/images/top/sea-sky-cloud-tile.jpg";
+
 type Props = {
   /** 海と空の静止画（next/image の fill）。ページごとの sizes で作り、ここで3回使う（取得は1回） */
   image: ReactNode;
@@ -26,7 +29,8 @@ const SeaSkyMotion = ({ image }: Props) => (
       {image}
       <div className={styles.breath}>{image}</div>
     </div>
-    <div className={styles.clouds} aria-hidden="true">
+    {/* 雲のタイルは CSS の背景なので、舞台を出す前に読み終えるよう ParallaxStage に URL を渡す */}
+    <div className={styles.clouds} data-await-images={CLOUD_TILE} aria-hidden="true">
       <div className={styles.cloudFrame}>
         <div className={styles.cloudStrip} />
       </div>
