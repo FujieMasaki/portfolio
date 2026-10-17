@@ -1099,6 +1099,20 @@
     transition: opacity 0.5s var(--ease-calm);
   }
 
+  /*
+   * 文字の後ろだけに敷く、ぼかした暗い帯。案内の下は明るい琉球石灰岩になることがあり、朝・昼に文字が沈まないようにする
+   * （hover の案内の名前の .archLabel::before と同じ考え方。縁は大きくぼかし、帯の形が見えないようにする）
+   */
+  .slideNav::before {
+    content: "";
+    position: absolute;
+    inset: -6px -10px;
+    z-index: -1;
+    border-radius: 999px;
+    background: rgb(12 10 8 / 0.34);
+    filter: blur(10px);
+  }
+
   /* 指で押しやすいよう 44px 以上の当たりを取る */
   .slideButton {
     width: 44px;
