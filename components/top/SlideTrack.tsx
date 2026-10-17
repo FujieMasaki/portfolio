@@ -136,8 +136,9 @@ const SlideTrack = ({ children }: Props) => {
         event.preventDefault();
       }
     };
-    // 館名と画面下の案内は箱の外にあるので、それらを含む ArchPassage の範囲で受ける（TOP の画面全体）
-    const area = node.closest<HTMLElement>(`.${styles.passageScope}`) ?? node;
+    // 館名と画面下の案内は箱の外にあるので、それらを含む TOP の画面全体（.hero）で受ける。
+    // ArchPassage の .passageScope は display: contents で描画の箱がなく、そこで preventDefault が効くかは処理系によるので使わない
+    const area = node.closest<HTMLElement>(`.${styles.hero}`) ?? node;
     area.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       area.removeEventListener("wheel", onWheel);
