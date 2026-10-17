@@ -55,7 +55,8 @@ const WHEEL_MIN_DELTA = 4;
  * 箱は CSS だけで横にスクロールし、アーチの中心で1つずつ止まる（TopHero.module.css の .track）。
  * ここで JS が受け持つのは、案内の矢印とマウスのホイールで隣のアーチへ動かすことと、いまどのアーチが中央にあるかを案内に出すこと。
  * スライドの条件に当たらない画面では、箱は display: contents で配置に関わらず、案内も出さない。
- * prefers-reduced-motion では、矢印で動かすときになめらかに動かさず、すぐに移る。
+ * prefers-reduced-motion では、矢印とホイールで動かすときになめらかに動かさず、すぐに移る。
+ * 動いている途中に設定が変わったときも、その場でいちばん近いアーチに着地させる。
  */
 const SlideTrack = ({ children }: Props) => {
   const track = useRef<HTMLDivElement>(null);
@@ -73,14 +74,23 @@ const SlideTrack = ({ children }: Props) => {
       frame = requestAnimationFrame(() => setCurrent(centerIndexIn(node)));
     };
     const slide = window.matchMedia(SLIDE_MEDIA);
+    // 矢印やホイールでなめらかに動いている途中に「動きを減らす」へ変わったら、その場でいちばん近いアーチにすぐ着地させる
+    const reducedMotion = window.matchMedia(REDUCED_MOTION);
+    const landNow = () => {
+      if (!reducedMotion.matches) return;
+      const link = archLinksIn(node)[centerIndexIn(node)];
+      if (link) node.scrollBy({ left: offsetFromCenter(node, link), behavior: "auto" });
+    };
     node.addEventListener("scroll", measureSoon, { passive: true });
     slide.addEventListener("change", measureSoon);
+    reducedMotion.addEventListener("change", landNow);
     window.addEventListener("resize", measureSoon);
     // ブラウザが箱の横の位置を復元した場合に備え、表示した時点でも一度測る
     measureSoon();
     return () => {
       node.removeEventListener("scroll", measureSoon);
       slide.removeEventListener("change", measureSoon);
+      reducedMotion.removeEventListener("change", landNow);
       window.removeEventListener("resize", measureSoon);
       cancelAnimationFrame(frame);
     };
