@@ -27,6 +27,7 @@ type Props = {
  * 舞台の幅はスマホ幅のルール（幅 767px 以下で縦横比 6/7 以下か、幅 700px 以下）で 200vw。
  * 幅 767px 以下のそれ以外では画面の比率により変わり、縦横比 4/3 以下では最大約 207vw になる。
  * 幅 768px 以上では、安全域のルールで最大約 122vw、それより横長では 100〜約122vw。
+ * スマホ幅の部屋（scene.ts の ROOMS_MEDIA）では最大約 418vw になる（先頭の roomsSizes）。
  */
 const interiorSizes = (openingWidth: number, frameWidth: string) => {
   const ratio = (openingWidth / CANVAS.width) * (parseFloat(frameWidth) / 100);
@@ -71,7 +72,7 @@ const ArchEntrance = ({ arch, background, inert }: Props) => {
             src={background}
             alt=""
             fill
-            sizes={`${Math.round((opening.width / CANVAS.width) * 300)}vw`}
+            sizes={`${roomsSizes((opening.width / CANVAS.width) * 1.02)}, ${Math.round((opening.width / CANVAS.width) * 300)}vw`}
             className={styles.archView}
             style={{ objectPosition: interior.objectPosition }}
           />

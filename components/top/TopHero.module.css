@@ -1006,8 +1006,10 @@
     display: none;
   }
 
+  /* 部屋の大きさは、スクロールバーを除いた幅（100cqw）で決める（100vw だと、スクロールバーのある画面で中心がずれる） */
   .rooms {
     display: block;
+    container-type: inline-size;
   }
 
   /* 部屋の近くまで来たら、その部屋の上端にそっと合わせる。勢いよくスクロールすれば通り過ぎられる（mandatory にしない） */
@@ -1017,12 +1019,14 @@
 
   .room {
     /* キャンバスの 1px が画面の何 px か。幅 400 を画面幅に合わせ、舞台の高さ 941 が画面の高さを超えないところで止める */
-    --room-k: min(100vw / 400, 100svh / 941);
+    --room-k: min(100cqw / 400, 100svh / 941);
 
     position: relative;
     height: calc((941 - var(--room-top)) * var(--room-k));
     overflow: hidden;
     scroll-snap-align: start;
+    /* 画面の外の部屋は描かない（舞台が3つ並ぶので、見えている部屋の分だけ描く。高さは上で決めてあるので、スクロールの長さは変わらない） */
+    content-visibility: auto;
   }
 
   /*
@@ -1065,6 +1069,11 @@
     color: var(--hero-ink);
     text-shadow: 0 1px 8px rgb(0 0 0 / 0.4);
     pointer-events: none;
+  }
+
+  /* 舞台が画像を待って隠れている間は、目印も出さない（暗い地の上に、目印だけが先に出ないように） */
+  .stage:not([data-ready]) ~ .scrollCue {
+    visibility: hidden;
   }
 
   .scrollCue::after {
