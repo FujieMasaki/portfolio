@@ -46,8 +46,17 @@ const stepIn = (node: HTMLElement, step: -1 | 1) => {
 
 /** マウスのホイールの1回の操作の終わりとみなす、イベントの途切れ（ms）。トラックパッドの慣性の続きを同じ操作にまとめる */
 const WHEEL_GESTURE_GAP = 220;
-/** これより小さい縦の量は、手の揺れとして扱って動かさない */
+/** これより小さい縦の量（px）は、手の揺れとして扱って動かさない */
 const WHEEL_MIN_DELTA = 4;
+/** 行単位（deltaMode = 1）のホイールの量を px に換算するときの、1行の高さ */
+const WHEEL_LINE_HEIGHT = 16;
+
+/** ホイールの縦の量を px に換算する（行単位・ページ単位で送る環境でも、手の揺れの判定を px でそろえる） */
+const wheelDeltaY = (event: WheelEvent, page: number) => {
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * WHEEL_LINE_HEIGHT;
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) return event.deltaY * page;
+  return event.deltaY;
+};
 
 /**
  * スマホ幅のスライド（scene.ts の SLIDE_MEDIA）の、横スクロールの箱と画面下の案内（‹ ABOUT 1/3 ›）。
@@ -120,8 +129,9 @@ const SlideTrack = ({ children }: Props) => {
         event.preventDefault();
         return;
       }
-      if (Math.abs(event.deltaY) < WHEEL_MIN_DELTA) return;
-      if (stepIn(node, event.deltaY > 0 ? 1 : -1)) {
+      const deltaY = wheelDeltaY(event, node.clientHeight);
+      if (Math.abs(deltaY) < WHEEL_MIN_DELTA) return;
+      if (stepIn(node, deltaY > 0 ? 1 : -1)) {
         moved = true;
         event.preventDefault();
       }
