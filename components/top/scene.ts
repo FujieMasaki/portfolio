@@ -275,19 +275,20 @@ export const ARCHES: Arch[] = [
 ];
 
 /**
- * スマホ幅の部屋：縦長のスマホでは、舞台全体ではなくアーチ1つずつのアップを1画面にし、About → Work → Contact と縦に並べる。
- * 同じ舞台を部屋ごとに置き、画面にはキャンバスの幅 ROOM_VIEW_WIDTH 分だけを、開口部の中心を画面の中央にして切り取る。
- * この幅だと舞台の高さ（約 2.35 × 画面幅）が、縦長のスマホの画面の高さとほぼ同じになる。
+ * スマホ幅の部屋：幅 767px 以下の縦向きでは、舞台全体ではなくアーチ1つずつのアップを1画面にし、About → Work → Contact と縦に並べる。
+ * 同じ舞台を部屋ごとに置き、キャンバスの幅 ROOM_VIEW_WIDTH 分を画面幅に合わせ、開口部の中心を画面の中央にして切り取る。
+ * ただし舞台の高さ（キャンバスの 941）が画面の高さを超えないよう、拡大率は画面の高さでも抑える
+ * （縦長のスマホでは About の部屋がちょうど1画面になり、縦向きのタブレットでは左右に隣のアーチが少し覗く）。
  *
  * ROOMS_MEDIA は TopHero.module.css の「スマホ幅の部屋」の @media と同じ条件にする（CSS の @media には変数を使えないので、変えるときは両方）。
- * 縦横比 3/5 より横長（小さなタブレット・横向きのスマホなど）では部屋の高さが画面より大きく余るので、今までの舞台のままにする。
+ * 横向き（小さなスマホの横向きなど）では、高さで抑えるとどの部屋にも建物のほぼ全体が映るので、今までの舞台のままにする。
  */
-export const ROOMS_MEDIA = "(max-width: 767.98px) and (max-aspect-ratio: 3/5)";
+export const ROOMS_MEDIA = "(max-width: 767.98px) and (orientation: portrait)";
 
-/** 部屋の画面1つに切り取るキャンバスの幅（TopHero.module.css の .room の計算と同じ値） */
+/** 部屋の画面1つに切り取るキャンバスの幅の上限（TopHero.module.css の .room の計算と同じ値） */
 export const ROOM_VIEW_WIDTH = 400;
 
-/** 部屋の舞台の幅（画面幅に対する vw） */
+/** 部屋の舞台の幅の上限（画面幅に対する vw。画面の高さで抑えるときは、これより狭くなる） */
 export const ROOM_STAGE_VW = (CANVAS.width / ROOM_VIEW_WIDTH) * 100;
 
 /**

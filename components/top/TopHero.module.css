@@ -927,10 +927,11 @@
 /*
  * 縦長画面とスマホ幅では、舞台の上に大きく余った空の上に館名を置き、その帯を沈める
  * （幅 768px 以上の縦長も含め、条件は安全域のルールを入れる前と同じ）。
+ * スマホ幅の部屋（幅 767px 以下の縦向き）も含める。部屋では、最初の About の部屋の空の上に館名が来る。
  * 周辺減光は楕円ではなく上下の帯にし、館名の下の空を沈める層（--ambient-sky-shade-layer）を足す。
  * 縦横比 6/7 より横長では上に余る空が少ないので、館名は左下のまま、周辺減光も cover のルールと同じ楕円のままにする
  */
-@media (max-width: 700px), (max-aspect-ratio: 6/7) {
+@media (max-width: 700px), (max-aspect-ratio: 6/7), (max-width: 767.98px) and (orientation: portrait) {
   .atmosphere {
     background:
       linear-gradient(
@@ -987,17 +988,16 @@
 }
 
 /*
- * スマホ幅の部屋（TopHero.tsx・scene.ts の ROOMS）：縦長のスマホでは、アーチ1つずつのアップを1画面にし、
+ * スマホ幅の部屋（TopHero.tsx・scene.ts の ROOMS）：幅 767px 以下の縦向きでは、アーチ1つずつのアップを1画面にし、
  * About → Work → Contact と縦に並べる。部屋ごとに同じ舞台を置き、キャンバスの幅 400（scene.ts の ROOM_VIEW_WIDTH）を
- * 画面幅に合わせ、開口部の中心（--room-cx）を画面の中央に置く。
- * 条件は scene.ts の ROOMS_MEDIA と同じにする（変えるときは両方）。縦横比 3/5 より横長では部屋が画面より大きく余るので、
- * 今までの舞台（.mainStage）のままにする。
+ * 画面幅に合わせ、開口部の中心（--room-cx）を画面の中央に置く。舞台の高さが画面の高さを超えるときは、高さで拡大率を抑える。
+ * 条件は scene.ts の ROOMS_MEDIA と同じにする（変えるときは両方）。横向きでは、今までの舞台（.mainStage）のままにする。
  */
 .rooms {
   display: none;
 }
 
-@media (max-width: 767.98px) and (max-aspect-ratio: 3/5) {
+@media (max-width: 767.98px) and (orientation: portrait) {
   .hero {
     height: auto;
   }
@@ -1016,8 +1016,8 @@
   }
 
   .room {
-    /* キャンバスの 1px が画面の何 px か */
-    --room-k: calc(100vw / 400);
+    /* キャンバスの 1px が画面の何 px か。幅 400 を画面幅に合わせ、舞台の高さ 941 が画面の高さを超えないところで止める */
+    --room-k: min(100vw / 400, 100svh / 941);
 
     position: relative;
     height: calc((941 - var(--room-top)) * var(--room-k));
