@@ -9,9 +9,10 @@ type Props = {
 };
 
 // 舞台の幅（TopHero.module.css）：スマホ幅は 200vw（幅 767px 以下で縦横比 4/3 以下の横長も約 207vw まで広がる）、
-// 幅 768px 以上で 16:9 より縦長なら最大約 122vw（安全域のルール）。空の箱は舞台より 4% 広い（.sky の inset: -2%）
+// 幅 768px 以上で 16:9 より縦長なら最大約 122vw（安全域のルール）。空の箱は舞台より 4% 広い（.sky の inset: -2%）。
+// 縦長（縦横比 6/7 以下）は、空の箱が画像より縦長になり、高さに合わせて画面幅の2倍以上に広げて描くので 200vw にする
 const SIZES =
-  "(max-width: 700px) 200vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 200vw, (max-aspect-ratio: 1672/941) 127vw, 110vw";
+  "(max-width: 700px) 200vw, (max-aspect-ratio: 6/7) 200vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 200vw, (max-aspect-ratio: 1672/941) 127vw, 110vw";
 
 /**
  * 海と空のレイヤー。
