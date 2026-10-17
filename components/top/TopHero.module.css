@@ -827,15 +827,16 @@
 
 /*
  * 舞台が画面より背が低くなるとき：舞台を画面下に置き、上に余る空は空レイヤーだけを上へ伸ばして埋める
- * （水平線の高さは舞台と揃えたまま）。舞台の幅（--stage-w）は、下の2つのルールが決める。
+ * （水平線の高さは舞台と揃えたまま）。舞台の幅（--stage-w）は、下のルールが決める。
  *
  *   スマホ幅    幅 767px 以下で縦長（縦横比 6/7 以下）か、幅 700px 以下。200vw
+ *   スライド    幅 767px 以下の縦向き。アーチ1つ分を画面幅に合わせる（ファイル末尾の「スマホ幅のスライド」が上書きする）
  *   安全域      幅 768px 以上で、縦横比 1372/941（≒ 1.46）以下。安全域が画面幅ちょうどになる幅
  *
  * それ以外（縦横比 1.46 より横長）は、上の .stage の cover のままにする。cover で切れるのは両端の植物だけで、
  * 16:9 以上の画面では左右は切れない。
  */
-@media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7), (min-width: 768px) and (max-aspect-ratio: 1372/941) {
+@media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7), (max-width: 767.98px) and (orientation: portrait), (min-width: 768px) and (max-aspect-ratio: 1372/941) {
   .stage {
     --stage-h: calc(var(--stage-w) * 941 / 1672);
     --above: calc(max(100svh, 560px) - var(--stage-h));
@@ -925,10 +926,11 @@
 /*
  * 縦長画面とスマホ幅では、舞台の上に大きく余った空の上に館名を置き、その帯を沈める
  * （幅 768px 以上の縦長も含め、条件は安全域のルールを入れる前と同じ）。
+ * スマホ幅のスライド（幅 767px 以下の縦向き）も含める。館名はスライドの箱の外にあり、どのアーチを見ていても空の上に残る。
  * 周辺減光は楕円ではなく上下の帯にし、館名の下の空を沈める層（--ambient-sky-shade-layer）を足す。
  * 縦横比 6/7 より横長では上に余る空が少ないので、館名は左下のまま、周辺減光も cover のルールと同じ楕円のままにする
  */
-@media (max-width: 700px), (max-aspect-ratio: 6/7) {
+@media (max-width: 700px), (max-aspect-ratio: 6/7), (max-width: 767.98px) and (orientation: portrait) {
   .atmosphere {
     background:
       linear-gradient(
@@ -985,12 +987,12 @@
 }
 
 /*
- * スマホ幅のスライド（SlideTrack.tsx・scene.ts の SLIDE_MEDIA）：幅 767px 以下で縦長の画面では、舞台を横スクロールの箱（.track）に入れ、
+ * スマホ幅のスライド（SlideTrack.tsx・scene.ts の SLIDE_MEDIA）：幅 767px 以下の縦向きの画面では、舞台を横スクロールの箱（.track）に入れ、
  * アーチ1つずつのアップを横にスライドして見る（横長の建物に沿って、隣の入口へ歩く）。
  * キャンバスの幅 400（scene.ts の SLIDE_VIEW_WIDTH）を画面幅に合わせ、舞台の高さ 941 が画面の高さを超えないところで拡大率を止める。
  * 最初は About の開口部の中心（--slide-start）が画面の中央に来るよう、舞台を左へずらして置く（JS で初めの位置を合わせない）。
  * 舞台の上に余る高さ（ごく細長い画面）は、上の「舞台が画面より背が低くなるとき」の仕組みで空を伸ばす。
- * 条件は scene.ts の SLIDE_MEDIA と同じにする（変えるときは両方）。縦横比 3/4 より正方形に近い窓は、今までの舞台のままにする。
+ * 条件は scene.ts の SLIDE_MEDIA と同じにする（変えるときは両方）。正方形に近い窓では隣のアーチも大きく映る。横向きは、今までの舞台のままにする。
  * 上の共通・スマホ幅のルールと同じ詳細度で、後ろに置いて上書きする。
  */
 .track {
@@ -1001,7 +1003,7 @@
   display: none;
 }
 
-@media (max-width: 767.98px) and (max-aspect-ratio: 3/4) {
+@media (max-width: 767.98px) and (orientation: portrait) {
   .track {
     /* キャンバスの 1px が画面の何 px か */
     --slide-k: min(100vw / 400, max(100svh, 560px) / 941);
