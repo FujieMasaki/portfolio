@@ -8,8 +8,10 @@ type Props = {
   background: string;
 };
 
-// 縦横比 4/3 以下の横長（正方形に近い窓など）でも、舞台は約 207vw まで広がる
-const SIZES = "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 110vw";
+// 舞台の幅（TopHero.module.css）：スマホ幅は 200vw（幅 767px 以下で縦横比 4/3 以下の横長も約 207vw まで広がる）、
+// 幅 768px 以上で 16:9 より縦長なら最大約 122vw（安全域のルール）
+const SIZES =
+  "(max-width: 700px) 200vw, (max-width: 767px) and (max-aspect-ratio: 4/3) 200vw, (max-aspect-ratio: 1672/941) 122vw, 110vw";
 
 /**
  * 海と空のレイヤー。
