@@ -8,6 +8,11 @@ const CLOUD_TILE = "/images/top/sea-sky-cloud-tile.jpg";
 type Props = {
   /** 海と空の静止画（next/image の fill）。ページごとの sizes で作り、ここで3回使う（取得は1回） */
   image: ReactNode;
+  /**
+   * 水面（SeaWater）を描く条件の media query。省くと常に描き、null なら描かない
+   * （TOP のスマホ幅のように、同じ海を別の舞台にも置き、水面は見える舞台の1つでだけ動かすときに使う）
+   */
+  waterMedia?: string | null;
 };
 
 /**
@@ -21,9 +26,9 @@ type Props = {
  *
  * 位置と色の合わせ方は seaMotion.module.css。/contact の左右反転は、ページ側の反転の箱の中に置けばそのままかかる。
  */
-const SeaSkyMotion = ({ image }: Props) => (
+const SeaSkyMotion = ({ image, waterMedia }: Props) => (
   <>
-    <SeaWater />
+    {waterMedia !== null && <SeaWater media={waterMedia} />}
     <div className={styles.skyStill}>{image}</div>
     <div className={styles.seaStill}>
       {image}

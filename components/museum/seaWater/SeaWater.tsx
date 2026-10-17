@@ -3,7 +3,13 @@
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useRef, useState } from "react";
 import styles from "../seaMotion.module.css";
+import useMediaQuery from "../useMediaQuery";
 import { SeaErrorBoundary, supportsWebGL, useReducedMotion, whenIdle } from "./seaWaterSupport";
+
+type Props = {
+  /** この media query に当たる間だけ描く。省くと常に描く */
+  media?: string;
+};
 
 /** three と R3F は、Water.js の海を始めるときだけ読み込む */
 const SeaWaterCanvas = dynamic(() => import("./SeaWaterCanvas"), { ssr: false });
@@ -18,21 +24,23 @@ const prefersSavingData = () =>
  * 薄くなる（seaMotion.module.css）。写真の質感を残したまま、水面の動きだけを足すため。
  *
  * 次のときは何も描かず、静止画の海のままにする。
- * prefers-reduced-motion・データ節約モード・サーバーでの描画・WebGL が使えない・初期化／shader の失敗・context の喪失。
+ * prefers-reduced-motion・データ節約モード・サーバーでの描画・WebGL が使えない・初期化／shader の失敗・context の喪失・
+ * media に当たらない（同じ海を画面の条件ごとに別の舞台で描くページで、見えていない側の canvas を作らないため）。
  */
-const SeaWater = () => {
+const SeaWater = ({ media = "all" }: Props) => {
   const reducedMotion = useReducedMotion();
+  const visible = useMediaQuery(media);
   const [phase, setPhase] = useState<"waiting" | "running" | "failed">("waiting");
   const layer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (reducedMotion || prefersSavingData()) return;
+    if (reducedMotion || !visible || prefersSavingData()) return;
     return whenIdle(() =>
       setPhase((current) => (current === "waiting" ? (supportsWebGL() ? "running" : "failed") : current)),
     );
-  }, [reducedMotion]);
+  }, [reducedMotion, visible]);
 
-  if (reducedMotion || phase !== "running") return null;
+  if (reducedMotion || !visible || phase !== "running") return null;
 
   return (
     <div ref={layer} className={styles.water} aria-hidden="true">

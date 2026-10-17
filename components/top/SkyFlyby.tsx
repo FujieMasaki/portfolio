@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import useAmbient from "@/components/museum/useAmbient";
+import useMediaQuery from "@/components/museum/useMediaQuery";
 import styles from "./TopHero.module.css";
 import { buildFlightKeyframes, flybyDelayRange, planGroup, type Flight } from "./flight";
 import { buildWingKeyframes, type Flyer } from "./wingbeat";
@@ -147,6 +148,11 @@ const subscribeReducedMotion = (onChange: () => void) => {
   return () => query.removeEventListener("change", onChange);
 };
 
+type Props = {
+  /** この media query に当たる間だけ飛ばす。省くと常に飛ばす */
+  media?: string;
+};
+
 /**
  * TOP の空を、ときどきリュウキュウツバメ（夜・深夜はコウモリ）が横切る。
  * 空のレイヤー（Sky.tsx）の中に置くので、建物と植物の向こうの遠い空を飛び、手前を横切ることはない。
@@ -156,8 +162,9 @@ const subscribeReducedMotion = (onChange: () => void) => {
  * 待っている間に動かすのはタイマー1本だけで、群れが抜けきってから次の間を数え始める。
  * タブが見えていないときは飛ばさずに次の間を空け、ページを離れたらタイマーと動きを片付ける。
  * prefers-reduced-motion では飛ばさない（閲覧の途中で有効にしたときも、飛んでいる群れを消す）。
+ * media に当たらない間も飛ばさない（スマホ幅とそれ以外で別の舞台に空を置くので、見えていない側の空では飛ばさない）。
  */
-const SkyFlyby = () => {
+const SkyFlyby = ({ media = "all" }: Props) => {
   const [group, setGroup] = useState<Flight[]>([]);
   // サーバーでは鳥を描かないので、動きを減らす側（true）として扱う
   const reducedMotion = useSyncExternalStore(
@@ -165,13 +172,14 @@ const SkyFlyby = () => {
     () => window.matchMedia(REDUCED_MOTION).matches,
     () => true,
   );
+  const visible = useMediaQuery(media);
   const ambient = useAmbient();
   /** これまでに飛ばした数（id と、最初の群れかどうかの判定に使う） */
   const flown = useRef(0);
 
   // 次の群れを出すまでの間を空ける。群れが飛んでいる間と、動きを減らす設定の間は予約しない
   useEffect(() => {
-    if (group.length > 0 || reducedMotion) return;
+    if (group.length > 0 || reducedMotion || !visible) return;
 
     let timer = 0;
     const wait = (first: boolean) => {
@@ -189,14 +197,14 @@ const SkyFlyby = () => {
     };
     wait(flown.current === 0);
     return () => window.clearTimeout(timer);
-  }, [group, reducedMotion, ambient]);
+  }, [group, reducedMotion, visible, ambient]);
 
   const onDone = useCallback((id: number) => {
     setGroup((current) => current.filter((flight) => flight.id !== id));
   }, []);
 
-  // 動きを減らす設定の間は、飛んでいる途中の群れも描かない
-  if (reducedMotion) return null;
+  // 動きを減らす設定の間と、見えていない側の空では、飛んでいる途中の群れも描かない
+  if (reducedMotion || !visible) return null;
 
   return (
     <div className={styles.flyby} aria-hidden="true">
