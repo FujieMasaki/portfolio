@@ -31,10 +31,28 @@ const centerIndexIn = (node: HTMLElement) => {
 };
 
 /**
+ * 隣のアーチへ動かす。行き先は、案内の表示ではなく、その時点の位置から決める。
+ * 端で隣がないときと、アーチを通り抜けている間（ArchPassage の [data-passage]）は動かさず、false を返す
+ */
+const stepIn = (node: HTMLElement, step: -1 | 1) => {
+  if (node.closest("[data-passage]")) return false;
+  const link = archLinksIn(node)[centerIndexIn(node) + step];
+  if (!link) return false;
+  const reducedMotion = window.matchMedia(REDUCED_MOTION).matches;
+  node.scrollBy({ left: offsetFromCenter(node, link), behavior: reducedMotion ? "instant" : "smooth" });
+  return true;
+};
+
+/** マウスのホイールの1回の操作の終わりとみなす、イベントの途切れ（ms）。トラックパッドの慣性の続きを同じ操作にまとめる */
+const WHEEL_GESTURE_GAP = 220;
+/** これより小さい縦の量は、手の揺れとして扱って動かさない */
+const WHEEL_MIN_DELTA = 4;
+
+/**
  * スマホ幅のスライド（scene.ts の SLIDE_MEDIA）の、横スクロールの箱と画面下の案内（‹ ABOUT 1/3 ›）。
  *
  * 箱は CSS だけで横にスクロールし、アーチの中心で1つずつ止まる（TopHero.module.css の .track）。
- * ここで JS が受け持つのは、案内の矢印で隣のアーチへ動かすことと、いまどのアーチが中央にあるかを案内に出すことだけ。
+ * ここで JS が受け持つのは、案内の矢印とマウスのホイールで隣のアーチへ動かすことと、いまどのアーチが中央にあるかを案内に出すこと。
  * スライドの条件に当たらない画面では、箱は display: contents で配置に関わらず、案内も出さない。
  * prefers-reduced-motion では、矢印で動かすときになめらかに動かさず、すぐに移る。
  */
@@ -65,14 +83,47 @@ const SlideTrack = ({ children }: Props) => {
     };
   }, []);
 
-  /** 隣のアーチへ動かす。行き先は、案内の表示ではなく、押した時点の位置から決める */
-  const go = (step: -1 | 1) => {
+  /*
+   * マウスのホイールを縦に回したら、隣のアーチへ1つだけ動かす（スライドの条件の間だけ。TOP はこのとき1画面で、縦にはスクロールしない）。
+   * 1回の操作（イベントが WHEEL_GESTURE_GAP 途切れるまで）で動かすのは1つだけにし、トラックパッドの慣性で次々に飛ばさない。
+   * 横の操作（トラックパッドの横・Shift + ホイール）と、ピンチのズーム（ctrlKey）はブラウザに任せる。
+   * 端で隣がないときは何もしない（横取りもしない）
+   */
+  useEffect(() => {
     const node = track.current;
     if (!node) return;
-    const link = archLinksIn(node)[centerIndexIn(node) + step];
-    if (!link) return;
-    const reducedMotion = window.matchMedia(REDUCED_MOTION).matches;
-    node.scrollBy({ left: offsetFromCenter(node, link), behavior: reducedMotion ? "instant" : "smooth" });
+    const slide = window.matchMedia(SLIDE_MEDIA);
+    let gestureTimer = 0;
+    let moved = false;
+    const onWheel = (event: WheelEvent) => {
+      if (!slide.matches || event.ctrlKey || event.shiftKey) return;
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      window.clearTimeout(gestureTimer);
+      gestureTimer = window.setTimeout(() => {
+        moved = false;
+      }, WHEEL_GESTURE_GAP);
+      if (moved) {
+        // 同じ操作の続きは、動かさずに受け止める（ページや箱が縦横に揺れないように）
+        event.preventDefault();
+        return;
+      }
+      if (Math.abs(event.deltaY) < WHEEL_MIN_DELTA) return;
+      if (stepIn(node, event.deltaY > 0 ? 1 : -1)) {
+        moved = true;
+        event.preventDefault();
+      }
+    };
+    // 館名と画面下の案内は箱の外にあるので、それらを含む ArchPassage の範囲で受ける（TOP の画面全体）
+    const area = node.closest<HTMLElement>(`.${styles.passageScope}`) ?? node;
+    area.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      area.removeEventListener("wheel", onWheel);
+      window.clearTimeout(gestureTimer);
+    };
+  }, []);
+
+  const go = (step: -1 | 1) => {
+    if (track.current) stepIn(track.current, step);
   };
 
   const atStart = current === 0;
@@ -85,7 +136,7 @@ const SlideTrack = ({ children }: Props) => {
       </div>
 
       {/* 押せない端の矢印は disabled にせず aria-disabled にする（押した直後にフォーカスを見失わないため） */}
-      <div className={styles.slideNav}>
+      <div className={styles.slideNav} role="group" aria-label="入口の切り替え">
         <button
           type="button"
           className={styles.slideButton}
