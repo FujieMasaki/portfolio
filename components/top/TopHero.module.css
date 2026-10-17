@@ -1031,6 +1031,8 @@
 
     left: calc(50vw - var(--slide-start) * var(--slide-k));
     translate: none;
+    /* 現れるときの拡大の支点を、画面の中央の About に置く（舞台の中央は画面の外にあり、景色が横へ流れて見えた） */
+    transform-origin: calc(var(--slide-start) / 1672 * 100%) 50%;
   }
 
   .arch {
@@ -1092,6 +1094,8 @@
     gap: 4px;
     color: var(--hero-ink);
     text-shadow: 0 1px 8px rgb(0 0 0 / 0.45);
+    /* 矢印の間の文字の上から払っても、下の箱がスライドするよう、触れるのは矢印だけにする */
+    pointer-events: none;
     transition: opacity 0.5s var(--ease-calm);
   }
 
@@ -1108,6 +1112,9 @@
     font-size: 22px;
     line-height: 1;
     cursor: pointer;
+    pointer-events: auto;
+    /* 続けて押したときに、iOS Safari でダブルタップのズームにしない */
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -1167,6 +1174,9 @@
   /* 通り抜けている間は、館名と同じく案内も消し、横にも動かさない（広がる窓とアーチの位置がずれないように） */
   .passageScope[data-passage] .slideNav {
     opacity: 0;
+  }
+
+  .passageScope[data-passage] .slideButton {
     pointer-events: none;
   }
 
