@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import AmbientRoot from "@/components/museum/AmbientRoot";
 import ArchPassage from "./ArchPassage";
 import ParallaxStage from "./ParallaxStage";
+import ScrollCue from "./ScrollCue";
 import { ROOMS, ROOMS_MEDIA, TOP_AMBIENT_VARIABLES } from "./scene";
 import styles from "./TopHero.module.css";
 import TopScene from "./TopScene";
@@ -73,12 +74,8 @@ const TopHero = () => {
                   flyby={index === 0}
                 />
               </ParallaxStage>
-              {/* 下へ続くことの目印。動かさない（常に動いている UI にしない） */}
-              {index === 0 && (
-                <span className={styles.scrollCue} aria-hidden="true">
-                  Scroll
-                </span>
-              )}
+              {/* 下へ続くことの目印。押すと次の部屋までスクロールする。動かさない（常に動いている UI にしない） */}
+              {index === 0 && <ScrollCue to={ROOMS[1].arch.id} label={`${ROOMS[1].arch.title} へ進む`} />}
             </div>
           ))}
         </nav>

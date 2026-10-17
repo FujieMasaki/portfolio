@@ -1050,8 +1050,9 @@
   }
 
   /*
-   * 下へ続くことの目印。文字と細い線だけで、動かさない。最初の部屋の、次の部屋が重なる範囲より上に置き、
-   * 部屋が画面より背の高いスマホでも、最初の1画面の下端の少し上に収める
+   * 下へ続くことの目印（ScrollCue）。文字と細い線だけで、動かさない。押すと次の部屋までスクロールする。
+   * 最初の部屋の、次の部屋が重なる範囲より上に置き、部屋が画面より背の高いスマホでも、最初の1画面の下端の少し上に収める。
+   * 下にある About のアーチではなく目印が押されるよう、指で押しやすい大きさ（44px 以上）の当たりを取る
    */
   .scrollCue {
     position: absolute;
@@ -1061,14 +1062,25 @@
     display: grid;
     justify-items: center;
     gap: 8px;
-    /* 字間の分だけ右にずれて見えるのを戻す */
-    padding-left: 0.32em;
+    min-width: 64px;
+    margin: 0;
+    /* 字間の分だけ右にずれて見えるのを戻す（左だけ 0.32em 多く取る） */
+    padding: 10px 16px 6px calc(16px + 0.32em);
+    border: 0;
+    background: none;
+    font: inherit;
     font-size: 10px;
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--hero-ink);
     text-shadow: 0 1px 8px rgb(0 0 0 / 0.4);
-    pointer-events: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .scrollCue:focus-visible {
+    outline: 1px solid var(--hero-ink);
+    outline-offset: 2px;
   }
 
   /* 舞台が画像を待って隠れている間は、目印も出さない（暗い地の上に、目印だけが先に出ないように） */
