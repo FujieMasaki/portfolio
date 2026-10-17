@@ -3,7 +3,7 @@
  * 舞台（.stage）は完成イメージと同じ 1672:941 の箱で、中の各レイヤーは scene.ts の座標を % で置く。
  * 画面に対しては object-fit: cover と同じ考え方で舞台を拡大・中央寄せする。
  * ただし画面が縦長になるほど左右が切れるので、幅 768px 以上では建物とアーチ（安全域）を切らない大きさで止める
- * （ファイル末尾の「舞台が画面より背が低くなるとき」）。
+ * （ファイル後半の「舞台が画面より背が低くなるとき」）。
  */
 
 .hero {
@@ -871,18 +871,9 @@
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
+  /* 上に伸ばした空にも空気の色がかかるよう、上端を空の上まで広げる（色の重ね方は、館名の置き場所のルールで変わる） */
   .atmosphere {
     top: calc(-1 * var(--sky-above));
-    background:
-      linear-gradient(
-        to bottom,
-        rgb(40 36 52 / 0.16),
-        transparent 40%,
-        transparent 75%,
-        rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
-      ),
-      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
-      var(--ambient-sky-shade-layer);
   }
 
   /* 舞台の上端で切れる木々の梢を空へ溶かす */
@@ -932,11 +923,26 @@
 }
 
 /*
- * 縦長画面とスマホ幅では、館名を画面上部の空の上に置く。
+ * 縦長画面とスマホ幅では、館名を画面上部の空の上に置き、その帯を沈める。
  * 幅 768px 以上の縦長（安全域のルール）も含める。左下のままだと、舞台の左端が切り詰められて
- * 館名が琉球石灰岩の明るい塊の上に乗り、朝・昼に読みにくくなるため
+ * 館名が琉球石灰岩の明るい塊の上に乗り、朝・昼に読みにくくなるため。
+ * 周辺減光は楕円ではなく上下の帯にし、館名の下の空を沈める層（--ambient-sky-shade-layer）を足す。
+ * 縦横比 6/7 より横長では館名が左下のままなので、周辺減光も cover のルールと同じ楕円のままにする
  */
 @media (max-width: 700px), (max-aspect-ratio: 6/7) {
+  .atmosphere {
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(40 36 52 / 0.16),
+        transparent 40%,
+        transparent 75%,
+        rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
+      ),
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
+  }
+
   .plaque {
     top: clamp(28px, 8svh, 64px);
     bottom: auto;
@@ -952,6 +958,20 @@
 @media (min-width: 768px) and (max-aspect-ratio: 1372/941) {
   .stage {
     --stage-w: calc(100vw * 1672 / 1372);
+  }
+
+  /*
+   * 梢を空へ溶かす長さは、上に伸ばした空の高さに比例させる（最大は共通のルールと同じ 16%）。
+   * 縦横比 1.46 の近くでは伸ばす空がほとんどないので、梢はほぼそのまま残り、cover のルールと見た目がつながる
+   */
+  .plantsBack {
+    mask-image: linear-gradient(to bottom, transparent, #000 min(16%, calc(var(--sky-above) * 0.5)));
+  }
+
+  .plantsFront {
+    mask-image:
+      url("/images/top/top-foreground-front-mask.svg"),
+      linear-gradient(to bottom, transparent, #000 min(16%, calc(var(--sky-above) * 0.5)));
   }
 
   /*
