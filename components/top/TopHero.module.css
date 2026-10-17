@@ -1069,7 +1069,7 @@
   .slideNav {
     position: absolute;
     left: 50%;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    bottom: 16px;
     z-index: 1;
     translate: -50% 0;
     display: flex;
@@ -1126,13 +1126,32 @@
     font-size: 10px;
     letter-spacing: 0.16em;
     font-variant-numeric: tabular-nums;
-    opacity: 0.72;
+    opacity: 0.8;
   }
 
-  /* 通り抜けている間は、館名と同じく案内も消す */
+  /* 朝・昼は植物と琉球石灰岩が明るくなるので、館名と同じく文字の縁にだけ細い影を足す */
+  .hero:is([data-ambient="morning"], [data-ambient="day"]) .slideNav {
+    text-shadow:
+      0 0 3px rgb(0 0 0 / 0.5),
+      0 1px 12px rgb(0 0 0 / 0.4);
+  }
+
+  /*
+   * 舞台が画像を待って隠れている間は、案内も出さない（場所より先に UI が出ないように）。
+   * JS が動かない環境でも舞台は出る（noscript）が、矢印は押しても動かないので、案内は出さないままにする
+   */
+  .passageScope:has(.stage:not([data-ready])) .slideNav {
+    visibility: hidden;
+  }
+
+  /* 通り抜けている間は、館名と同じく案内も消し、横にも動かさない（広がる窓とアーチの位置がずれないように） */
   .passageScope[data-passage] .slideNav {
     opacity: 0;
     pointer-events: none;
+  }
+
+  .passageScope[data-passage] .track {
+    overflow-x: hidden;
   }
 }
 

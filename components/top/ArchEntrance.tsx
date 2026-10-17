@@ -64,6 +64,10 @@ const ArchEntrance = ({ arch, background }: Props) => {
             />
           </span>
         )}
+        {/*
+          景色を見せる展示（kind: "view"）は今の ARCHES では使っていない。使うときは、縦長の開口部に cover で描くと
+          高さに合わせて開口部の幅の約3.6倍に広がるので、描く幅から sizes を出し直す
+        */}
         {interior?.kind === "view" && (
           <Image
             src={background}
