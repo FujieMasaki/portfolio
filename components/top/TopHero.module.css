@@ -835,7 +835,7 @@
  * それ以外（縦横比 1.46 より横長）は、上の .stage の cover のままにする。cover で切れるのは両端の植物だけで、
  * 16:9 以上の画面では左右は切れない。
  */
-@media (max-width: 700px), (max-width: 767px) and (max-aspect-ratio: 6/7), (min-width: 768px) and (max-aspect-ratio: 1372/941) {
+@media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7), (min-width: 768px) and (max-aspect-ratio: 1372/941) {
   .stage {
     --stage-h: calc(var(--stage-w) * 941 / 1672);
     --above: calc(max(100svh, 560px) - var(--stage-h));
@@ -908,7 +908,7 @@
  * 700px 以下なら、舞台の上が切れても部屋名とアーチの頂点（舞台の上から約 32%）は画面に残る。
  * 幅 768px 以上の縦長は、200vw だと About と Contact のアーチの外側が切れるので、下の安全域のルールにする。
  */
-@media (max-width: 700px), (max-width: 767px) and (max-aspect-ratio: 6/7) {
+@media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7) {
   .stage {
     --stage-w: 200vw;
   }

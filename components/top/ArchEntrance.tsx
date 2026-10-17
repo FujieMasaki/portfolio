@@ -31,7 +31,7 @@ const interiorSizes = (openingWidth: number, frameWidth: string) => {
   const portrait = `${Math.ceil(ratio * 200)}vw`;
   // sizes ではカンマが候補の区切りなので、スマホ幅のルールに入る条件ごとに同じ値を並べる
   // 幅 767px 以下で縦横比 4/3 以下の横長でも舞台は約 207vw まで広がるので、スマホ幅と同じ値を使う
-  return `(max-width: 700px) ${portrait}, (max-width: 767px) and (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
+  return `(max-width: 700px) ${portrait}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
 };
 
 const ArchEntrance = ({ arch, background }: Props) => {
