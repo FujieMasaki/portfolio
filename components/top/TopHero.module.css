@@ -929,7 +929,14 @@
     letter-spacing: 0.14em;
     white-space: nowrap;
   }
+}
 
+/*
+ * 縦長画面とスマホ幅では、館名を画面上部の空の上に置く。
+ * 幅 768px 以上の縦長（安全域のルール）も含める。左下のままだと、舞台の左端が切り詰められて
+ * 館名が琉球石灰岩の明るい塊の上に乗り、朝・昼に読みにくくなるため
+ */
+@media (max-width: 700px), (max-aspect-ratio: 6/7) {
   .plaque {
     top: clamp(28px, 8svh, 64px);
     bottom: auto;
