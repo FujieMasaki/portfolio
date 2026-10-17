@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ARCHES } from "./scene";
+import { ARCHES, SLIDE_MEDIA } from "./scene";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -15,8 +15,20 @@ const START_X = ARCHES[0].opening.x + ARCHES[0].opening.width / 2;
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
 /** 箱の中のアーチの入口のリンク（ARCHES の順に並んでいる） */
-const archLinksIn = (node: HTMLElement | null) =>
-  Array.from(node?.querySelectorAll<HTMLElement>(`.${styles.arch}`) ?? []);
+const archLinksIn = (node: HTMLElement) => Array.from(node.querySelectorAll<HTMLElement>(`.${styles.arch}`));
+
+/** 箱の中央からの、アーチの中心のずれ（px） */
+const offsetFromCenter = (node: HTMLElement, link: HTMLElement) => {
+  const view = node.getBoundingClientRect();
+  const rect = link.getBoundingClientRect();
+  return rect.left + rect.width / 2 - (view.left + view.width / 2);
+};
+
+/** いま箱の中央にいちばん近いアーチ（ARCHES の添字） */
+const centerIndexIn = (node: HTMLElement) => {
+  const distances = archLinksIn(node).map((link) => Math.abs(offsetFromCenter(node, link)));
+  return distances.length > 0 ? distances.indexOf(Math.min(...distances)) : 0;
+};
 
 /**
  * スマホ幅のスライド（scene.ts の SLIDE_MEDIA）の、横スクロールの箱と画面下の案内（‹ ABOUT 1/3 ›）。
@@ -30,42 +42,37 @@ const SlideTrack = ({ children }: Props) => {
   const track = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
 
-  // スクロールしたら、画面の中央にいちばん近いアーチを案内に出す（描画のたびではなく、フレームに1回だけ測る）
+  // スクロールしたら、画面の中央にいちばん近いアーチを案内に出す（描画のたびではなく、フレームに1回だけ測る）。
+  // 横向きにして戻したときや窓の大きさを変えたときは、箱が作り直されて位置が About に戻ることがあり、
+  // scroll イベントが来ないので、スライドの条件の切り替わりと resize でも測り直す
   useEffect(() => {
     const node = track.current;
     if (!node) return;
     let frame = 0;
-    const measure = () => {
-      const view = node.getBoundingClientRect();
-      const center = view.left + view.width / 2;
-      const distances = archLinksIn(node).map((link) => {
-        const rect = link.getBoundingClientRect();
-        return Math.abs(rect.left + rect.width / 2 - center);
-      });
-      if (distances.length > 0) setCurrent(distances.indexOf(Math.min(...distances)));
-    };
-    const onScroll = () => {
+    const measureSoon = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(measure);
+      frame = requestAnimationFrame(() => setCurrent(centerIndexIn(node)));
     };
-    node.addEventListener("scroll", onScroll, { passive: true });
+    const slide = window.matchMedia(SLIDE_MEDIA);
+    node.addEventListener("scroll", measureSoon, { passive: true });
+    slide.addEventListener("change", measureSoon);
+    window.addEventListener("resize", measureSoon);
     return () => {
-      node.removeEventListener("scroll", onScroll);
+      node.removeEventListener("scroll", measureSoon);
+      slide.removeEventListener("change", measureSoon);
+      window.removeEventListener("resize", measureSoon);
       cancelAnimationFrame(frame);
     };
   }, []);
 
-  const go = (index: number) => {
+  /** 隣のアーチへ動かす。行き先は、案内の表示ではなく、押した時点の位置から決める */
+  const go = (step: -1 | 1) => {
     const node = track.current;
-    const link = archLinksIn(node)[index];
-    if (!node || !link) return;
-    const view = node.getBoundingClientRect();
-    const rect = link.getBoundingClientRect();
+    if (!node) return;
+    const link = archLinksIn(node)[centerIndexIn(node) + step];
+    if (!link) return;
     const reducedMotion = window.matchMedia(REDUCED_MOTION).matches;
-    node.scrollBy({
-      left: rect.left + rect.width / 2 - (view.left + view.width / 2),
-      behavior: reducedMotion ? "instant" : "smooth",
-    });
+    node.scrollBy({ left: offsetFromCenter(node, link), behavior: reducedMotion ? "instant" : "smooth" });
   };
 
   const atStart = current === 0;
@@ -82,9 +89,9 @@ const SlideTrack = ({ children }: Props) => {
         <button
           type="button"
           className={styles.slideButton}
-          aria-label="前の入口へ"
+          aria-label={atStart ? "前の入口へ" : `前の入口へ（${ARCHES[current - 1].title}）`}
           aria-disabled={atStart}
-          onClick={() => !atStart && go(current - 1)}
+          onClick={() => go(-1)}
         >
           ‹
         </button>
@@ -97,9 +104,9 @@ const SlideTrack = ({ children }: Props) => {
         <button
           type="button"
           className={styles.slideButton}
-          aria-label="次の入口へ"
+          aria-label={atEnd ? "次の入口へ" : `次の入口へ（${ARCHES[current + 1].title}）`}
           aria-disabled={atEnd}
-          onClick={() => !atEnd && go(current + 1)}
+          onClick={() => go(1)}
         >
           ›
         </button>
