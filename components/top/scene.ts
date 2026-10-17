@@ -275,6 +275,29 @@ export const ARCHES: Arch[] = [
 ];
 
 /**
+ * スマホ幅のスライド：幅 767px 以下で縦長の画面では、舞台を横スクロールの箱に入れ、アーチ1つずつのアップを横にスライドして見る
+ * （横長の建物に沿って、隣の入口へ歩く）。キャンバスの幅 SLIDE_VIEW_WIDTH を画面幅に合わせ、舞台の高さ（941）が画面の高さを
+ * 超えないところで拡大率を止める。最初は About の開口部の中心が画面の中央に来る。
+ *
+ * SLIDE_MEDIA は TopHero.module.css の「スマホ幅のスライド」の @media と同じ条件にする（CSS の @media には変数を使えないので、変えるときは両方）。
+ * 縦横比 3/4 より正方形に近い窓（分割表示・折りたたみのスマホを開いた画面など）では、画面に建物のほぼ全体が映り
+ * 「1つずつのアップ」にならないので、今までの舞台のままにする。
+ */
+export const SLIDE_MEDIA = "(max-width: 767.98px) and (max-aspect-ratio: 3/4)";
+
+/** スライドの1画面に収めるキャンバスの幅の上限（TopHero.module.css の .track の計算と同じ値） */
+export const SLIDE_VIEW_WIDTH = 400;
+
+/** スライドのときの舞台の幅の上限（画面幅に対する vw。画面の高さで抑えるときは、これより狭くなる） */
+export const SLIDE_STAGE_VW = (CANVAS.width / SLIDE_VIEW_WIDTH) * 100;
+
+/**
+ * 舞台に置く画像の sizes の先頭に足す、スライドのときの候補（ratio は舞台の幅に対する画像の幅）。
+ * 先頭に置くのは、sizes が最初に当たった条件の値を使うため
+ */
+export const slideSizes = (ratio: number) => `${SLIDE_MEDIA} ${Math.ceil(ratio * SLIDE_STAGE_VW)}vw`;
+
+/**
  * TOP の時間帯ごとの光と空気（時間帯は components/museum/ambient.ts が訪問者のローカル時刻で決める）。
  *
  * 同じ美術館に時間が流れて見えるよう、建物の形・植物・アーチ・展示は共通のまま、
