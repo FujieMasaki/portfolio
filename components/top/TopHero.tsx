@@ -39,7 +39,7 @@ import styles from "./TopHero.module.css";
  * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
  *
  * 館名と舞台を ArchPassage で包み、アーチを選んだときに、舞台の上へ通り抜ける遷移の窓を重ねる。
- * 幅 767px 以下の縦長の画面（scene.ts の SLIDE_MEDIA）では、舞台を SlideTrack の横スクロールの箱に入れ、
+ * 幅 767px 以下の縦向きの画面（scene.ts の SLIDE_MEDIA）では、舞台を SlideTrack の横スクロールの箱に入れ、
  * アーチ1つずつのアップを横にスライドして見る。
  */
 const TopHero = () => {
