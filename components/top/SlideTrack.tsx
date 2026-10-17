@@ -39,7 +39,8 @@ const stepIn = (node: HTMLElement, step: -1 | 1) => {
   const link = archLinksIn(node)[centerIndexIn(node) + step];
   if (!link) return false;
   const reducedMotion = window.matchMedia(REDUCED_MOTION).matches;
-  node.scrollBy({ left: offsetFromCenter(node, link), behavior: reducedMotion ? "instant" : "smooth" });
+  // 箱には scroll-behavior を付けていないので、auto ならすぐに移る（"instant" は古い Safari で例外になる）
+  node.scrollBy({ left: offsetFromCenter(node, link), behavior: reducedMotion ? "auto" : "smooth" });
   return true;
 };
 
@@ -75,6 +76,8 @@ const SlideTrack = ({ children }: Props) => {
     node.addEventListener("scroll", measureSoon, { passive: true });
     slide.addEventListener("change", measureSoon);
     window.addEventListener("resize", measureSoon);
+    // ブラウザが箱の横の位置を復元した場合に備え、表示した時点でも一度測る
+    measureSoon();
     return () => {
       node.removeEventListener("scroll", measureSoon);
       slide.removeEventListener("change", measureSoon);
