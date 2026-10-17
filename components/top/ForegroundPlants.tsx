@@ -5,6 +5,7 @@ import {
   PLANT_SWAY_GROUPS,
   PLANT_SWAYS,
   PLANTS_BASE,
+  slideSizes,
   type PlantSway,
   type PlantSwayGroup,
 } from "./scene";
@@ -37,11 +38,12 @@ const swayStyle = (sway: Omit<PlantSway, "src">, outer: Rect) => {
 /**
  * 舞台の幅のうち ratio の割合で描く画像の sizes。
  * 舞台の幅は、スマホ幅のルール（幅 767px 以下で縦横比 6/7 以下か、幅 700px 以下）で 200vw、
- * 幅 767px 以下で縦横比 4/3 以下の横長でも最大約 207vw。幅 768px 以上では最大約 122vw になる（ArchEntrance の interiorSizes と同じ）
+ * 幅 767px 以下で縦横比 4/3 以下の横長でも最大約 207vw。幅 768px 以上では最大約 122vw になる。
+ * スマホ幅のスライドでは最大約 418vw（先頭の slideSizes。ArchEntrance の interiorSizes と同じ）
  */
 const sizes = (ratio: number) => {
   const narrow = `${Math.ceil(ratio * 200)}vw`;
-  return `(max-width: 700px) ${narrow}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 135)}vw`;
+  return `${slideSizes(ratio)}, (max-width: 700px) ${narrow}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 135)}vw`;
 };
 
 /**
