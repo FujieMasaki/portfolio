@@ -26,12 +26,15 @@ const prefersSavingData = () =>
  * 次のときは何も描かず、静止画の海のままにする。
  * prefers-reduced-motion・データ節約モード・サーバーでの描画・WebGL が使えない・初期化／shader の失敗・context の喪失・
  * media に当たらない（同じ海を画面の条件ごとに別の舞台で描くページで、見えていない側の canvas を作らないため）。
+ * 描き始めた後も、水面の層が画面の外にある間（TOP のスマホ幅で、Contact の部屋までスクロールしていないときなど）は描画を止める。
  */
 const SeaWater = ({ media = "all" }: Props) => {
   const reducedMotion = useReducedMotion();
   const visible = useMediaQuery(media);
   const [phase, setPhase] = useState<"waiting" | "running" | "failed">("waiting");
   const layer = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const shown = !reducedMotion && visible && phase === "running";
 
   useEffect(() => {
     if (reducedMotion || !visible || prefersSavingData()) return;
@@ -40,7 +43,16 @@ const SeaWater = ({ media = "all" }: Props) => {
     );
   }, [reducedMotion, visible]);
 
-  if (reducedMotion || !visible || phase !== "running") return null;
+  // 水面の層が画面に入っている間だけ描く（外にある間は frameloop を止める）
+  useEffect(() => {
+    const node = layer.current;
+    if (!shown || !node) return;
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shown]);
+
+  if (!shown) return null;
 
   return (
     <div ref={layer} className={styles.water} aria-hidden="true">
@@ -54,6 +66,7 @@ const SeaWater = ({ media = "all" }: Props) => {
             // 静止画の切り替えは state を介さず属性で始める（描画ループの中から呼ばれるため）
             onReady={() => layer.current?.setAttribute("data-sea-ready", "")}
             onError={() => setPhase("failed")}
+            paused={!inView}
           />
         </Suspense>
       </SeaErrorBoundary>

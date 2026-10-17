@@ -11,6 +11,8 @@ type Props = {
   onReady: () => void;
   /** shader のエラー・WebGL の context の喪失・反射を描けない環境。静止画だけに戻す */
   onError: () => void;
+  /** 画面の外にある間は描かない（最後に描いた1枚がそのまま残る） */
+  paused: boolean;
 };
 
 /**
@@ -21,8 +23,9 @@ type Props = {
  * - flat：tone mapping を外す（Water.js の色をそのまま出す）
  * - antialias なし・stencil なし。ソフトウェア描画など遅い環境では作らずに静止画へ戻す（failIfMajorPerformanceCaveat）
  * - resize の offsetSize：舞台のフェードイン（scale）中に測っても、拡大前の箱の大きさで描く
+ * - paused の間は frameloop を止める。戻ったときの時間の飛びは、SeaWaterScene が WATER_MAX_DELTA で抑える
  */
-const SeaWaterCanvas = ({ onReady, onError }: Props) => {
+const SeaWaterCanvas = ({ onReady, onError, paused }: Props) => {
   const failed = useRef(false);
   const fail = () => {
     if (failed.current) return;
@@ -33,6 +36,7 @@ const SeaWaterCanvas = ({ onReady, onError }: Props) => {
   return (
     <Canvas
       flat
+      frameloop={paused ? "never" : "always"}
       dpr={WATER_DPR}
       resize={{ offsetSize: true }}
       camera={{
