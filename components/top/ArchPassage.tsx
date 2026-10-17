@@ -123,6 +123,11 @@ const ArchPassage = ({ children }: Props) => {
     setPassage(arch.id);
     router.prefetch(arch.href);
 
+    // スマホ幅のスライドで、矢印やホイールの横の動きが続いていたら、その場で止めてから位置を測る
+    // （止めないと、測った開口部の位置に広がる窓と、横へ動き続ける舞台がずれる）
+    const track = stage.closest<HTMLElement>(`.${styles.track}`);
+    track?.scrollTo({ left: track.scrollLeft, behavior: "auto" });
+
     const openingRect = opening.getBoundingClientRect();
     stage.style.transformOrigin = originIn(stage.getBoundingClientRect(), openingRect);
     const timing = { duration: DURATION, easing: EASE, fill: "forwards" } as const;

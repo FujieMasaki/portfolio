@@ -1171,7 +1171,7 @@
     animation: slide-nav-arrive 1.6s var(--ease-calm) 1.2s both;
   }
 
-  /* 通り抜けている間は、館名と同じく案内も消し、横にも動かさない（広がる窓とアーチの位置がずれないように） */
+  /* 通り抜けている間は、館名と同じく案内も消す */
   .passageScope[data-passage] .slideNav {
     opacity: 0;
   }
@@ -1180,8 +1180,13 @@
     pointer-events: none;
   }
 
+  /*
+   * 通り抜けている間は、指でも横に動かさず、スナップの合わせ直しもさせない（広がる窓とアーチの位置がずれないように）。
+   * 矢印・ホイールで始まっていた動きは、ArchPassage が通り抜けを始めるときに止める
+   */
   .passageScope[data-passage] .track {
     overflow-x: hidden;
+    scroll-snap-type: none;
   }
 }
 
