@@ -2,6 +2,8 @@
  * TOP ヒーロー
  * 舞台（.stage）は完成イメージと同じ 1672:941 の箱で、中の各レイヤーは scene.ts の座標を % で置く。
  * 画面に対しては object-fit: cover と同じ考え方で舞台を拡大・中央寄せする。
+ * ただし画面が縦長になるほど左右が切れるので、幅 768px 以上では建物とアーチ（安全域）を切らない大きさで止める
+ * （ファイル後半の「舞台が画面より背が低くなるとき」）。
  */
 
 .hero {
@@ -824,18 +826,18 @@
 }
 
 /*
- * 縦長画面：舞台を画面下に置き、3つのアーチが画面幅に収まる大きさにする。
- * 舞台の上に余る空は、空レイヤーだけを上へ伸ばして埋める（水平線の高さは舞台と揃えたまま）。
- * 境目は 6/7。4/5 だと、それより少しだけ横長の画面（640×800 など）で舞台が画面より大きく広がり、
- * 右端のアーチと部屋名が切れていた。舞台の高さ（200vw × 941/1672 ≒ 1.13 × 幅）が画面の高さを
- * 超えない範囲（縦横比 0.88 まで）なら、このルールで3つのアーチが収まる。
- * 幅 700px 以下も、縦横比によらずこのルールにする。高さの低いスマホ幅（390×450 など）では、
- * 通常のルールだと最低の高さ（560px）から舞台が約 1000px に広がり、右端の入口と部屋名が切れるため。
- * 700px 以下なら、舞台の上が切れても部屋名とアーチの頂点（舞台の上から約 32%）は画面に残る。
+ * 舞台が画面より背が低くなるとき：舞台を画面下に置き、上に余る空は空レイヤーだけを上へ伸ばして埋める
+ * （水平線の高さは舞台と揃えたまま）。舞台の幅（--stage-w）は、下の2つのルールが決める。
+ *
+ *   スマホ幅    幅 767px 以下で縦長（縦横比 6/7 以下）か、幅 700px 以下。200vw
+ *   安全域      幅 768px 以上で、縦横比 1372/941（≒ 1.46）以下。安全域が画面幅ちょうどになる幅
+ *
+ * それ以外（縦横比 1.46 より横長）は、上の .stage の cover のままにする。cover で切れるのは両端の植物だけで、
+ * 16:9 以上の画面では左右は切れない。
  */
-@media (max-aspect-ratio: 6/7), (max-width: 700px) {
+@media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7), (min-width: 768px) and (max-aspect-ratio: 1372/941) {
   .stage {
-    --stage-h: calc(200vw * 941 / 1672);
+    --stage-h: calc(var(--stage-w) * 941 / 1672);
     --above: calc(max(100svh, 560px) - var(--stage-h));
     /*
      * 空を伸ばす高さは 0 で止める。横向きのスマホなど高さの低い画面では --above が負になり、
@@ -846,7 +848,7 @@
 
     top: auto;
     bottom: 0;
-    width: 200vw;
+    width: var(--stage-w);
     translate: -50% 0;
   }
 
@@ -869,18 +871,9 @@
     transform: translate3d(calc(var(--px) * -0.3%), 0, 0);
   }
 
+  /* 上に伸ばした空にも空気の色がかかるよう、上端を空の上まで広げる（色の重ね方は、館名の置き場所のルールで変わる） */
   .atmosphere {
     top: calc(-1 * var(--sky-above));
-    background:
-      linear-gradient(
-        to bottom,
-        rgb(40 36 52 / 0.16),
-        transparent 40%,
-        transparent 75%,
-        rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
-      ),
-      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
-      var(--ambient-sky-shade-layer);
   }
 
   /* 舞台の上端で切れる木々の梢を空へ溶かす */
@@ -893,6 +886,22 @@
       url("/images/top/top-foreground-front-mask.svg"),
       linear-gradient(to bottom, transparent, #000 16%);
     mask-composite: intersect;
+  }
+}
+
+/*
+ * スマホ幅：3つのアーチが画面幅に収まる大きさにする。
+ * 縦長の境目は 6/7。4/5 だと、それより少しだけ横長の画面（640×800 など）で舞台が画面より大きく広がり、
+ * 右端のアーチと部屋名が切れていた。舞台の高さ（200vw × 941/1672 ≒ 1.13 × 幅）が画面の高さを
+ * 超えない範囲（縦横比 0.88 まで）なら、このルールで3つのアーチが収まる。
+ * 幅 700px 以下も、縦横比によらずこのルールにする。高さの低いスマホ幅（390×450 など）では、
+ * 通常のルールだと最低の高さ（560px）から舞台が約 1000px に広がり、右端の入口と部屋名が切れるため。
+ * 700px 以下なら、舞台の上が切れても部屋名とアーチの頂点（舞台の上から約 32%）は画面に残る。
+ * 幅 768px 以上の縦長は、200vw だと About と Contact のアーチの外側が切れるので、下の安全域のルールにする。
+ */
+@media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7) {
+  .stage {
+    --stage-w: 200vw;
   }
 
   /* アーチの幅が狭いので、名前が切れないよう字間を詰める */
@@ -911,10 +920,67 @@
     letter-spacing: 0.14em;
     white-space: nowrap;
   }
+}
+
+/*
+ * 縦長画面とスマホ幅では、舞台の上に大きく余った空の上に館名を置き、その帯を沈める
+ * （幅 768px 以上の縦長も含め、条件は安全域のルールを入れる前と同じ）。
+ * 周辺減光は楕円ではなく上下の帯にし、館名の下の空を沈める層（--ambient-sky-shade-layer）を足す。
+ * 縦横比 6/7 より横長では上に余る空が少ないので、館名は左下のまま、周辺減光も cover のルールと同じ楕円のままにする
+ */
+@media (max-width: 700px), (max-aspect-ratio: 6/7) {
+  .atmosphere {
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(40 36 52 / 0.16),
+        transparent 40%,
+        transparent 75%,
+        rgb(16 18 14 / calc(0.35 * var(--ambient-vignette)))
+      ),
+      linear-gradient(to bottom, var(--ambient-air-top), var(--ambient-air-bottom)),
+      var(--ambient-sky-shade-layer);
+  }
 
   .plaque {
     top: clamp(28px, 8svh, 64px);
     bottom: auto;
+  }
+}
+
+/*
+ * 安全域：建物（scene.ts の BUILDING、x 196〜1479）に左右 46px ずつ足した x 150〜1522（幅 1372）を、
+ * 画面幅にちょうど収める。cover のままだと、縦横比 1.46 より縦長の画面で左右が大きく切れ、
+ * 1.02 より縦長では About と Contact のアーチの外側まで切れていた。
+ * 切れるのは安全域の外の植物だけで、高さの足りない分は空を上へ伸ばす（上の共通のルール）
+ */
+@media (min-width: 768px) and (max-aspect-ratio: 1372/941) {
+  .stage {
+    --stage-w: calc(100vw * 1672 / 1372);
+  }
+
+  /*
+   * 梢を空へ溶かす長さは、上に伸ばした空の高さに比例させる（最大は共通のルールと同じ 16%）。
+   * 縦横比 1.46 の近くでは伸ばす空がほとんどないので、梢はほぼそのまま残り、cover のルールと見た目がつながる
+   */
+  .plantsBack {
+    mask-image: linear-gradient(to bottom, transparent, #000 min(16%, calc(var(--sky-above) * 0.5)));
+  }
+
+  .plantsFront {
+    mask-image:
+      url("/images/top/top-foreground-front-mask.svg"),
+      linear-gradient(to bottom, transparent, #000 min(16%, calc(var(--sky-above) * 0.5)));
+  }
+
+  /*
+   * 開口部が狭くなる（幅 768px で約 83px）ので、hover / focus の案内の名前の下限を 16px から 12px に下げ、字間も少し詰める
+   * （CONTACT が 16px・0.2em のままだと約 108px あり、開口部の外が切れていた）
+   */
+  .archTitle {
+    font-size: max(1.2cqw, 12px);
+    letter-spacing: 0.14em;
+    margin-right: -0.14em;
   }
 }
 

@@ -82,7 +82,7 @@ const TopHero = () => {
               layers={BUILDING_LAYERS}
               className={styles.building}
               style={toPercentBox(BUILDING)}
-              sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
+              sizes="(max-width: 700px) 160vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 160vw, (max-aspect-ratio: 1672/941) 94vw, 80vw"
             />
 
             <div
