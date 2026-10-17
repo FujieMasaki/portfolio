@@ -948,11 +948,11 @@
   }
 
   /*
-   * 開口部が狭くなる（幅 768px で約 83px）ので、hover / focus の案内の名前は 16px の下限を外し、字間も少し詰める
+   * 開口部が狭くなる（幅 768px で約 83px）ので、hover / focus の案内の名前の下限を 16px から 12px に下げ、字間も少し詰める
    * （CONTACT が 16px・0.2em のままだと約 108px あり、開口部の外が切れていた）
    */
   .archTitle {
-    font-size: clamp(12px, 1.2cqw, 16px);
+    font-size: max(1.2cqw, 12px);
     letter-spacing: 0.14em;
     margin-right: -0.14em;
   }
