@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { ARCHES, toPercentBox } from "./scene";
+import { ARCHES, toPercentBox, type ArchId } from "./scene";
 import styles from "./TopHero.module.css";
 
 /**
@@ -11,7 +11,12 @@ import styles from "./TopHero.module.css";
  * 選ばれた入口の部屋名だけ、文字と上下の線をわずかに濃くする。
  * hover の無い端末でも、この部屋名だけで入口だと分かるようにし、押せばその入口へ行ける。
  */
-const ArchSigns = () => {
+type Props = {
+  /** スマホ幅の部屋のアーチ。ほかの部屋名は押せないようにする（TopScene の focus と同じ） */
+  focus?: ArchId;
+};
+
+const ArchSigns = ({ focus }: Props) => {
   return (
     <div className={styles.archSigns} aria-hidden="true">
       {ARCHES.map((arch) => (
@@ -33,7 +38,12 @@ const ArchSigns = () => {
             見えている部屋名を押しても入口へ行けるよう、同じ行き先のリンクにする。
             Tab と読み上げはアーチ側のリンクに任せ、こちらは重ねない。
           */}
-          <Link href={arch.href} className={styles.archPlate} tabIndex={-1}>
+          <Link
+            href={arch.href}
+            className={styles.archPlate}
+            tabIndex={-1}
+            inert={focus !== undefined && focus !== arch.id}
+          >
             {arch.title}
           </Link>
         </div>

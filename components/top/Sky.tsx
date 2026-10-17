@@ -1,20 +1,28 @@
 import Image from "next/image";
 import ambientStyles from "@/components/museum/ambient.module.css";
 import SeaSkyMotion from "@/components/museum/SeaSkyMotion";
+import { roomsSizes } from "./scene";
 import SkyFlyby from "./SkyFlyby";
 import styles from "./TopHero.module.css";
 
 type Props = {
   background: string;
+  /** 空の動き（水面と燕・コウモリ）を付ける条件の media query（TopScene） */
+  motionMedia: string;
+  /** 水面を描くか */
+  water: boolean;
+  /** 燕・コウモリを飛ばすか */
+  flyby: boolean;
 };
 
 // 舞台の幅（TopHero.module.css）：スマホ幅は 200vw（幅 767px 以下で縦横比 4/3 以下の横長も約 207vw まで広がる）、
 // 幅 768px 以上で 16:9 より縦長なら最大約 122vw（安全域のルール）。空の箱は舞台より 4% 広い（.sky の inset: -2%）。
 // 安全域のルールで縦横比が約 1.22 以下になると、上へ伸ばした空の箱が画像（4:3）より縦長になり、画像を高さに合わせて
 // 箱の幅より広く描く（800×900 で約 217vw、768×1024 で約 278vw）。元画像は幅 1448px なので、幅 768px 以上では
-// 200vw と宣言すれば元画像が選ばれる。境目は 6/5 にそろえる（6/5〜1.22 では描く幅が 127vw をわずかに超えるだけ）
+// 200vw と宣言すれば元画像が選ばれる。境目は 6/5 にそろえる（6/5〜1.22 では描く幅が 127vw をわずかに超えるだけ）。
+// スマホ幅の部屋では舞台が約 418vw になる（scene.ts の roomsSizes。空の箱はその 104%）
 const SIZES =
-  "(max-width: 700px) 200vw, (max-aspect-ratio: 6/5) 200vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 200vw, (max-aspect-ratio: 1672/941) 127vw, 110vw";
+  `${roomsSizes(1.04)}, (max-width: 700px) 200vw, (max-aspect-ratio: 6/5) 200vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 200vw, (max-aspect-ratio: 1672/941) 127vw, 110vw`;
 
 /**
  * 海と空のレイヤー。
@@ -28,7 +36,7 @@ const SIZES =
  * （海と空の光は /contact と共有。components/museum/seaSky.ts）。
  * 同じ src なので画像の取得は1回で済む。
  */
-const Sky = ({ background }: Props) => {
+const Sky = ({ background, motionMedia, water, flyby }: Props) => {
   const image = (
     <Image
       src={background}
@@ -42,10 +50,10 @@ const Sky = ({ background }: Props) => {
 
   return (
     <div className={styles.sky} aria-hidden="true">
-      <SeaSkyMotion image={image} />
+      <SeaSkyMotion image={image} waterMedia={water ? motionMedia : null} />
       <div className={ambientStyles.glaze} />
       <div className={styles.haze} />
-      <SkyFlyby />
+      {flyby && <SkyFlyby media={motionMedia} />}
     </div>
   );
 };

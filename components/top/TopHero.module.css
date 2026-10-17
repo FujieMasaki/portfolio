@@ -834,9 +834,11 @@
  *
  * それ以外（縦横比 1.46 より横長）は、上の .stage の cover のままにする。cover で切れるのは両端の植物だけで、
  * 16:9 以上の画面では左右は切れない。
+ * ここから下の3つ（共通・スマホ幅・安全域）は、舞台が1つの画面の舞台（.mainStage）にだけ当てる。
+ * 縦長のスマホでは .mainStage を隠し、アーチごとの部屋の舞台を見せる（ファイル末尾の「スマホ幅の部屋」）。
  */
 @media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7), (min-width: 768px) and (max-aspect-ratio: 1372/941) {
-  .stage {
+  .mainStage {
     --stage-h: calc(var(--stage-w) * 941 / 1672);
     --above: calc(max(100svh, 560px) - var(--stage-h));
     /*
@@ -856,7 +858,7 @@
    * 背景画像の水平線は上から 44.9%、舞台の水平線は 42.3% の高さ。
    * 空の上端と舞台の下端は画面の端にそろえているので、パララックスは横にだけ動かす（縦に動かすと端に背景色が出る）
    */
-  .sky {
+  .mainStage .sky {
     --horizon: 44.9%;
     /*
      * object-position の y を画像の水平線の割合（488 / 1086）にすると、画像が高さで合っても幅で合っても、
@@ -872,16 +874,16 @@
   }
 
   /* 上に伸ばした空にも空気の色がかかるよう、上端を空の上まで広げる（色の重ね方は、館名の置き場所のルールで変わる） */
-  .atmosphere {
+  .mainStage .atmosphere {
     top: calc(-1 * var(--sky-above));
   }
 
   /* 舞台の上端で切れる木々の梢を空へ溶かす */
-  .plantsBack {
+  .mainStage .plantsBack {
     mask-image: linear-gradient(to bottom, transparent, #000 16%);
   }
 
-  .plantsFront {
+  .mainStage .plantsFront {
     mask-image:
       url("/images/top/top-foreground-front-mask.svg"),
       linear-gradient(to bottom, transparent, #000 16%);
@@ -900,19 +902,19 @@
  * 幅 768px 以上の縦長は、200vw だと About と Contact のアーチの外側が切れるので、下の安全域のルールにする。
  */
 @media (max-width: 700px), (max-width: 767.98px) and (max-aspect-ratio: 6/7) {
-  .stage {
+  .mainStage {
     --stage-w: 200vw;
   }
 
   /* アーチの幅が狭いので、名前が切れないよう字間を詰める */
-  .archTitle {
+  .mainStage .archTitle {
     font-size: min(12px, 3vw);
     letter-spacing: 0.1em;
     margin-right: -0.1em;
   }
 
   /* アーチの間隔が狭いので、プレートは文字に合わせた幅にし、字間も少し詰める */
-  .archPlate {
+  .mainStage .archPlate {
     left: var(--opening-center);
     width: auto;
     padding: 0.4em 0.6em 0.36em 0.74em;
@@ -955,7 +957,7 @@
  * 切れるのは安全域の外の植物だけで、高さの足りない分は空を上へ伸ばす（上の共通のルール）
  */
 @media (min-width: 768px) and (max-aspect-ratio: 1372/941) {
-  .stage {
+  .mainStage {
     --stage-w: calc(100vw * 1672 / 1372);
   }
 
@@ -963,11 +965,11 @@
    * 梢を空へ溶かす長さは、上に伸ばした空の高さに比例させる（最大は共通のルールと同じ 16%）。
    * 縦横比 1.46 の近くでは伸ばす空がほとんどないので、梢はほぼそのまま残り、cover のルールと見た目がつながる
    */
-  .plantsBack {
+  .mainStage .plantsBack {
     mask-image: linear-gradient(to bottom, transparent, #000 min(16%, calc(var(--sky-above) * 0.5)));
   }
 
-  .plantsFront {
+  .mainStage .plantsFront {
     mask-image:
       url("/images/top/top-foreground-front-mask.svg"),
       linear-gradient(to bottom, transparent, #000 min(16%, calc(var(--sky-above) * 0.5)));
@@ -977,10 +979,100 @@
    * 開口部が狭くなる（幅 768px で約 83px）ので、hover / focus の案内の名前の下限を 16px から 12px に下げ、字間も少し詰める
    * （CONTACT が 16px・0.2em のままだと約 108px あり、開口部の外が切れていた）
    */
-  .archTitle {
+  .mainStage .archTitle {
     font-size: max(1.2cqw, 12px);
     letter-spacing: 0.14em;
     margin-right: -0.14em;
+  }
+}
+
+/*
+ * スマホ幅の部屋（TopHero.tsx・scene.ts の ROOMS）：縦長のスマホでは、アーチ1つずつのアップを1画面にし、
+ * About → Work → Contact と縦に並べる。部屋ごとに同じ舞台を置き、キャンバスの幅 400（scene.ts の ROOM_VIEW_WIDTH）を
+ * 画面幅に合わせ、開口部の中心（--room-cx）を画面の中央に置く。
+ * 条件は scene.ts の ROOMS_MEDIA と同じにする（変えるときは両方）。縦横比 3/5 より横長では部屋が画面より大きく余るので、
+ * 今までの舞台（.mainStage）のままにする。
+ */
+.rooms {
+  display: none;
+}
+
+@media (max-width: 767.98px) and (max-aspect-ratio: 3/5) {
+  .hero {
+    height: auto;
+  }
+
+  .mainStage {
+    display: none;
+  }
+
+  .rooms {
+    display: block;
+  }
+
+  /* 部屋の近くまで来たら、その部屋の上端にそっと合わせる。勢いよくスクロールすれば通り過ぎられる（mandatory にしない） */
+  :global(html):has(.rooms) {
+    scroll-snap-type: y proximity;
+  }
+
+  .room {
+    /* キャンバスの 1px が画面の何 px か */
+    --room-k: calc(100vw / 400);
+
+    position: relative;
+    height: calc((941 - var(--room-top)) * var(--room-k));
+    overflow: hidden;
+    scroll-snap-align: start;
+  }
+
+  /*
+   * Work と Contact の部屋は、前の部屋の下端に重ね、上端を透かして溶け込ませる。
+   * 前の部屋の手前の植物と岩の下から、次の壁が現れるように見せる（境目で景色を区切らない）
+   */
+  .room + .room {
+    --room-blend: 60;
+
+    margin-top: calc(-1 * var(--room-blend) * var(--room-k));
+    mask-image: linear-gradient(to bottom, transparent, #000 calc(var(--room-blend) * var(--room-k)));
+  }
+
+  /* 舞台は部屋の下端にそろえ、上の --room-top より上は部屋の外に出す */
+  .room .stage {
+    top: auto;
+    bottom: 0;
+    left: calc(50% - var(--room-cx) * var(--room-k));
+    width: calc(1672 * var(--room-k));
+    translate: none;
+  }
+
+  /*
+   * 下へ続くことの目印。文字と細い線だけで、動かさない。最初の部屋の、次の部屋が重なる範囲より上に置き、
+   * 部屋が画面より背の高いスマホでも、最初の1画面の下端の少し上に収める
+   */
+  .scrollCue {
+    position: absolute;
+    left: 50%;
+    bottom: max(calc(60 * var(--room-k) + 20px), calc(100% - 100svh + 28px));
+    translate: -50% 0;
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    /* 字間の分だけ右にずれて見えるのを戻す */
+    padding-left: 0.32em;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--hero-ink);
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.4);
+    pointer-events: none;
+  }
+
+  .scrollCue::after {
+    content: "";
+    width: 1px;
+    height: 28px;
+    background: currentColor;
+    opacity: 0.7;
   }
 }
 

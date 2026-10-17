@@ -114,7 +114,8 @@ const ArchPassage = ({ children }: Props) => {
     }
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const overlay = overlayRef.current;
-    const stage = event.currentTarget.querySelector<HTMLElement>(`.${styles.stage}`);
+    // 舞台はスマホ幅の部屋ごとにもあるので、押したリンクのある舞台を使う
+    const stage = event.target instanceof Element ? event.target.closest<HTMLElement>(`.${styles.stage}`) : null;
     const opening = stage?.querySelector<HTMLElement>(`.${styles.arch}[data-arch="${arch.id}"]`);
     if (!isPlainClick(event) || reducedMotion.matches || !overlay?.animate || !stage || !opening) return;
 

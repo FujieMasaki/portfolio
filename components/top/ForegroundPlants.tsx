@@ -5,6 +5,7 @@ import {
   PLANT_SWAY_GROUPS,
   PLANT_SWAYS,
   PLANTS_BASE,
+  roomsSizes,
   type PlantSway,
   type PlantSwayGroup,
 } from "./scene";
@@ -41,7 +42,7 @@ const swayStyle = (sway: Omit<PlantSway, "src">, outer: Rect) => {
  */
 const sizes = (ratio: number) => {
   const narrow = `${Math.ceil(ratio * 200)}vw`;
-  return `(max-width: 700px) ${narrow}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 135)}vw`;
+  return `${roomsSizes(ratio)}, (max-width: 700px) ${narrow}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${narrow}, ${Math.ceil(ratio * 135)}vw`;
 };
 
 /**

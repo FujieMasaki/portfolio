@@ -1,21 +1,10 @@
+import type { CSSProperties } from "react";
 import AmbientRoot from "@/components/museum/AmbientRoot";
-import LayeredBuilding from "@/components/museum/LayeredBuilding";
-import { SEA_SKY_BACKGROUND } from "@/components/museum/seaSky";
-import ArchEntrance from "./ArchEntrance";
 import ArchPassage from "./ArchPassage";
-import ArchSigns from "./ArchSigns";
-import ForegroundPlants from "./ForegroundPlants";
 import ParallaxStage from "./ParallaxStage";
-import Sky from "./Sky";
-import {
-  ARCHES,
-  BUILDING,
-  BUILDING_LAYERS,
-  FOREGROUND,
-  TOP_AMBIENT_VARIABLES,
-  toPercentBox,
-} from "./scene";
+import { ROOMS, ROOMS_MEDIA, TOP_AMBIENT_VARIABLES } from "./scene";
 import styles from "./TopHero.module.css";
+import TopScene from "./TopScene";
 
 /**
  * TOP のヒーロー。海辺の小さな私設美術館の入口として、3つのアーチを About / Work / Contact の入口にする。
@@ -30,7 +19,8 @@ import styles from "./TopHero.module.css";
  *   6. atmosphere 周辺減光と、時間帯の空気の色
  *   7. archSigns  アーチ上部の部屋名（ABOUT / WORK / CONTACT）
  *
- * 1〜7 は .lens にまとめ、アーチの hover で、景色ごとまっすぐ前へわずかに近づく（館名は動かさない）。
+ * 1〜7 は .lens にまとめ（TopScene）、アーチの hover で、景色ごとまっすぐ前へわずかに近づく（館名は動かさない）。
+ * 縦長のスマホ（scene.ts の ROOMS_MEDIA）では、同じ舞台をアーチごとの部屋に置き、アーチ1つずつのアップを縦に並べる。
  *
  * 光・霞・室内灯・空気は訪問者のローカル時刻で変わる（AmbientRoot が scene.ts の TOP_AMBIENT_VARIABLES を
  * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
@@ -55,49 +45,43 @@ const TopHero = () => {
           <p className={styles.role}>Web Engineer</p>
         </header>
 
-        <ParallaxStage className={styles.stage}>
+        {/* 768px 以上などの舞台。スマホ幅の部屋の条件（ROOMS_MEDIA）では隠し、下の部屋を見せる */}
+        <ParallaxStage className={`${styles.stage} ${styles.mainStage}`}>
           {/* 舞台の全レイヤーを1枚にまとめ、アーチの hover で景色ごとまっすぐ前へわずかに近づける */}
-          <div className={styles.lens}>
-            <Sky background={SEA_SKY_BACKGROUND} />
-
-            <div
-              className={styles.plantsBack}
-              style={toPercentBox(FOREGROUND)}
-              aria-hidden="true"
-            >
-              <ForegroundPlants />
-            </div>
-
-            <nav className={styles.arches} aria-label="メインメニュー">
-              {ARCHES.map((arch) => (
-                <ArchEntrance
-                  key={arch.id}
-                  arch={arch}
-                  background={SEA_SKY_BACKGROUND}
-                />
-              ))}
-            </nav>
-
-            <LayeredBuilding
-              layers={BUILDING_LAYERS}
-              className={styles.building}
-              style={toPercentBox(BUILDING)}
-              sizes="(max-width: 700px) 160vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 160vw, (max-aspect-ratio: 1672/941) 94vw, 80vw"
-            />
-
-            <div
-              className={styles.plantsFront}
-              style={toPercentBox(FOREGROUND)}
-              aria-hidden="true"
-            >
-              <ForegroundPlants />
-            </div>
-
-            <div className={styles.atmosphere} aria-hidden="true" />
-
-            <ArchSigns />
-          </div>
+          <TopScene motionMedia={`not all and ${ROOMS_MEDIA}`} water flyby />
         </ParallaxStage>
+
+        {/*
+          スマホ幅の部屋：アーチ1つずつのアップを、About → Work → Contact と縦に並べる（ROOMS_MEDIA のときだけ見せる）。
+          部屋ごとに同じ舞台を置き、その部屋のアーチだけを入口にする。メニューの名前は部屋を包むこの nav に付ける
+        */}
+        <nav className={styles.rooms} aria-label="メインメニュー">
+          {ROOMS.map((room, index) => (
+            <div
+              key={room.arch.id}
+              className={styles.room}
+              data-room={room.arch.id}
+              style={{ "--room-cx": room.centerX, "--room-top": room.top } as CSSProperties}
+            >
+              <ParallaxStage className={styles.stage}>
+                <TopScene
+                  focus={room.arch.id}
+                  archesAs="div"
+                  motionMedia={ROOMS_MEDIA}
+                  // 窓から海が見えるのは Contact だけ、空が見えるのは最初の About だけ
+                  water={room.arch.id === "contact"}
+                  flyby={index === 0}
+                />
+              </ParallaxStage>
+              {/* 下へ続くことの目印。動かさない（常に動いている UI にしない） */}
+              {index === 0 && (
+                <span className={styles.scrollCue} aria-hidden="true">
+                  Scroll
+                </span>
+              )}
+            </div>
+          ))}
+        </nav>
       </ArchPassage>
 
       {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}

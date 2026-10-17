@@ -275,6 +275,46 @@ export const ARCHES: Arch[] = [
 ];
 
 /**
+ * スマホ幅の部屋：縦長のスマホでは、舞台全体ではなくアーチ1つずつのアップを1画面にし、About → Work → Contact と縦に並べる。
+ * 同じ舞台を部屋ごとに置き、画面にはキャンバスの幅 ROOM_VIEW_WIDTH 分だけを、開口部の中心を画面の中央にして切り取る。
+ * この幅だと舞台の高さ（約 2.35 × 画面幅）が、縦長のスマホの画面の高さとほぼ同じになる。
+ *
+ * ROOMS_MEDIA は TopHero.module.css の「スマホ幅の部屋」の @media と同じ条件にする（CSS の @media には変数を使えないので、変えるときは両方）。
+ * 縦横比 3/5 より横長（小さなタブレット・横向きのスマホなど）では部屋の高さが画面より大きく余るので、今までの舞台のままにする。
+ */
+export const ROOMS_MEDIA = "(max-width: 767.98px) and (max-aspect-ratio: 3/5)";
+
+/** 部屋の画面1つに切り取るキャンバスの幅（TopHero.module.css の .room の計算と同じ値） */
+export const ROOM_VIEW_WIDTH = 400;
+
+/** 部屋の舞台の幅（画面幅に対する vw） */
+export const ROOM_STAGE_VW = (CANVAS.width / ROOM_VIEW_WIDTH) * 100;
+
+/**
+ * 部屋の舞台に置く画像の sizes の先頭に足す候補（ratio は舞台の幅に対する画像の幅）。
+ * 部屋の舞台と、ほかの画面の舞台の画像は同じ sizes にする。同じ候補が選ばれ、隠れている側の舞台の画像を二重に読み込まないため
+ */
+export const roomsSizes = (ratio: number) => `${ROOMS_MEDIA} ${Math.ceil(ratio * ROOM_STAGE_VW)}vw`;
+
+export type Room = {
+  arch: Arch;
+  /** 画面の中央に置くキャンバスの x（開口部の中心） */
+  centerX: number;
+  /**
+   * 部屋の上端に来るキャンバスの y。About は空と館名を見せるので舞台の上端から、
+   * Work と Contact は壁の上端（BUILDING.y = 200）のすぐ下から始め、前の部屋の手前の植物の下から壁が現れるように溶け込ませる
+   * （壁より上から始めると、壁の上の空が前の部屋との間に帯になって見えた）
+   */
+  top: number;
+};
+
+export const ROOMS: Room[] = ARCHES.map((arch, index) => ({
+  arch,
+  centerX: arch.opening.x + arch.opening.width / 2,
+  top: index === 0 ? 0 : 205,
+}));
+
+/**
  * TOP の時間帯ごとの光と空気（時間帯は components/museum/ambient.ts が訪問者のローカル時刻で決める）。
  *
  * 同じ美術館に時間が流れて見えるよう、建物の形・植物・アーチ・展示は共通のまま、

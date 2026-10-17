@@ -1,12 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CANVAS, toPercentBox, type Arch } from "./scene";
+import { CANVAS, roomsSizes, toPercentBox, type Arch } from "./scene";
 import styles from "./TopHero.module.css";
 
 type Props = {
   arch: Arch;
   /** Contact のアーチ越しに見せる背景（色調は時間帯の CSS 変数で TopHero.module.css が決める） */
   background: string;
+  /** スマホ幅の部屋で、ほかの部屋のアーチ。画面の端にかかっても、押せず・Tab でも止まらないようにする */
+  inert?: boolean;
 };
 
 /**
@@ -31,10 +33,10 @@ const interiorSizes = (openingWidth: number, frameWidth: string) => {
   const portrait = `${Math.ceil(ratio * 200)}vw`;
   // sizes ではカンマが候補の区切りなので、スマホ幅のルールに入る条件ごとに同じ値を並べる
   // 幅 767px 以下で縦横比 4/3 以下の横長でも舞台は約 207vw まで広がるので、スマホ幅と同じ値を使う
-  return `(max-width: 700px) ${portrait}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
+  return `${roomsSizes(ratio)}, (max-width: 700px) ${portrait}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
 };
 
-const ArchEntrance = ({ arch, background }: Props) => {
+const ArchEntrance = ({ arch, background, inert }: Props) => {
   const { opening, interior } = arch;
   // 上端を半円にするための縦方向の半径（開口部の高さに対する比率）
   const radiusY = `${(opening.width / 2 / opening.height) * 100}%`;
@@ -44,6 +46,7 @@ const ArchEntrance = ({ arch, background }: Props) => {
       href={arch.href}
       className={styles.arch}
       data-arch={arch.id}
+      inert={inert}
       style={{
         ...toPercentBox(opening),
         borderRadius: `50% 50% 0 0 / ${radiusY} ${radiusY} 0 0`,
