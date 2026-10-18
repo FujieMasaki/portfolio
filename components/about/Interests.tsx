@@ -26,8 +26,6 @@ const Interests = () => {
 
       <ul
         className={styles.hall}
-        // 床（.hall::after）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink）
-        data-room-floor
         style={
           {
             "--hall-columns": INTERESTS.map((item) => `${item.plinth.width}fr`).join(" "),
@@ -41,7 +39,7 @@ const Interests = () => {
       </ul>
 
       <MuseumRoomNavigation
-        previous={{ label: "Back to entrance", title: "Top", href: "/" }}
+        previous={{ label: "Back to entrance", title: "Top", href: "/", ground: "dark" }}
         next={{ label: "Next room", title: "Work", href: "/work" }}
         className={styles.roomNavigation}
       />

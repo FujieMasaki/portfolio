@@ -37,8 +37,16 @@
   inset: 0;
 }
 
-/* 順路の案内（RoomStepLink）から来たときだけ、進んだ向きの 12px 先から着地する（AboutMuseum.module.css と同じ動き） */
+/*
+ * 順路の案内（RoomStepLink）から来たときだけ、部屋ごと（館の外の暗い地・Menu も）静かに現れ、
+ * 景色は進んだ向きの 12px 先から着地する（AboutMuseum.module.css と同じ動き）。
+ * 来る前の部屋は、館の外と同じ暗がり（globals.css の [data-room-ground="dark"]）へ溶けている
+ */
 @media (prefers-reduced-motion: no-preference) {
+  :global(:root[data-room-step]) .contact {
+    animation: room-enter 0.8s var(--ease-calm) both;
+  }
+
   :global(:root[data-room-step="next"]) .contact > main {
     --room-step: 12px;
 
@@ -64,6 +72,13 @@
 }
 
 @keyframes passage-arrive {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 印は名前に room-step を含む動きの終わりで外れるので、部屋ごと現れる動きの名前には room-step を含めない */
+@keyframes room-enter {
   from {
     opacity: 0;
   }

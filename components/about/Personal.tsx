@@ -19,8 +19,6 @@ const Personal = () => {
     <section
       className={styles.archive}
       aria-labelledby="person-title"
-      // 床（.archive::after）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink）
-      data-room-floor
     >
       <div className={styles.archiveText}>
         <h1 className={shared.heading} id="person-title">
@@ -58,8 +56,8 @@ const Personal = () => {
         </div>
       </figure>
 
-      {/* 展示室の床に置かれた植物。床と同じく、順路の案内で移るときも動かさない（data-room-fixed。RoomStepLink） */}
-      <div className={styles.plant} aria-hidden="true" data-room-fixed>
+      {/* 展示室の床に置かれた植物 */}
+      <div className={styles.plant} aria-hidden="true">
         <Image
           src="/images/about/about-alocasia-plant.png"
           alt=""
