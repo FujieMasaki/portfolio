@@ -96,6 +96,12 @@ const ArchPassage = ({ children }: Props) => {
   // Web Animations は React の外の動きなので、この後片付けだけを effect に置く
   useEffect(() => () => animations.current.forEach((animation) => animation.cancel()), []);
 
+  // 順路の案内で TOP へ戻ってきたときの地の色（RoomStepLink）を、TOP が描かれたら外す。
+  // TOP には着地の動きが無く、印が動きの終わりで外れないため。TOP の地は同じ暗い色なので、外しても見え方は変わらない
+  useEffect(() => {
+    clearMark("roomGround");
+  }, []);
+
   // 入口を選びそうな気配（hover・focus・指が触れた）で行き先を決めておき、遷移先を先に読み始める
   const onIntent = (event: SyntheticEvent) => {
     const arch = archFor(event.target);
@@ -142,8 +148,8 @@ const ArchPassage = ({ children }: Props) => {
 
     Promise.all(animations.current.map((animation) => animation.finished))
       .then(() => {
-        // 順路の案内の印が残っていれば外し、着地の動きを1つにする（念のため。TOP へ戻る順路の案内は印を付けない）。
-        // TOP へ戻る順路の案内が敷いた地の色も、時間で外れる前なら外し、通り抜けの暗がりの地にする
+        // 順路の案内の印が残っていれば外し、着地の動きを1つにする（念のため。TOP へ戻る順路の案内は印を付けない。
+        // 地の色の印も、TOP が描かれたときに外している）
         clearMark("roomStep");
         clearMark("roomGround");
         setMark("arrival", "passage", "passage-arrive");

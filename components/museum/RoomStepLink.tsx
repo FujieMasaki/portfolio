@@ -79,9 +79,8 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
     const sign = direction === "next" ? -1 : 1;
 
     // 部屋の外の地の色を、行き先に合わせて先に敷いておく。次の部屋の着地の動きが終わったら外れる。
-    // 入口（TOP）には着地の動きが無いので時間で外れるが、それまでは同じ色の TOP の地が上を覆っていて見えない。
-    // （この部屋には着地の動きが無いので、ignore はこの部屋の中の動きの終わりを数えないための念のため）
-    clearMark("roomGround");
+    // 入口（TOP）には着地の動きが無いので、TOP が描かれたら ArchPassage が外す（同じ色の TOP の地が上を覆う）。
+    // この部屋に順路で着いた直後は、まだこの部屋の着地の動きが続いているので、ignore でそれを数えない
     setMark("roomGround", ground ?? "wall", "room-step", room);
 
     // 部屋ごと地の色へ溶かし、中身だけを進む向きと逆へ退かせる
@@ -103,13 +102,9 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
         leaving = [];
         if (!main.isConnected) return;
         // 次の部屋に印を残す。入口（TOP）には着地の動きが無いので、印を残さない。
-        // 印を付けてから遷移するまでの間は、退いたこの部屋にも着地の動きがかかる（見えない）ので、それの終わりは数えない
+        // 印を付けてから遷移するまでの間は、退いたこの部屋にも着地の動きがかかる（見えない）ので、それの始まりと終わりは数えない
         clearMark("roomStep");
         if (href !== "/") setMark("roomStep", direction, "room-step", room);
-        // 地の色の印も付け直し、外れるまでの時間を roomStep と同じく遷移の直前から数える
-        // （押した時点から数えると、次の部屋の描画が遅いときに、現れる前に地の色が外れて明るい地が見える）。
-        // 外して付け直すまでは同じ処理の中なので、その間の地の色は描かれない
-        setMark("roomGround", ground ?? "wall", "room-step", room);
         router.push(href);
       })
       // 取り消された（ページを離れた）ときは遷移しない
