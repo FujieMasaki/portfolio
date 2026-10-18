@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CANVAS, toPercentBox, type Arch } from "./scene";
+import { CANVAS, slideSizes, toPercentBox, type Arch } from "./scene";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -22,15 +22,17 @@ type Props = {
  */
 /**
  * アーチ内の画像の sizes。表示幅は「開口部の幅 × 画像の拡大率 × 舞台の幅」で、
- * 舞台の幅は縦長のルール（縦横比 6/7 以下か幅 700px 以下）で 200vw。横長では画面の比率により変わり、
- * 縦横比 4/3 以下では最大約 207vw、それより横長では 100〜約135vw になる。
+ * 舞台の幅はスマホ幅のルール（幅 767px 以下で縦横比 6/7 以下か、幅 700px 以下）で 200vw。
+ * 幅 767px 以下のそれ以外では画面の比率により変わり、縦横比 4/3 以下では最大約 207vw になる。
+ * 幅 768px 以上では、安全域のルールで最大約 122vw、それより横長では 100〜約122vw。
+ * スマホ幅のスライド（scene.ts の SLIDE_MEDIA）では最大約 418vw になる（先頭の slideSizes）。
  */
 const interiorSizes = (openingWidth: number, frameWidth: string) => {
   const ratio = (openingWidth / CANVAS.width) * (parseFloat(frameWidth) / 100);
   const portrait = `${Math.ceil(ratio * 200)}vw`;
-  // sizes ではカンマが候補の区切りなので、縦長のルールに入る条件ごとに同じ値を並べる
-  // 縦横比 4/3 以下の横長でも舞台は約 207vw まで広がるので、縦長と同じ値を使う
-  return `(max-aspect-ratio: 6/7) ${portrait}, (max-width: 700px) ${portrait}, (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
+  // sizes ではカンマが候補の区切りなので、スマホ幅のルールに入る条件ごとに同じ値を並べる
+  // 幅 767px 以下で縦横比 4/3 以下の横長でも舞台は約 207vw まで広がるので、スマホ幅と同じ値を使う
+  return `${slideSizes(ratio)}, (max-width: 700px) ${portrait}, (max-width: 767.98px) and (max-aspect-ratio: 4/3) ${portrait}, ${Math.ceil(ratio * 135)}vw`;
 };
 
 const ArchEntrance = ({ arch, background }: Props) => {
@@ -62,12 +64,16 @@ const ArchEntrance = ({ arch, background }: Props) => {
             />
           </span>
         )}
+        {/*
+          景色を見せる展示（kind: "view"）は今の ARCHES では使っていない。使うときは、縦長の開口部に cover で描くと
+          高さに合わせて開口部の幅の約3.6倍に広がるので、描く幅から sizes を出し直す
+        */}
         {interior?.kind === "view" && (
           <Image
             src={background}
             alt=""
             fill
-            sizes={`${Math.round((opening.width / CANVAS.width) * 300)}vw`}
+            sizes={`${slideSizes((opening.width / CANVAS.width) * 1.02)}, ${Math.round((opening.width / CANVAS.width) * 300)}vw`}
             className={styles.archView}
             style={{ objectPosition: interior.objectPosition }}
           />

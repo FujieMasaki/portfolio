@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ambientStyles from "@/components/museum/ambient.module.css";
 import SeaSkyMotion from "@/components/museum/SeaSkyMotion";
+import { slideSizes } from "./scene";
 import SkyFlyby from "./SkyFlyby";
 import styles from "./TopHero.module.css";
 
@@ -8,8 +9,14 @@ type Props = {
   background: string;
 };
 
-// 縦横比 4/3 以下の横長（正方形に近い窓など）でも、舞台は約 207vw まで広がる
-const SIZES = "(max-aspect-ratio: 6/7) 200vw, (max-width: 700px) 200vw, (max-aspect-ratio: 4/3) 200vw, 110vw";
+// 舞台の幅（TopHero.module.css）：スマホ幅は 200vw（幅 767px 以下で縦横比 4/3 以下の横長も約 207vw まで広がる）、
+// 幅 768px 以上で 16:9 より縦長なら最大約 122vw（安全域のルール）。空の箱は舞台より 4% 広い（.sky の inset: -2%）。
+// 安全域のルールで縦横比が約 1.22 以下になると、上へ伸ばした空の箱が画像（4:3）より縦長になり、画像を高さに合わせて
+// 箱の幅より広く描く（800×900 で約 217vw、768×1024 で約 278vw）。元画像は幅 1448px なので、幅 768px 以上では
+// 200vw と宣言すれば元画像が選ばれる。境目は 6/5 にそろえる（6/5〜1.22 では描く幅が 127vw をわずかに超えるだけ）。
+// スマホ幅のスライドでは、舞台が最大約 418vw になる（scene.ts の slideSizes。空の箱はその 104%）
+const SIZES =
+  `${slideSizes(1.04)}, (max-width: 700px) 200vw, (max-aspect-ratio: 6/5) 200vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 200vw, (max-aspect-ratio: 1672/941) 127vw, 110vw`;
 
 /**
  * 海と空のレイヤー。

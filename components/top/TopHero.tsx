@@ -7,11 +7,14 @@ import ArchSigns from "./ArchSigns";
 import ForegroundPlants from "./ForegroundPlants";
 import ParallaxStage from "./ParallaxStage";
 import Sky from "./Sky";
+import SlideTrack from "./SlideTrack";
 import {
   ARCHES,
   BUILDING,
   BUILDING_LAYERS,
+  CANVAS,
   FOREGROUND,
+  slideSizes,
   TOP_AMBIENT_VARIABLES,
   toPercentBox,
 } from "./scene";
@@ -36,6 +39,8 @@ import styles from "./TopHero.module.css";
  * CSS 変数として流し、TopHero.module.css の「時間帯の光」が各レイヤーの filter や色に使う）。建物・植物・アーチの形と配置は時間帯で変えない。
  *
  * 館名と舞台を ArchPassage で包み、アーチを選んだときに、舞台の上へ通り抜ける遷移の窓を重ねる。
+ * 幅 767px 以下の縦向きの画面（scene.ts の SLIDE_MEDIA）では、舞台を SlideTrack の横スクロールの箱に入れ、
+ * アーチ1つずつのアップを横にスライドして見る。
  */
 const TopHero = () => {
   return (
@@ -55,49 +60,52 @@ const TopHero = () => {
           <p className={styles.role}>Web Engineer</p>
         </header>
 
-        <ParallaxStage className={styles.stage}>
-          {/* 舞台の全レイヤーを1枚にまとめ、アーチの hover で景色ごとまっすぐ前へわずかに近づける */}
-          <div className={styles.lens}>
-            <Sky background={SEA_SKY_BACKGROUND} />
+        {/* スマホ幅のスライドでは、舞台を横スクロールの箱に入れ、画面下に案内を出す（それ以外の画面では配置に関わらない） */}
+        <SlideTrack>
+          <ParallaxStage className={styles.stage}>
+            {/* 舞台の全レイヤーを1枚にまとめ、アーチの hover で景色ごとまっすぐ前へわずかに近づける */}
+            <div className={styles.lens}>
+              <Sky background={SEA_SKY_BACKGROUND} />
 
-            <div
-              className={styles.plantsBack}
-              style={toPercentBox(FOREGROUND)}
-              aria-hidden="true"
-            >
-              <ForegroundPlants />
+              <div
+                className={styles.plantsBack}
+                style={toPercentBox(FOREGROUND)}
+                aria-hidden="true"
+              >
+                <ForegroundPlants />
+              </div>
+
+              <nav className={styles.arches} aria-label="メインメニュー">
+                {ARCHES.map((arch) => (
+                  <ArchEntrance
+                    key={arch.id}
+                    arch={arch}
+                    background={SEA_SKY_BACKGROUND}
+                  />
+                ))}
+              </nav>
+
+              <LayeredBuilding
+                layers={BUILDING_LAYERS}
+                className={styles.building}
+                style={toPercentBox(BUILDING)}
+                sizes={`${slideSizes(BUILDING.width / CANVAS.width)}, (max-width: 700px) 160vw, (max-width: 767.98px) and (max-aspect-ratio: 4/3) 160vw, (max-aspect-ratio: 1672/941) 94vw, 80vw`}
+              />
+
+              <div
+                className={styles.plantsFront}
+                style={toPercentBox(FOREGROUND)}
+                aria-hidden="true"
+              >
+                <ForegroundPlants />
+              </div>
+
+              <div className={styles.atmosphere} aria-hidden="true" />
+
+              <ArchSigns />
             </div>
-
-            <nav className={styles.arches} aria-label="メインメニュー">
-              {ARCHES.map((arch) => (
-                <ArchEntrance
-                  key={arch.id}
-                  arch={arch}
-                  background={SEA_SKY_BACKGROUND}
-                />
-              ))}
-            </nav>
-
-            <LayeredBuilding
-              layers={BUILDING_LAYERS}
-              className={styles.building}
-              style={toPercentBox(BUILDING)}
-              sizes="(max-aspect-ratio: 6/7) 160vw, (max-width: 700px) 160vw, (max-aspect-ratio: 4/3) 160vw, 80vw"
-            />
-
-            <div
-              className={styles.plantsFront}
-              style={toPercentBox(FOREGROUND)}
-              aria-hidden="true"
-            >
-              <ForegroundPlants />
-            </div>
-
-            <div className={styles.atmosphere} aria-hidden="true" />
-
-            <ArchSigns />
-          </div>
-        </ParallaxStage>
+          </ParallaxStage>
+        </SlideTrack>
       </ArchPassage>
 
       {/* JS が動かない環境では、画像を待つフェードインをせず舞台をそのまま見せる */}
