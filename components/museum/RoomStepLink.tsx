@@ -104,6 +104,10 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
         // 印を付けてから遷移するまでの間は、退いたこの部屋にも着地の動きがかかる（見えない）ので、それの終わりは数えない
         clearMark("roomStep");
         if (href !== "/") setMark("roomStep", direction, "room-step", room);
+        // 地の色の印も付け直し、外れるまでの時間を roomStep と同じく遷移の直前から数える
+        // （押した時点から数えると、次の部屋の描画が遅いときに、現れる前に地の色が外れて明るい地が見える）。
+        // 外して付け直すまでは同じ処理の中なので、その間の地の色は描かれない
+        setMark("roomGround", ground ?? "wall", "room-step", room);
         router.push(href);
       })
       // 取り消された（ページを離れた）ときは遷移しない
