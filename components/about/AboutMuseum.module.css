@@ -150,9 +150,11 @@
 }
 
 /*
- * 順路の案内（RoomStepLink）から来たときは、壁と床は動かさず、入ってすぐの札・展示が、それぞれの現れ方（arrive）の
- * 時間差のまま、進んだ向きの 12px 先から着地する（--room-step を Personal・WorkMuseum の arrive が使う）。
+ * 順路の案内（RoomStepLink）から来たときは、部屋ごと（壁・床・Menu も）地の色の上に静かに現れ（room-enter）、
+ * 入ってすぐの札・展示が、それぞれの現れ方（arrive）の時間差のまま、進んだ向きの 12px 先から着地する
+ * （--room-step を Personal・WorkMuseum の arrive が使う）。
  * 印（<html data-room-step>）は、札・展示が現れ終わった後（room-step-hold の終わり）に RoomStepLink が外す。
+ * 印は名前に room-step を含む動きの終わりで外れるので、部屋ごと現れる動きの名前には room-step を含めない。
  * --room-step を使う中でいちばん遅いのは /about の所在地（0.71s 遅れ ＋ 1.6s ＝ 2.31s）なので、少し余裕を持たせて 2.5s にする
  * （床の植物は横へずらさない arrive-in-place なので数えない）。
  * それより先に外すと、--room-step が途中で 0 に戻り、現れている途中の札が横に跳ぶ
@@ -161,13 +163,23 @@
   :global(:root[data-room-step="next"]) .museum {
     --room-step: 12px;
 
-    animation: room-step-hold 2.5s linear;
+    animation:
+      room-enter 0.8s var(--ease-calm) both,
+      room-step-hold 2.5s linear;
   }
 
   :global(:root[data-room-step="previous"]) .museum {
     --room-step: -12px;
 
-    animation: room-step-hold 2.5s linear;
+    animation:
+      room-enter 0.8s var(--ease-calm) both,
+      room-step-hold 2.5s linear;
+  }
+}
+
+@keyframes room-enter {
+  from {
+    opacity: 0;
   }
 }
 

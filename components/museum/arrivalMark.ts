@@ -1,10 +1,11 @@
 /**
- * 遷移の後に、次の部屋の着地の動きを選ぶための印（<html data-arrival> / <html data-room-step>）。
+ * 遷移の後に、次の部屋の着地の動きを選ぶための印（<html data-arrival> / <html data-room-step>）と、
+ * 部屋が入れ替わる間に body に敷く地の色の印（<html data-room-ground>）。
  * 印は遷移の直前に付け、次の部屋の着地の動きが終わったら外す（Menu で移ったときや再読み込みでは付かない）。
  * ArchPassage（TOP のアーチ）と RoomStepLink（順路の案内）が使う。
  */
 
-type MarkName = "arrival" | "roomStep";
+type MarkName = "arrival" | "roomStep" | "roomGround";
 
 /**
  * 着地の動きが終わらなかったときに、印を外すまでの時間。

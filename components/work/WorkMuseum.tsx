@@ -55,8 +55,7 @@ const WorkMuseum = () => {
           </div>
 
           {/* 窓の外の植物。葉の影（同じ画像を暗くぼかしたもの）を先に描き、壁に落ちているように見せる */}
-          {/* data-room-fixed：壁と一緒にあるもの。順路の案内で移るときも動かさない（RoomStepLink） */}
-          <div className={styles.canopy} aria-hidden="true" data-room-fixed>
+          <div className={styles.canopy} aria-hidden="true">
             <Image
               src="/images/work/work-plant-top-right.png"
               alt=""
@@ -82,11 +81,10 @@ const WorkMuseum = () => {
         <Projects />
         <Studies />
 
-        {/* 床（.floor::before）を持つ箱。順路の案内で移るとき、箱は止めて中身だけを動かす（RoomStepLink） */}
-        <div className={styles.floor} data-room-floor>
+        <div className={styles.floor}>
           <MuseumRoomNavigation
             previous={{ label: "Previous room", title: "About", href: "/about" }}
-            next={{ label: "Next room", title: "Contact", href: "/contact" }}
+            next={{ label: "Next room", title: "Contact", href: "/contact", ground: "dark" }}
             className={styles.roomNavigation}
           />
         </div>

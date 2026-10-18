@@ -68,6 +68,21 @@ video {
   background: var(--passage-dark);
 }
 
+/*
+ * 順路の案内で移るとき（RoomStepLink が <html data-room-ground> を付けている間）は、いまの部屋をこの地へ溶かし、
+ * 次の部屋がその上に現れるようにする。
+ *   wall  館内の部屋どうし。壁の素材（about-wall.webp に #faf4ec を乗算したもの）の平均の色。
+ *         body の明るい地（--color-bg）のままだと、壁より明るく、入れ替わる間に光って見える
+ *   dark  /contact へ向かうとき。館の外の暗い地（ContactMuseum.module.css の .contact と同じ色）
+ */
+:root[data-room-ground="wall"] body {
+  background: rgb(165 157 150);
+}
+
+:root[data-room-ground="dark"] body {
+  background: #1c211b;
+}
+
 a {
   color: inherit;
   text-decoration: none;
