@@ -68,6 +68,8 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
     const main = event.currentTarget.closest("main");
+    // 部屋のルート（.museum / .contact）。順路の案内を置くページは、main の親を部屋のルートにする
+    // （body の直下に main を置くページでは、body ごと透明になり、地の色も見えなくなる）
     const room = main?.parentElement;
     if (!main || !room || typeof main.animate !== "function") return;
 
