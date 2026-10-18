@@ -135,7 +135,7 @@ const ContactMuseum = () => {
 
         <MuseumRoomNavigation
           previous={{ label: "Previous room", title: "Work", href: "/work" }}
-          next={{ label: "Back to entrance", title: "Top", href: "/" }}
+          next={{ label: "Back to entrance", title: "Top", href: "/", ground: "dark" }}
           className={styles.roomNavigation}
         />
       </main>

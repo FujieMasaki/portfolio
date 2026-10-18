@@ -6,7 +6,7 @@ export type RoomLink = {
   label: string;
   title: string;
   href: string;
-  /** 行き先の地の色。館の外の暗がりの部屋（/contact）へ向かうときだけ "dark"。省くと館内の壁の色（RoomStepLink） */
+  /** 行き先の地の色。館の外の暗がり（/contact・入口）へ向かうときは "dark"。省くと館内の壁の色（RoomStepLink） */
   ground?: "dark";
 };
 

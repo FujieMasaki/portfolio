@@ -26,7 +26,7 @@ type Props = ComponentProps<typeof Link> & {
   direction: "previous" | "next";
   /**
    * 行き先の地の色。部屋が入れ替わる間、body にその色を敷く（globals.css の [data-room-ground]）。
-   * 省くと館内の壁の色。"dark" は館の外の暗がり（/contact）。入口（TOP）へ向かうときは敷かない
+   * 省くと館内の壁の色。"dark" は館の外の暗がり（/contact と入口の TOP。どちらも地は同じ色）
    */
   ground?: "dark";
 };
@@ -41,7 +41,7 @@ type Props = ComponentProps<typeof Link> & {
  *
  * 順路の案内はページの末尾にあり、次の部屋は先頭から見せるので、床や壁の見えている場所は前後で同じにならない。
  * 部屋ごと地の色に溶かし、入れ替わる瞬間（スクロール位置が末尾から先頭へ飛ぶところ）を見せない（TOP の通り抜けの暗がりと同じ考え方）。
- * 地の色は、館内の部屋どうしは壁の色、/contact へ向かうときは館の外の暗がり（<html data-room-ground>。globals.css）。
+ * 地の色は、館内の部屋どうしは壁の色、/contact と入口へ向かうときは館の外の暗がり（<html data-room-ground>。globals.css）。
  * 横にスライドするページ送りには見せない（ずれる距離は数 px）。
  * 修飾キー付きのクリック・prefers-reduced-motion・Web Animations が無い環境では、通常の Link と同じ。
  */
@@ -76,10 +76,11 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
     stepping = true;
     const sign = direction === "next" ? -1 : 1;
 
-    // 部屋の外の地の色を、行き先に合わせて先に敷いておく。次の部屋の着地の動きが終わったら外れる
+    // 部屋の外の地の色を、行き先に合わせて先に敷いておく。次の部屋の着地の動きが終わったら外れる。
+    // 入口（TOP）には着地の動きが無いので時間で外れるが、それまでは同じ色の TOP の地が上を覆っていて見えない。
     // （この部屋には着地の動きが無いので、ignore はこの部屋の中の動きの終わりを数えないための念のため）
     clearMark("roomGround");
-    if (href !== "/") setMark("roomGround", ground ?? "wall", "room-step", room);
+    setMark("roomGround", ground ?? "wall", "room-step", room);
 
     // 部屋ごと地の色へ溶かし、中身だけを進む向きと逆へ退かせる
     const timing = { duration: EXIT_MS, easing: EASE, fill: "forwards" } as const;

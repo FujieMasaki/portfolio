@@ -39,7 +39,7 @@ const Interests = () => {
       </ul>
 
       <MuseumRoomNavigation
-        previous={{ label: "Back to entrance", title: "Top", href: "/" }}
+        previous={{ label: "Back to entrance", title: "Top", href: "/", ground: "dark" }}
         next={{ label: "Next room", title: "Work", href: "/work" }}
         className={styles.roomNavigation}
       />
