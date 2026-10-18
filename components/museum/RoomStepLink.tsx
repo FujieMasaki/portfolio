@@ -68,10 +68,10 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (reducedMotion.matches) return;
     const main = event.currentTarget.closest("main");
-    // 部屋のルート（.museum / .contact）。順路の案内を置くページは、main の親を部屋のルートにする
-    // （body の直下に main を置くページでは、body ごと透明になり、地の色も見えなくなる）
+    // 部屋のルート（.museum / .contact）。順路の案内を置くページは、main の親を部屋のルートにする。
+    // body の直下に main を置くページでは、body ごと透明になり地の色も見えなくなるので、通常の Link にする
     const room = main?.parentElement;
-    if (!main || !room || typeof main.animate !== "function") return;
+    if (!main || !room || room === document.body || typeof main.animate !== "function") return;
 
     event.preventDefault();
     if (stepping) return;
@@ -101,6 +101,8 @@ const RoomStepLink = ({ href, direction, ground, onClick, ...props }: Props) => 
       .then(() => {
         leaving = [];
         if (!main.isConnected) return;
+        // 透明になった部屋（Menu・リンク）を、遷移を待つ間に押したり Tab でフォーカスしたりできないようにする
+        room.inert = true;
         // 次の部屋に印を残す。入口（TOP）には着地の動きが無いので、印を残さない。
         // 印を付けてから遷移するまでの間は、退いたこの部屋にも着地の動きがかかる（見えない）ので、それの始まりと終わりは数えない
         clearMark("roomStep");
