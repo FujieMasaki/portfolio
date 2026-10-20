@@ -217,6 +217,15 @@ export type Arch = {
   interior?: ImageInterior | ViewInterior;
 };
 
+/** About / Work は同じ展示室の建築写真と切り抜き位置を共有する。 */
+const GALLERY_ROOM = {
+  src: "/images/top/top-arch-shared-gallery-base.png",
+  width: 1122,
+  height: 1402,
+  light: "indoor",
+  frame: { left: "-61%", top: "-10%", width: "223%" },
+} as const;
+
 export const ARCHES: Arch[] = [
   {
     id: "about",
@@ -227,11 +236,7 @@ export const ARCHES: Arch[] = [
     body: { x: 355, y: 340, width: 310, height: 300 },
     interior: {
       kind: "image",
-      src: "/images/top/top-arch-about-gallery.png",
-      width: 1122,
-      height: 1402,
-      light: "indoor",
-      frame: { left: "-43%", top: "0%", width: "186%" },
+      ...GALLERY_ROOM,
     },
   },
   {
@@ -243,11 +248,7 @@ export const ARCHES: Arch[] = [
     body: { x: 688, y: 340, width: 309, height: 300 },
     interior: {
       kind: "image",
-      src: "/images/top/top-arch-work-single-frame.png",
-      width: 1122,
-      height: 1402,
-      light: "indoor",
-      frame: { left: "-61%", top: "-10%", width: "223%" },
+      ...GALLERY_ROOM,
     },
   },
   {
@@ -257,19 +258,13 @@ export const ARCHES: Arch[] = [
     opening: { x: 1083, y: 418, width: 149, height: 404 },
     body: { x: 1023, y: 340, width: 307, height: 300 },
     /*
-     * 展示を見終えて外とつながる、奥が海へ開いた通路（灯りのある天井・突き当たりのアーチ形の窓・床）。
-     * 画像は窓の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
-     * 画像は縦長（約 1:2.2）で描いてあり、通路の左右の壁・天井の灯り・床まで開口部に収める。
-     * 上を少し切って天井の灯りを頂点に寄せ、下端が開口部の下まで届く 126% にする。窓は中央より少し右に置く
-     * （はみ出しはアーチ形のリンク（overflow: hidden）が切り抜く）
+     * About / Work と同じ建築・表示位置で、奥の壁と石の棚だけを透過させた1枚。
+     * 透過した出口から、TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
      */
     interior: {
       kind: "image",
-      src: "/images/top/contact-arch-space.png",
-      width: 839,
-      height: 1875,
-      light: "outdoor",
-      frame: { left: "-11%", top: "-3%", width: "126%" },
+      ...GALLERY_ROOM,
+      src: "/images/top/contact-arch-shared-transparent-v2.png",
     },
   },
 ];
