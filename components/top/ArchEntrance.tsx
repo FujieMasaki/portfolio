@@ -76,6 +76,7 @@ const ArchEntrance = ({ arch, background }: Props) => {
                     alt=""
                     width={1122}
                     height={1402}
+                    loading="eager"
                     sizes={interiorSizes(opening.width, interior.frame.width)}
                   />
                 </span>

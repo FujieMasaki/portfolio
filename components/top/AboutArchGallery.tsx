@@ -5,7 +5,7 @@ import styles from "./TopHero.module.css";
 /**
  * About の入口に掛ける4枚の写真。
  * 建築は Work と同じ画像。展示する実際の写真は /about と同じデータを参照する。
- * 写真を差し替えるときは components/about/content.ts の CAREER を変更すればよい。
+ * 写真を差し替えるときは components/about/content.ts の CAREER を変更すればよい（先頭から4件の写真を使う）。
  *
  * 配置は共通建築（1122 × 1402）の正面壁に合わせた %。
  * 木枠は CSS、写真との間に白い台紙・余白は設けない。
@@ -20,7 +20,7 @@ const PHOTO_FRAMES = [
 const AboutArchGallery = () => (
   <>
     {PHOTO_FRAMES.map(({ careerIndex, ...position }) => {
-      const photo = CAREER[careerIndex].photo;
+      const photo = CAREER[careerIndex]?.photo;
       if (!photo) return null;
 
       return (
@@ -29,6 +29,8 @@ const AboutArchGallery = () => (
             src={photo.src}
             alt=""
             fill
+            // 下の展示室の画像と同じく最初から見える位置にあるので、遅れて現れないよう遅延させない
+            loading="eager"
             sizes="(max-width: 767px) 30vw, 6vw"
             style={{ objectFit: "cover", objectPosition: photo.position ?? "center" }}
           />
