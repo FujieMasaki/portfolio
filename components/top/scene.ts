@@ -366,7 +366,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
   },
   /*
    * 深夜：景色（植物・霞）は夜より大きく沈めてシルエットにし、建物は外形と質感が分かる暗さに留める。
-   * About / Work の室内灯は夜より数%だけ上げ、外が暗いことで相対的に目立たせる（色は夕方の淡い琥珀のまま）
+   * About / Work / Contact の室内灯は夜より数%だけ上げ、外が暗いことで相対的に目立たせる（色は夕方の淡い琥珀のまま）
    */
   midnight: {
     haze: 0.12,
