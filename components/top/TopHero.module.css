@@ -281,7 +281,36 @@
   position: absolute;
 }
 
-.archImage img {
+.archImage > img {
+  width: 100%;
+  height: auto;
+}
+
+/* 室内は About / Work 共通画像。額縁だけを展示作品とともに載せる。 */
+.archPhotoSlot {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  border: 2px solid #90643e;
+  background: #90643e;
+  box-shadow: 0 1px 1px rgb(40 26 15 / 0.45), 0 6px 8px rgb(40 26 15 / 0.25);
+}
+
+.archPhotoSlot img {
+  object-fit: cover;
+  filter: saturate(0.88) contrast(0.98);
+}
+
+/* 元の Work 写真から額装作品だけを表示。周囲は共通の建築素材を見せる。 */
+.archWorkArtwork {
+  position: absolute;
+  inset: 0;
+  display: block;
+  clip-path: inset(28.2% 28% 30.25% 27.3%);
+  pointer-events: none;
+}
+
+.archWorkArtwork > img {
   width: 100%;
   height: auto;
 }

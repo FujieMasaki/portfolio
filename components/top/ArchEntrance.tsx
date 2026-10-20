@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CANVAS, slideSizes, toPercentBox, type Arch } from "./scene";
+import AboutArchGallery from "./AboutArchGallery";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -62,6 +63,18 @@ const ArchEntrance = ({ arch, background }: Props) => {
               loading="eager"
               sizes={interiorSizes(opening.width, interior.frame.width)}
             />
+            {arch.id === "about" && <AboutArchGallery />}
+            {arch.id === "work" && (
+              <span className={styles.archWorkArtwork}>
+                <Image
+                  src="/images/top/top-arch-work-droplet-artwork-source.png"
+                  alt=""
+                  width={1122}
+                  height={1402}
+                  sizes={interiorSizes(opening.width, interior.frame.width)}
+                />
+              </span>
+            )}
           </span>
         )}
         {/*
