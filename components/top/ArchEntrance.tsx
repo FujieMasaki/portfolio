@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CANVAS, slideSizes, toPercentBox, type Arch } from "./scene";
+import AboutArchGallery from "./AboutArchGallery";
 import styles from "./TopHero.module.css";
 
 type Props = {
@@ -62,6 +63,24 @@ const ArchEntrance = ({ arch, background }: Props) => {
               loading="eager"
               sizes={interiorSizes(opening.width, interior.frame.width)}
             />
+            {arch.id === "about" && <AboutArchGallery />}
+            {/*
+              額と壁に落ちる影はそのまま、額の内側の絵だけを抑える層を重ねる。
+              同じ src と sizes なので、画像の取得は1回で済む
+            */}
+            {arch.id === "work" &&
+              [styles.archWorkArtwork, `${styles.archWorkArtwork} ${styles.archWorkCanvas}`].map((className) => (
+                <span className={className} key={className}>
+                  <Image
+                    src="/images/top/top-arch-work-droplet-artwork-source.png"
+                    alt=""
+                    width={1122}
+                    height={1402}
+                    loading="eager"
+                    sizes={interiorSizes(opening.width, interior.frame.width)}
+                  />
+                </span>
+              ))}
           </span>
         )}
         {/*

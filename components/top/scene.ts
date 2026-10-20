@@ -180,7 +180,8 @@ type ImageInterior = {
   height: number;
   /**
    * どの光の中にあるか。indoor は室内灯の灯る展示室（--ambient-interior-filter）、
-   * outdoor は外光の入る窓辺（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える
+   * outdoor は外光の入る窓辺（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える。
+   * 今は About / Work / Contact とも共通の展示室（GALLERY_ROOM）の indoor で、outdoor を使うアーチはない
    */
   light: "indoor" | "outdoor";
   /**
@@ -217,6 +218,15 @@ export type Arch = {
   interior?: ImageInterior | ViewInterior;
 };
 
+/** About / Work / Contact は同じ展示室の建築写真と切り抜き位置を共有する（Contact は src だけ透過版に替える）。 */
+const GALLERY_ROOM = {
+  src: "/images/top/top-arch-shared-gallery-base.png",
+  width: 1122,
+  height: 1402,
+  light: "indoor",
+  frame: { left: "-61%", top: "-10%", width: "223%" },
+} as const;
+
 export const ARCHES: Arch[] = [
   {
     id: "about",
@@ -227,11 +237,7 @@ export const ARCHES: Arch[] = [
     body: { x: 355, y: 340, width: 310, height: 300 },
     interior: {
       kind: "image",
-      src: "/images/top/top-arch-about-gallery.png",
-      width: 1122,
-      height: 1402,
-      light: "indoor",
-      frame: { left: "-43%", top: "0%", width: "186%" },
+      ...GALLERY_ROOM,
     },
   },
   {
@@ -243,11 +249,7 @@ export const ARCHES: Arch[] = [
     body: { x: 688, y: 340, width: 309, height: 300 },
     interior: {
       kind: "image",
-      src: "/images/top/top-arch-work-single-frame.png",
-      width: 1122,
-      height: 1402,
-      light: "indoor",
-      frame: { left: "-61%", top: "-10%", width: "223%" },
+      ...GALLERY_ROOM,
     },
   },
   {
@@ -257,19 +259,13 @@ export const ARCHES: Arch[] = [
     opening: { x: 1083, y: 418, width: 149, height: 404 },
     body: { x: 1023, y: 340, width: 307, height: 300 },
     /*
-     * 展示を見終えて外とつながる、奥が海へ開いた通路（灯りのある天井・突き当たりのアーチ形の窓・床）。
-     * 画像は窓の部分を透過してあり、そこから TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
-     * 画像は縦長（約 1:2.2）で描いてあり、通路の左右の壁・天井の灯り・床まで開口部に収める。
-     * 上を少し切って天井の灯りを頂点に寄せ、下端が開口部の下まで届く 126% にする。窓は中央より少し右に置く
-     * （はみ出しはアーチ形のリンク（overflow: hidden）が切り抜く）
+     * About / Work と同じ建築・表示位置で、奥の壁と石の棚だけを透過させた1枚。
+     * 透過した出口から、TOP 共通の空・海（Sky.tsx。時間帯の光を含む）がそのまま見える。
      */
     interior: {
       kind: "image",
-      src: "/images/top/contact-arch-space.png",
-      width: 839,
-      height: 1875,
-      light: "outdoor",
-      frame: { left: "-11%", top: "-3%", width: "126%" },
+      ...GALLERY_ROOM,
+      src: "/images/top/contact-arch-shared-transparent-v2.png",
     },
   },
 ];
@@ -320,10 +316,10 @@ export type TopAmbient = {
   buildingFilter: string;
   /** 植物を同じ光の中に置く。saturate → brightness */
   sceneFilter: string;
-  /** About / Work の室内灯。brightness → saturate */
+  /** About / Work / Contact の室内灯。brightness → saturate（About / Work は TopHero.module.css でさらに 0.8 倍にする） */
   interiorFilter: string;
   /**
-   * Contact の通路（画像は夕方の光で描いてある）。brightness → saturate。
+   * 外光の入る通路（light: "outdoor"）。brightness → saturate。今は使うアーチがない（以前の Contact の通路の画像で使っていた）。
    * About / Work の室内灯（interiorFilter）と同じ色の寄せ方にし、明るさは各時間帯でその約 0.82 倍にする
    * （通路の画像は About / Work の画像より約 2 割明るく描いてあり、同じ値では Contact だけが明るく見えた）
    */
@@ -370,7 +366,7 @@ export const TOP_AMBIENTS: Record<AmbientId, TopAmbient> = {
   },
   /*
    * 深夜：景色（植物・霞）は夜より大きく沈めてシルエットにし、建物は外形と質感が分かる暗さに留める。
-   * About / Work の室内灯は夜より数%だけ上げ、外が暗いことで相対的に目立たせる（色は夕方の淡い琥珀のまま）
+   * About / Work / Contact の室内灯は夜より数%だけ上げ、外が暗いことで相対的に目立たせる（色は夕方の淡い琥珀のまま）
    */
   midnight: {
     haze: 0.12,

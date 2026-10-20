@@ -281,9 +281,48 @@
   position: absolute;
 }
 
-.archImage img {
+.archImage > img {
   width: 100%;
   height: auto;
+}
+
+/* 室内は About / Work 共通画像。額縁だけを展示作品とともに載せる。 */
+.archPhotoSlot {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  border: 2px solid #90643e;
+  background: #90643e;
+  box-shadow: 0 1px 1px rgb(40 26 15 / 0.45), 0 6px 8px rgb(40 26 15 / 0.25);
+}
+
+/* 写真が空間より前に出ないよう、彩度と明るさを抑える（木枠は .archPhotoSlot の border なので変わらない） */
+.archPhotoSlot img {
+  object-fit: cover;
+  filter: saturate(0.75) contrast(0.98) brightness(0.85);
+}
+
+/* 元の Work 写真から額装作品だけを表示。周囲は共通の建築素材を見せる。 */
+.archWorkArtwork {
+  position: absolute;
+  inset: 0;
+  display: block;
+  clip-path: inset(28.2% 28% 30.25% 27.3%);
+  pointer-events: none;
+}
+
+.archWorkArtwork > img {
+  width: 100%;
+  height: auto;
+}
+
+/* 額の内側（元画像の 336〜775 × 416〜933px）の絵だけを、明るさ・彩度とも約1割抑える */
+.archWorkArtwork.archWorkCanvas {
+  clip-path: inset(29.67% 30.84% 33.38% 29.95%);
+}
+
+.archWorkCanvas > img {
+  filter: saturate(0.9) brightness(0.9);
 }
 
 .archView {
@@ -768,13 +807,23 @@
   filter: var(--ambient-scene-filter);
 }
 
-/* About / Work の室内灯。夜・深夜は少し存在感が増し（深夜がいちばん目立つ）、昼はほとんど目立たない */
+/* About / Work / Contact の室内灯。夜・深夜は少し存在感が増し（深夜がいちばん目立つ）、昼はほとんど目立たない */
 .archImage[data-light="indoor"] {
   filter: var(--ambient-interior-filter);
 }
 
 /*
- * Contact の通路。About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
+ * About / Work の展示室は、時間帯の室内灯に加えて全体を 0.8 倍に抑え、外のコンクリートの陰になじませる。
+ * Contact も同じ indoor だが、展示物のない出口の部屋として今の明るさで確定したので含めない
+ * （filter は画像にだけかかり、透過した出口の向こうの空・海（Sky.tsx）の明るさは変わらない）
+ */
+.arch:is([data-arch="about"], [data-arch="work"]) .archImage[data-light="indoor"] {
+  filter: var(--ambient-interior-filter) brightness(0.8);
+}
+
+/*
+ * 外光の入る通路（light: "outdoor"）。今は使うアーチがない（以前の Contact の通路の画像で使っていた）。
+ * About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
  * 天井のライトも今は画像ごと同じ明るさになる。時間帯でライトだけを強めるときは、
  * ライトの範囲のマスクを用意し、建物の夕方の光（LayeredBuilding の .light）と同じ形で暖色を足す
  */
