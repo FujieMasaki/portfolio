@@ -64,17 +64,22 @@ const ArchEntrance = ({ arch, background }: Props) => {
               sizes={interiorSizes(opening.width, interior.frame.width)}
             />
             {arch.id === "about" && <AboutArchGallery />}
-            {arch.id === "work" && (
-              <span className={styles.archWorkArtwork}>
-                <Image
-                  src="/images/top/top-arch-work-droplet-artwork-source.png"
-                  alt=""
-                  width={1122}
-                  height={1402}
-                  sizes={interiorSizes(opening.width, interior.frame.width)}
-                />
-              </span>
-            )}
+            {/*
+              額と壁に落ちる影はそのまま、額の内側の絵だけを抑える層を重ねる。
+              同じ src と sizes なので、画像の取得は1回で済む
+            */}
+            {arch.id === "work" &&
+              [styles.archWorkArtwork, `${styles.archWorkArtwork} ${styles.archWorkCanvas}`].map((className) => (
+                <span className={className} key={className}>
+                  <Image
+                    src="/images/top/top-arch-work-droplet-artwork-source.png"
+                    alt=""
+                    width={1122}
+                    height={1402}
+                    sizes={interiorSizes(opening.width, interior.frame.width)}
+                  />
+                </span>
+              ))}
           </span>
         )}
         {/*
