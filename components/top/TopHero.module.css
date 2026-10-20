@@ -807,21 +807,23 @@
   filter: var(--ambient-scene-filter);
 }
 
-/* About / Work の室内灯。夜・深夜は少し存在感が増し（深夜がいちばん目立つ）、昼はほとんど目立たない */
+/* About / Work / Contact の室内灯。夜・深夜は少し存在感が増し（深夜がいちばん目立つ）、昼はほとんど目立たない */
 .archImage[data-light="indoor"] {
   filter: var(--ambient-interior-filter);
 }
 
 /*
  * About / Work の展示室は、時間帯の室内灯に加えて全体を 0.8 倍に抑え、外のコンクリートの陰になじませる。
- * Contact も同じ indoor だが、出口の向こうの空・海と合わせる明るさなので含めない
+ * Contact も同じ indoor だが、展示物のない出口の部屋として今の明るさで確定したので含めない
+ * （filter は画像にだけかかり、透過した出口の向こうの空・海（Sky.tsx）の明るさは変わらない）
  */
 .arch:is([data-arch="about"], [data-arch="work"]) .archImage[data-light="indoor"] {
   filter: var(--ambient-interior-filter) brightness(0.8);
 }
 
 /*
- * Contact の通路。About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
+ * 外光の入る通路（light: "outdoor"）。今は使うアーチがない（以前の Contact の通路の画像で使っていた）。
+ * About / Work の室内灯と同じ寄せ方で、画像が明るい分だけ少し抑える（scene.ts の outdoorRoomFilter）。
  * 天井のライトも今は画像ごと同じ明るさになる。時間帯でライトだけを強めるときは、
  * ライトの範囲のマスクを用意し、建物の夕方の光（LayeredBuilding の .light）と同じ形で暖色を足す
  */

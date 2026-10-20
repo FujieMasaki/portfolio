@@ -180,7 +180,8 @@ type ImageInterior = {
   height: number;
   /**
    * どの光の中にあるか。indoor は室内灯の灯る展示室（--ambient-interior-filter）、
-   * outdoor は外光の入る窓辺（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える
+   * outdoor は外光の入る窓辺（--ambient-outdoor-room-filter）。TopHero.module.css が data-light で切り替える。
+   * 今は About / Work / Contact とも共通の展示室（GALLERY_ROOM）の indoor で、outdoor を使うアーチはない
    */
   light: "indoor" | "outdoor";
   /**
@@ -315,10 +316,10 @@ export type TopAmbient = {
   buildingFilter: string;
   /** 植物を同じ光の中に置く。saturate → brightness */
   sceneFilter: string;
-  /** About / Work の室内灯。brightness → saturate */
+  /** About / Work / Contact の室内灯。brightness → saturate（About / Work は TopHero.module.css でさらに 0.8 倍にする） */
   interiorFilter: string;
   /**
-   * Contact の通路（画像は夕方の光で描いてある）。brightness → saturate。
+   * 外光の入る通路（light: "outdoor"）。brightness → saturate。今は使うアーチがない（以前の Contact の通路の画像で使っていた）。
    * About / Work の室内灯（interiorFilter）と同じ色の寄せ方にし、明るさは各時間帯でその約 0.82 倍にする
    * （通路の画像は About / Work の画像より約 2 割明るく描いてあり、同じ値では Contact だけが明るく見えた）
    */
