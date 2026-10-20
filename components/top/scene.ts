@@ -217,7 +217,7 @@ export type Arch = {
   interior?: ImageInterior | ViewInterior;
 };
 
-/** About / Work は同じ展示室の建築写真と切り抜き位置を共有する。 */
+/** About / Work / Contact は同じ展示室の建築写真と切り抜き位置を共有する（Contact は src だけ透過版に替える）。 */
 const GALLERY_ROOM = {
   src: "/images/top/top-arch-shared-gallery-base.png",
   width: 1122,
