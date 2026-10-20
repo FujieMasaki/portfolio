@@ -31,7 +31,7 @@ const AboutArchGallery = () => (
             fill
             // 下の展示室の画像と同じく最初から見える位置にあるので、遅れて現れないよう遅延させない
             loading="eager"
-            sizes="(max-width: 767px) 30vw, 6vw"
+            sizes="(max-width: 767.98px) 30vw, 6vw"
             style={{ objectFit: "cover", objectPosition: photo.position ?? "center" }}
           />
         </span>
