@@ -302,6 +302,74 @@
   filter: saturate(0.75) contrast(0.98) brightness(0.85);
 }
 
+/*
+ * About の趣味の展示台。/about の Interests の展示台（壁と同じ素材を少し濃くした石の塊・明るい天板・足元の影）を小さくしたもの。
+ * 建築画像と同じ .archImage の中にあるので、時間帯の室内灯と About の brightness(0.8) がそのままかかる。
+ * 側面の陰は、天井のダウンライトから遠い側（data-light-side の反対側）だけを僅かに暗くする。
+ */
+.archPlinth {
+  --plinth-shade: rgb(40 30 20 / 0.16);
+
+  position: absolute;
+  display: block;
+  /* /about と同じく壁より少し濃い石。ダウンライトの暖色を受けた展示室の壁（建築画像）に合わせて色を寄せる */
+  background-color: #e4a25a;
+  background-image:
+    linear-gradient(to var(--plinth-lit-side), var(--plinth-shade), rgb(40 30 20 / 0) 55%),
+    linear-gradient(to bottom, rgb(40 30 20 / 0), rgb(40 30 20 / 0.14)),
+    url("/images/about/about-wall.webp");
+  /* /about の 900px の質感を、展示台の縮尺に合わせて細かくする */
+  background-size: 100% 100%, 100% 100%, 220px auto;
+  background-blend-mode: normal, normal, soft-light;
+  /* ベンチの面と床に落ちる、ダウンライトの反対側へわずかに流れた影 */
+  box-shadow: var(--plinth-cast-x) 3px 5px -1px rgb(30 22 14 / 0.3);
+}
+
+.archPlinth[data-light-side="right"] {
+  --plinth-lit-side: right;
+  --plinth-cast-x: -2px;
+}
+
+.archPlinth[data-light-side="left"] {
+  --plinth-lit-side: left;
+  --plinth-cast-x: 2px;
+}
+
+/* 天板。光を受ける上面だけ、わずかに明るい（/about の .plinth::before と同じ作り） */
+.archPlinth::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 7%;
+  min-height: 1px;
+  background: rgb(255 250 242 / 0.3);
+  border-bottom: 1px solid rgb(60 50 40 / 0.12);
+}
+
+/* 展示物。天板の奥に少し沈めて、載っているように見せる */
+.archPlinthObject {
+  position: absolute;
+  bottom: calc(100% - 4%);
+  display: block;
+}
+
+/* 天板に落ちる接地の影。展示物の真下に、ダウンライトの反対側へわずかにずらして置く */
+.archPlinthObject::before {
+  content: "";
+  position: absolute;
+  inset: auto 4% -6% 4%;
+  height: 16%;
+  translate: calc(var(--plinth-cast-x) * 0.5) 0;
+  background: radial-gradient(closest-side, rgb(30 22 14 / 0.4), rgb(30 22 14 / 0));
+}
+
+.archPlinthObject > img {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  filter: drop-shadow(var(--plinth-cast-x) 1px 1px rgb(30 22 14 / 0.25));
+}
+
 /* 元の Work 写真から額装作品だけを表示。周囲は共通の建築素材を見せる。 */
 .archWorkArtwork {
   position: absolute;
