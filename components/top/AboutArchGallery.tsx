@@ -66,7 +66,7 @@ const AboutArchGallery = () => (
       const box = image.box ?? { x: 0, y: 0, width: image.width, height: image.height };
 
       return (
-        <span className={styles.archPlinth} data-light={light} style={position} key={interestIndex}>
+        <span className={styles.archPlinth} data-light-side={light} style={position} key={interestIndex}>
           {/* 画像の透明な余白を除いた範囲（box）の底を、天板に載せる（/about の Interests と同じ切り出し方） */}
           <span
             className={styles.archPlinthObject}
@@ -82,7 +82,9 @@ const AboutArchGallery = () => (
               width={image.width}
               height={image.height}
               loading="eager"
-              // 展示物は建築画像の幅の約8〜12%。スライドの About のアップでも画面幅の1割に満たない
+              // 描く幅（透明な余白を含む）は、靴・ボールとも建築画像の幅の約12%。
+              // スライドの About のアップで画面幅の約10%、768px 以上（hover で拡大したとき）で約3%なので、ほぼ余裕はない。
+              // objectWidth・展示台の幅を大きくするときは sizes も上げる
               sizes="(max-width: 767.98px) 10vw, 3vw"
               style={{
                 width: `${(image.width / box.width) * 100}%`,

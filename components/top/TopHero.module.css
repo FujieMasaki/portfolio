@@ -305,7 +305,7 @@
 /*
  * About の趣味の展示台。/about の Interests の展示台（壁と同じ素材を少し濃くした石の塊・明るい天板・足元の影）を小さくしたもの。
  * 建築画像と同じ .archImage の中にあるので、時間帯の室内灯と About の brightness(0.8) がそのままかかる。
- * 側面の陰は、天井のダウンライトから遠い側（data-light の反対側）だけを僅かに暗くする。
+ * 側面の陰は、天井のダウンライトから遠い側（data-light-side の反対側）だけを僅かに暗くする。
  */
 .archPlinth {
   --plinth-shade: rgb(40 30 20 / 0.16);
@@ -325,12 +325,12 @@
   box-shadow: var(--plinth-cast-x) 3px 5px -1px rgb(30 22 14 / 0.3);
 }
 
-.archPlinth[data-light="right"] {
+.archPlinth[data-light-side="right"] {
   --plinth-lit-side: right;
   --plinth-cast-x: -2px;
 }
 
-.archPlinth[data-light="left"] {
+.archPlinth[data-light-side="left"] {
   --plinth-lit-side: left;
   --plinth-cast-x: 2px;
 }
