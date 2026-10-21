@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { CAREER } from "@/components/about/content";
+import { CAREER, INTERESTS } from "@/components/about/content";
 import styles from "./TopHero.module.css";
 
 /**
@@ -25,6 +25,20 @@ const PHOTO_FRAMES: readonly {
   { careerIndex: 3, left: "52.00%", top: "36.00%", width: "16.50%", height: "12.00%", objectPosition: "62% 50%" },
 ];
 
+/**
+ * 写真の下、石のベンチの手前の床に置く、趣味の展示（/about の Interests の展示台を小さくしたもの）。
+ * 展示物は /about と同じ INTERESTS の画像を使う（interestIndex：靴・バスケットボール）。
+ *
+ * 位置は写真と同じく共通建築に対する %。展示台の下端はベンチの足元（床との境目、約 86.7%）にそろえ、
+ * 高さだけを変えて、左右対称にならないようにする。
+ * light は天井のダウンライト（開口の中央の真上）のある側。展示台の側面の陰と、展示物の影の向きを決める。
+ * objectWidth は展示台の幅に対する展示物の幅（%）、objectShift は天板の中央からのずれ（展示物の幅に対する %）。
+ */
+const PLINTHS = [
+  { interestIndex: 0, left: "33.60%", top: "59.70%", width: "13.20%", height: "27.00%", light: "right", objectWidth: 86, objectShift: -4 },
+  { interestIndex: 1, left: "57.40%", top: "57.40%", width: "11.00%", height: "29.30%", light: "left", objectWidth: 69, objectShift: 0 },
+] as const;
+
 const AboutArchGallery = () => (
   <>
     {PHOTO_FRAMES.map(({ careerIndex, objectPosition, ...position }) => {
@@ -42,6 +56,41 @@ const AboutArchGallery = () => (
             sizes="(max-width: 767.98px) 30vw, 6vw"
             style={{ objectFit: "cover", objectPosition: objectPosition ?? photo.position ?? "center" }}
           />
+        </span>
+      );
+    })}
+
+    {PLINTHS.map(({ interestIndex, light, objectWidth, objectShift, ...position }) => {
+      const image = INTERESTS[interestIndex]?.image;
+      if (!image) return null;
+      const box = image.box ?? { x: 0, y: 0, width: image.width, height: image.height };
+
+      return (
+        <span className={styles.archPlinth} data-light={light} style={position} key={interestIndex}>
+          {/* 画像の透明な余白を除いた範囲（box）の底を、天板に載せる（/about の Interests と同じ切り出し方） */}
+          <span
+            className={styles.archPlinthObject}
+            style={{
+              width: `${objectWidth}%`,
+              left: `${50 - objectWidth / 2 + (objectWidth * objectShift) / 100}%`,
+              aspectRatio: `${box.width} / ${box.height}`,
+            }}
+          >
+            <Image
+              src={image.src}
+              alt=""
+              width={image.width}
+              height={image.height}
+              loading="eager"
+              // 展示物は建築画像の幅の約8〜12%。スライドの About のアップでも画面幅の1割に満たない
+              sizes="(max-width: 767.98px) 10vw, 3vw"
+              style={{
+                width: `${(image.width / box.width) * 100}%`,
+                left: `${(-box.x / box.width) * 100}%`,
+                top: `${(-box.y / box.height) * 100}%`,
+              }}
+            />
+          </span>
         </span>
       );
     })}
