@@ -101,16 +101,21 @@
 .number {
   margin: 0;
   font-size: var(--text-caption);
-  line-height: var(--leading-caption);
+  line-height: 1.2;
   letter-spacing: 0.1em;
   color: var(--wall-ink-muted);
 }
 
+/*
+ * 展示台の札。展示台の高さの比（content.ts の plinth.height）が中身に押し上げられて消えないよう、
+ * 項目の題（--text-title）より一段小さく、1行で組む
+ */
 .title {
   margin: 0.3em 0 0;
-  font-size: var(--text-title);
+  /* 4列の列が細い幅（768px 前後）でも「Alone Time」が1行に収まるよう、下限は 14px */
+  font-size: clamp(14px, 1.55vw, 20px);
   font-weight: 500;
-  line-height: var(--leading-title);
+  line-height: 1.2;
   letter-spacing: 0.02em;
 }
 
