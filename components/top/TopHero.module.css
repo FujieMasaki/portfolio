@@ -495,7 +495,6 @@
 }
 
 .archTitle {
-  font-family: var(--font-heading), serif;
   font-size: max(1.2cqw, 16px);
   font-weight: 500;
   line-height: 1;
@@ -607,7 +606,6 @@
   margin: 0;
   /* 字間の分だけ左に寄せて、中央を合わせる */
   padding: 0.36em 0 0.32em 0.22em;
-  font-family: var(--font-heading), serif;
   font-size: max(1cqw, 15px);
   font-weight: 500;
   line-height: 1;
@@ -838,7 +836,6 @@
 
 .name {
   margin: 0;
-  font-family: var(--font-heading), serif;
   font-size: clamp(14px, 1.1vw, 18px);
   font-weight: 500;
   letter-spacing: 0.14em;
@@ -1267,7 +1264,6 @@
   }
 
   .slideName {
-    font-family: var(--font-heading), serif;
     font-size: 13px;
     letter-spacing: 0.24em;
     /* 字間の分だけ右にずれて見えるのを戻す */
