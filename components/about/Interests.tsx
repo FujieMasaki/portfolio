@@ -76,8 +76,8 @@ const Exhibit = ({ item }: { item: Interest }) => {
           width={image.width}
           height={image.height}
           // 展示物の幅（列の幅 × objectWidth）に、切り落とす透明な余白の分を足した幅。広い列（Space）で約 26vw、
-          // 幅の狭い画面（1列・展示の幅は最大 320px）では最大約 270px
-          sizes="(max-width: 760px) 280px, 26vw"
+          // 幅の狭い画面（1列・展示の幅は最大 320px）では最大約 285px（Basketball：320 × 56% × 1325 / 835）
+          sizes="(max-width: 760px) 290px, 26vw"
           style={{
             width: `${(image.width / box.width) * 100}%`,
             left: `${(-box.x / box.width) * 100}%`,
