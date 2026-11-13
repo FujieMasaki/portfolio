@@ -299,7 +299,8 @@
 @media (hover: none) and (min-width: 760.02px) and (max-width: 1100px) {
   .hall {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 7vw;
+    /* 解説の列（約 300px）に、いちばん長い行（約 281px）が1字分の余裕を持って入るよう、列の間は詰める */
+    column-gap: 5vw;
   }
 
   /*
@@ -321,8 +322,8 @@
 
   /* 同じ行の展示台は下端がそろうので、線が左右でつながって1本の床になる */
   .plinth::after {
-    left: -4vw;
-    right: -4vw;
+    left: -2.5vw;
+    right: -2.5vw;
   }
 
   /* 解説は展示台のすぐ下から始める（.exhibit の align-items: center のままだと、短い解説が行の中ほどに下がる） */
