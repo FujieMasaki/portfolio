@@ -14,7 +14,7 @@
   z-index: 1;
   display: grid;
   /* 解説の列は、いちばん長い行（ジャーナリングサービスを企画・開発しています。）が本文の大きさで折り返さない幅にする */
-  grid-template-columns: minmax(480px, 1fr) minmax(0, 1.2fr) max-content;
+  grid-template-columns: minmax(500px, 1fr) minmax(0, 1.2fr) max-content;
   column-gap: clamp(24px, 3vw, 56px);
   align-items: end;
 }
@@ -230,10 +230,10 @@
 }
 
 /*
- * 幅の広くない画面（1900px まで）：解説の下に、棚とこれからを並べる。
- * 3列では、展示の列から解説の列（420px 以上）と Next を引いた残りが棚になり、実機が小さくなりすぎるため
+ * 幅の広くない画面（2100px まで）：解説の下に、棚とこれからを並べる。
+ * 3列では、展示の列から解説の列（500px 以上）と Next を引いた残りが棚になり、実機が小さくなりすぎるため
  */
-@media (max-width: 1900px) {
+@media (max-width: 2100px) {
   .project {
     grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
     row-gap: clamp(40px, 6svh, 56px);
