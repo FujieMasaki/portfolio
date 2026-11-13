@@ -20,6 +20,8 @@
   overflow: hidden;
   isolation: isolate;
   background: #1c211b;
+  /* 館の外の文字は、植物や夕方の空の上でも読めるよう、本文より少し太くする */
+  font-weight: 500;
   /* 植物や空の上でも Menu・順路の案内が読めるよう、TOP の館名と同じ淡い影を敷く（壁の案内では消す） */
   text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
 }
@@ -343,8 +345,6 @@
   border-top: 1px solid var(--wall-line);
   list-style: none;
   font-size: max(0.94cqw, var(--text-caption));
-  /* 植物や夕方の空の上でも読めるよう、景色の上の文字は少し太くする */
-  font-weight: 500;
   line-height: 1.6;
   letter-spacing: 0.08em;
 }
