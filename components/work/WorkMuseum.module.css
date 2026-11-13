@@ -120,9 +120,9 @@
   display: grid;
   /*
    * 札の列は3つの展示で同じ幅にし、展示の左端を壁の上で縦にそろえる。
-   * いちばん長い題（Explorations）と、札の文のいちばん長い行（約 19 字 × 本文の大きさ）が入る幅にする
+   * いちばん長い題（Explorations）と、札の文のいちばん長い行（約 19 字 × 本文の大きさ ≈ 356px）が、1〜2 字分の余裕を持って入る幅にする
    */
-  grid-template-columns: clamp(360px, 28vw, 420px) minmax(0, 1fr);
+  grid-template-columns: clamp(380px, 28vw, 420px) minmax(0, 1fr);
   column-gap: clamp(32px, 5vw, 96px);
   align-items: start;
   padding: clamp(56px, 8svh, 96px) var(--gutter);
