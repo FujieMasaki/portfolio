@@ -290,7 +290,6 @@
     word-break: auto-phrase;
   }
 
-  /* hover の無い端末向けに外した決めた改行を、展示台の下に置く幅では戻す */
   /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */
   .roomNavigation {
     height: auto;
