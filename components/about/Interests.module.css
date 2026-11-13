@@ -297,19 +297,22 @@
   .note br {
     display: revert;
   }
-}
-
-/* 幅 360px 以下では、解説のいちばん長い行（約 15 字）が数 px 収まらないので、決めた改行をやめて語の切れ目で折り返す */
-@media (max-width: 380px) {
-  .note br {
-    display: none;
-  }
 
   /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */
   .roomNavigation {
     height: auto;
     /* 左右の余白（--gutter）は案内の側が持つので、上下だけを決める */
     padding-block: 24px 112px;
+  }
+}
+
+/*
+ * 解説のいちばん長い行（15 字 × 18px × 1.04 ≈ 281px）は、解説の幅（画面の幅 − 左右の余白 7vw × 2 − 左の余白 16px）が
+ * それより狭くなる 350px 未満（320px など）では収まらないので、決めた改行をやめて語の切れ目で折り返す
+ */
+@media (max-width: 349.98px) {
+  .note br {
+    display: none;
   }
 }
 
