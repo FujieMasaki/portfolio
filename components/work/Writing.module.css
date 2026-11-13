@@ -62,7 +62,10 @@
   text-decoration: none;
 }
 
-/* 題。展示の主役なので、壁の文字（--wall-ink）より一段濃く、日本語の字間は詰めて文章として読ませる */
+/*
+ * 題。展示の主役なので、壁の文字（--wall-ink）より一段濃く、日本語の字間は詰めて文章として読ませる。
+ * 外部の記事の題は長く、2行で切るので、本文の大きさ（18px）にはせず、2行で読める字数を保つ（人間の判断）
+ */
 .entryTitle {
   /* 長い題は2行で切る（展示の高さをそろえる） */
   display: -webkit-box;
@@ -70,10 +73,10 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  font-size: var(--text-body);
+  font-size: clamp(16px, 1.15vw, 17px);
   font-weight: 500;
-  line-height: var(--leading-body);
-  letter-spacing: var(--tracking-body);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
   color: rgb(28 23 18);
   /* 語の途中（「だっ / た」など）で折り返さない（対応していないブラウザは通常の折り返し） */
   word-break: auto-phrase;

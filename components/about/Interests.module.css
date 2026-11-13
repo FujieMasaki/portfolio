@@ -217,26 +217,34 @@
   }
 }
 
-/*
- * hover の無い端末では、解説を最初から置いておく。
- * 全部の解説が列の幅で折り返すので、決めた改行はやめて語の切れ目で折り返す（細かく途中で切れた行を作らない）
- */
+/* hover の無い端末では、解説を最初から置いておく */
 @media (hover: none) {
   .note {
     opacity: 1;
     translate: none;
     pointer-events: auto;
   }
-
-  .note br {
-    display: none;
-  }
 }
 
-/* hover の無い幅の広い端末（1100px より広いタブレット）：全部の解説が同時に出て、列の幅で折り返すので、床の帯を高くする */
+/*
+ * hover の無い幅の広い端末（1100px より広いタブレット。iPad の横向きなど）：4列のまま全部の解説が同時に出る。
+ * 列が細く、本文の大きさでは1行9字ほどの細切れになるので、解説はこの幅だけ以前の小さな大きさにする（人間の判断）。
+ * 全部の解説が列の幅で折り返すので、床の帯を高くする
+ */
 @media (hover: none) and (min-width: 1100.02px) {
   .hall {
-    --floor-band: clamp(260px, 30svh, 320px);
+    --floor-band: clamp(200px, 24svh, 240px);
+  }
+
+  .note {
+    font-size: 12.5px;
+    line-height: 1.9;
+    letter-spacing: 0.1em;
+  }
+
+  /* 列の幅では決めた改行の行が途中で折り返すので、改行をやめて語の切れ目で折り返す */
+  .note br {
+    display: none;
   }
 }
 
@@ -283,10 +291,6 @@
   }
 
   /* hover の無い端末向けに外した決めた改行を、展示台の下に置く幅では戻す */
-  .note br {
-    display: revert;
-  }
-
   /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */
   .roomNavigation {
     height: auto;
