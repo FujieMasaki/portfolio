@@ -56,12 +56,12 @@
   opacity: 0.6;
 }
 
-/* 部屋の短い文。題の下の補足として、/about の本文（.lead）と同じくらいの大きさに置く */
+/* 部屋の短い文。/about の本文（.lead）と同じ大きさ・行間 */
 .statement {
-  margin: 2rem 0 0;
-  font-size: clamp(15px, 1.15vw, 17px);
-  line-height: 2;
-  letter-spacing: 0.06em;
+  margin: 1.6em 0 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
 }
 
 /* 順路の案内から来たときは、進んだ向きの 12px 先から現れる（--room-step。AboutMuseum.module.css） */
@@ -120,9 +120,9 @@
   display: grid;
   /*
    * 札の列は3つの展示で同じ幅にし、展示の左端を壁の上で縦にそろえる。
-   * いちばん長い題（Explorations）と札の文が入る幅にする
+   * いちばん長い題（Explorations）と、札の文のいちばん長い行（約 19 字 × 本文の大きさ）が入る幅にする
    */
-  grid-template-columns: clamp(300px, 24vw, 380px) minmax(0, 1fr);
+  grid-template-columns: clamp(360px, 28vw, 420px) minmax(0, 1fr);
   column-gap: clamp(32px, 5vw, 96px);
   align-items: start;
   padding: clamp(56px, 8svh, 96px) var(--gutter);
@@ -159,8 +159,11 @@
   padding-top: clamp(32px, 6svh, 64px);
 }
 
-/* タブレットまでの幅：札の下に展示を置く（横に並べると、展示の列が狭く、実機が小さくなりすぎる） */
-@media (max-width: 1000px) {
+/*
+ * タブレットまでの幅：札の下に展示を置く（横に並べると、展示の列が狭く、実機が小さくなりすぎる。
+ * Projects の解説のいちばん長い行（約 22 字）も、本文の大きさでは 1100px までの幅に収まらない）
+ */
+@media (max-width: 1100px) {
   .section {
     grid-template-columns: minmax(0, 1fr);
     row-gap: clamp(40px, 7svh, 56px);
