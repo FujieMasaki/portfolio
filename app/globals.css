@@ -15,6 +15,31 @@
   /* アーチを通り抜けて館内へ入るときの暗がり（TopHero.module.css の .passage と、着いた直後の body の地） */
   --passage-dark: #1f1b18;
 
+  /*
+   * 文字。英字・数字は Inter、日本語は Zen Kaku Gothic New（app/layout.tsx）。
+   * 大きさと行間は役割ごとにここで決め、各ページはこの値を使う（ページごとに本文の大きさを変えない）。
+   * ナビゲーション・札（ABOUT など）・タグ・ボタンは、役割に応じた大きさを各部品が持つ。
+   */
+  --font-family-base:
+    var(--font-inter), var(--font-zen-kaku-gothic-new), "Hiragino Sans", "Yu Gothic", sans-serif;
+
+  /* ページの題（Masaki Fujie など） */
+  --text-display: clamp(40px, 4vw, 56px);
+  --leading-display: 1.2;
+  /* 展示（セクション）の題（Career・Projects など） */
+  --text-heading: clamp(28px, 2.5vw, 36px);
+  --leading-heading: 1.3;
+  /* 展示の中の1点の題（Career の各時期、プロジェクト名など） */
+  --text-title: clamp(20px, 1.75vw, 24px);
+  --leading-title: 1.4;
+  /* 説明文・本文。全ページでこの大きさと行間にそろえる */
+  --text-body: 18px;
+  --leading-body: 1.7;
+  --tracking-body: 0.04em;
+  /* 補足・日付・番号 */
+  --text-caption: 14px;
+  --leading-caption: 1.5;
+
   --header-height: 64px;
   --container-max-width: 1160px;
   --container-padding: 32px;
@@ -23,7 +48,7 @@
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-text);
-  --font-sans: var(--font-body);
+  --font-sans: var(--font-family-base);
 }
 
 *,
@@ -47,7 +72,7 @@ body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-body), "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-family: var(--font-family-base);
   /* Safety net: layout is built to avoid overflow, this guards against unexpected regressions */
   overflow-x: hidden;
 }

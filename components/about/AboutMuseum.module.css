@@ -36,9 +36,6 @@
   isolation: isolate;
   min-height: 100svh;
   color: var(--wall-ink);
-  font-family:
-    var(--font-heading), "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
-  font-weight: 500;
   /*
    * 壁は1枚の素材をページ全体に敷く。about-wall.webp は about-background-img.png の上端 200px に
    * 下端 200px を少しずつ重ねて溶かしたもので、縦に繰り返しても継ぎ目が出ない（1774 x 687）。
@@ -59,7 +56,14 @@
   }
 }
 
-/* ---- 展示室の札（ABOUT / Masaki Fujie・Career・Interests の見出し。3つとも同じ大きさ） ---- */
+/* 札の短い文の決めた改行（約 19 字）は、本文の大きさでは幅の狭い画面に収まらないので、語の切れ目で折り返す */
+@media (max-width: 760px) {
+  .lead br {
+    display: none;
+  }
+}
+
+/* ---- 展示室の札（ABOUT / Masaki Fujie・Career・Interests の見出し） ---- */
 
 /* Career・Interests の札。Masaki Fujie と同じく、壁の左の余白にそろえて縦に積む */
 .sectionHeader {
@@ -82,18 +86,24 @@
   color: var(--wall-ink-muted);
 }
 
+/* 展示の題（Career・Interests・Writing など）。部屋の最初の札（h1）の題は、ページの題として一段大きくする */
 .roomTitle {
-  font-size: clamp(34px, 3.4vw, 50px);
-  line-height: 1.12;
-  letter-spacing: 0.04em;
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
+  letter-spacing: 0.02em;
   text-wrap: balance;
 }
 
+h1 > .roomTitle {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+}
+
 .lead {
-  margin: 2.2em 0 0;
-  font-size: clamp(14px, 1.05vw, 15.5px);
-  line-height: 2.2;
-  letter-spacing: 0.14em;
+  margin: 1.6em 0 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   /* 幅の狭い画面で折り返すときに、語の途中で切らない（対応していないブラウザは通常の折り返し） */
   word-break: auto-phrase;
 }

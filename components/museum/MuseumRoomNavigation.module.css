@@ -78,6 +78,8 @@
   align-items: center;
   gap: 0.6em;
   font-size: clamp(24px, 2.2vw, 32px);
+  /* 部屋の名前は、展示の題と同じ太さにする（壁の本文は 400） */
+  font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.04em;
   opacity: 0.86;

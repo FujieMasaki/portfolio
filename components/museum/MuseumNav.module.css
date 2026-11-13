@@ -15,7 +15,6 @@
   align-items: flex-start;
   justify-content: flex-start;
   padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 64px) 0;
-  font-family: var(--font-heading), serif;
   /* 壁に小さく書かれた館内案内の大きさ。壁の質感に埋もれないよう、太さではなく濃さ（--wall-ink）で読ませる */
   font-size: 15px;
   font-weight: 500;
