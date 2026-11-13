@@ -23,10 +23,10 @@
    */
   padding: clamp(64px, 10svh, 112px) var(--gutter) 48px;
   /*
-   * 末尾まで進んだとき、最後の展示（Experience。文字だけで幅 22em × 13px）が壁の中央に来るだけの余白。
+   * 末尾まで進んだとき、最後の展示（Experience。文字だけで幅 22em × 本文の大きさ）が壁の中央に来るだけの余白。
    * % は包含ブロック（.path。壁と同じ幅）に対する値。最後の展示の幅を変えたら、ここも合わせる
    */
-  padding-inline-end: max(var(--gutter), calc(50% - 22 * 13px / 2));
+  padding-inline-end: max(var(--gutter), calc(50% - 22 * var(--text-body) / 2));
 }
 
 .track[data-dragging] {
@@ -76,11 +76,14 @@
   translate: 0 24px;
 }
 
-/* 美術館のキャプション：番号と年 → 題 → 何をしていたか → そこで何を得たか */
+/*
+ * 美術館のキャプション：番号と年 → 題 → 何をしていたか → そこで何を得たか。
+ * 幅は本文の大きさの em で決め、解説のいちばん長い行（約 18 字）が決めた位置で改行されるようにする
+ */
 .label {
   flex: none;
   width: 20em;
-  font-size: 13px;
+  font-size: var(--text-body);
 }
 
 .exhibit[data-text-only] .label {
@@ -92,23 +95,24 @@
   align-items: baseline;
   gap: 1.4em;
   margin: 0;
+  font-size: var(--text-caption);
   font-style: italic;
+  line-height: var(--leading-caption);
   letter-spacing: 0.08em;
   color: var(--wall-ink-muted);
 }
 
 .period {
-  font-size: 12px;
   font-style: normal;
   letter-spacing: 0.16em;
 }
 
 .place {
-  margin: 0.7em 0 0;
-  font-size: clamp(20px, 1.6vw, 24px);
+  margin: 0.5em 0 0;
+  font-size: var(--text-title);
   font-weight: 500;
-  line-height: 1.25;
-  letter-spacing: 0.04em;
+  line-height: var(--leading-title);
+  letter-spacing: 0.02em;
 }
 
 .place::after {
@@ -120,25 +124,16 @@
 }
 
 .note {
-  margin: 1.3em 0 0;
-  font-size: 12.5px;
-  line-height: 1.95;
-  letter-spacing: 0.08em;
+  margin: 1.1em 0 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   word-break: auto-phrase;
 }
 
 /* 段落の間は、題との間より少しだけ詰める */
 .note + .note {
-  margin-top: 0.9em;
-}
-
-/* 最後の展示（Experience）は文字だけで段落が多いので、行と段落の間を少し広げ、窮屈に見せない（段落の間は、題との間 1.3em より少しだけ詰める） */
-.exhibit[data-text-only] .note {
-  line-height: 2.05;
-}
-
-.exhibit[data-text-only] .note + .note {
-  margin-top: 1.15em;
+  margin-top: 0.8em;
 }
 
 .frame {
@@ -336,13 +331,16 @@
     order: 4;
   }
 
-  /* 文字だけの展示は、決めた改行をやめて語の切れ目で折り返し、1行が長くなりすぎない幅にする */
-  .exhibit[data-text-only] .note {
-    max-width: 30em;
+  /*
+   * 決めた改行（約 18 字）は、本文の大きさでは幅の狭い画面に収まらないので、改行をやめて語の切れ目で折り返す。
+   * 文字だけの展示は、1行が長くなりすぎない幅にする
+   */
+  .note br {
+    display: none;
   }
 
-  .exhibit[data-text-only] .note br {
-    display: none;
+  .exhibit[data-text-only] .note {
+    max-width: 30em;
   }
 
   .period {

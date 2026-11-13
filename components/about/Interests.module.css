@@ -100,16 +100,18 @@
 
 .number {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-caption);
+  line-height: var(--leading-caption);
   letter-spacing: 0.1em;
   color: var(--wall-ink-muted);
 }
 
 .title {
-  margin: 0.5em 0 0;
-  font-size: clamp(14px, 1.15vw, 17px);
+  margin: 0.3em 0 0;
+  font-size: var(--text-title);
   font-weight: 500;
-  letter-spacing: 0.06em;
+  line-height: var(--leading-title);
+  letter-spacing: 0.02em;
 }
 
 .title::after {
@@ -131,9 +133,9 @@
   /* 隣の列の解説と重ならないよう、列の幅（＋列の間の半分ほど）で折り返す */
   width: max-content;
   max-width: calc(100% - clamp(16px, 2.2vw, 32px) + clamp(10px, 2vw, 36px));
-  font-size: 12.5px;
-  line-height: 1.9;
-  letter-spacing: 0.1em;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
   word-break: auto-phrase;
   opacity: 0;
   translate: 0 6px;
@@ -210,19 +212,26 @@
   }
 }
 
-/* hover の無い端末では、解説を最初から置いておく */
+/*
+ * hover の無い端末では、解説を最初から置いておく。
+ * 全部の解説が列の幅で折り返すので、決めた改行はやめて語の切れ目で折り返す（細かく途中で切れた行を作らない）
+ */
 @media (hover: none) {
   .note {
     opacity: 1;
     translate: none;
     pointer-events: auto;
   }
+
+  .note br {
+    display: none;
+  }
 }
 
 /* hover の無い幅の広い端末（タブレット）：全部の解説が同時に出て、列の幅で折り返すので、床の帯を高くする */
 @media (hover: none) and (min-width: 761px) {
   .hall {
-    --floor-band: clamp(200px, 24svh, 240px);
+    --floor-band: clamp(260px, 30svh, 320px);
   }
 }
 
@@ -233,13 +242,15 @@
   padding-top: clamp(32px, 6svh, 64px);
 }
 
-/* 幅の狭い画面：2列に置き、行ごとに床の線を引く。解説は場所を取るので、hover の有無によらず最初から見せる */
+/*
+ * 幅の狭い画面：1列に置き、展示ごとに床の線を引く。解説は場所を取るので、hover の有無によらず最初から見せる。
+ * 2列では解説の列が細く、本文の大きさでは1行に7〜8字しか入らず語の途中で切れるので、1列にして決めた改行のまま読ませる
+ */
 @media (max-width: 760px) {
   .hall {
     --plinth-base: clamp(84px, 24vw, 110px);
 
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 7vw;
+    grid-template-columns: minmax(0, 1fr);
     row-gap: 0;
     padding-bottom: 96px;
   }
@@ -249,45 +260,49 @@
   }
 
   /*
-   * 展示物・展示台・解説を行ごとに同じ高さの段にそろえる（subgrid）。
-   * 解説の行数が違っても、同じ行の展示台の下端がずれない。
+   * 展示は画面の中央に置く。展示台が画面幅いっぱいの板にならず、展示物も大きくなりすぎないよう、幅に上限を設ける
+   * （解説のいちばん長い行（約 15 字）が決めた位置で改行される幅）
    */
   .exhibit {
-    display: grid;
-    grid-row: span 3;
-    grid-template-rows: subgrid;
-    row-gap: 0;
-    justify-items: center;
+    justify-self: center;
+    width: min(100%, 320px);
   }
 
-  .object,
-  .plinth {
-    align-self: end;
-  }
-
-  /* 同じ行の展示台は下端がそろうので、線が左右でつながって1本の床になる */
+  /* 展示台の下に、壁の左右の余白まで届く床の線を引く */
   .plinth::after {
     content: "";
     position: absolute;
     top: 100%;
-    left: -4vw;
-    right: -4vw;
+    left: calc(50% - 50vw + var(--gutter));
+    right: calc(50% - 50vw + var(--gutter));
     border-top: 1px solid rgb(72 62 52 / 0.22);
   }
 
   .note {
     position: static;
-    justify-self: stretch;
+    /* 展示（縦の flex）の中で、展示台と同じ幅に広げて左揃えにする */
+    align-self: stretch;
     margin: 18px 0 56px;
     padding: 0 0 0 clamp(16px, 2.2vw, 32px);
     width: auto;
     max-width: none;
-    font-size: 12px;
     white-space: normal;
     opacity: 1;
     translate: none;
     pointer-events: auto;
     word-break: auto-phrase;
+  }
+
+  /* hover の無い端末向けに外した決めた改行を、1列の幅では戻す */
+  .note br {
+    display: revert;
+  }
+}
+
+/* 幅 360px 以下では、解説のいちばん長い行（約 15 字）が数 px 収まらないので、決めた改行をやめて語の切れ目で折り返す */
+@media (max-width: 380px) {
+  .note br {
+    display: none;
   }
 
   /* 床を敷かない幅なので、最後の展示の解説から少し間を空けて、順路の案内だけを置く */

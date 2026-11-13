@@ -112,17 +112,14 @@
   color: var(--wall-ink);
 }
 
-/*
- * 何をしている人かの短い文。日本語の字間は詰めて、文章として読ませる。
- * /about の展示の札の本文（.lead）より、少しだけ大きく、行間は読みやすさを優先する
- */
+/* 何をしている人かの短い文。全ページの本文と同じ大きさ・行間で、文章として読ませる */
 .introduction {
   display: grid;
-  gap: 1.1em;
-  margin-top: 2.2em;
-  font-size: clamp(14.5px, 1.1vw, 16px);
-  line-height: 2;
-  letter-spacing: 0.05em;
+  gap: 1em;
+  margin-top: 1.8em;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
 }
 
 .introduction p {
@@ -139,7 +136,7 @@
   align-items: center;
   gap: 1.2em;
   margin: 2.8em 0 0;
-  font-size: 14px;
+  font-size: var(--text-caption);
   letter-spacing: 0.24em;
   color: var(--wall-ink-muted);
 }
@@ -219,8 +216,7 @@
 
   .introduction {
     gap: 0.7em;
-    margin-top: 1.6em;
-    line-height: 1.75;
+    margin-top: 1.4em;
   }
 
   .place {
