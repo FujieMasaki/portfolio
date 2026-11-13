@@ -263,8 +263,16 @@
  */
 @media (max-width: 760px), (hover: none) and (max-width: 1100px) {
   .hall {
+    /* 札の題を大きくした分、低い台（Alone Time）でも中身が min-height を超えない高さにする */
+    --plinth-base: clamp(116px, 12vw, 124px);
+
     row-gap: 0;
     padding-bottom: 96px;
+  }
+
+  /* 展示を1点ずつ大きく見せる幅なので、札の題が下の解説（本文）より弱く見えない大きさにする（人間の判断） */
+  .title {
+    font-size: clamp(18px, 2.4vw, 20px);
   }
 
   .hall::after {
@@ -343,8 +351,6 @@
  */
 @media (max-width: 760px) {
   .hall {
-    --plinth-base: clamp(84px, 24vw, 110px);
-
     grid-template-columns: minmax(0, 1fr);
   }
 
