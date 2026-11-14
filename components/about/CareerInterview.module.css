@@ -1,0 +1,97 @@
+/*
+ * ABOUT / Career の後に添えるインタビューの札。
+ * 壁・文字・札は AboutMuseum.module.css と共通。Career の壁の左の余白にそろえ、文字だけで静かに置く。
+ * 上の間は Career の下の余白（.path）、下の間は Interests の上の余白がつくるので、ここでは足さない。
+ */
+
+.interview {
+  padding-inline: var(--gutter);
+}
+
+/* 見出し。Career の展示の題（.place）と同じ大きさで、札（Interview）の下に置く */
+.title {
+  margin: 1rem 0 0;
+  font-size: var(--text-title);
+  font-weight: 500;
+  line-height: var(--leading-title);
+  letter-spacing: 0.02em;
+  word-break: auto-phrase;
+}
+
+/* 見出しの下の短い線（Career の展示の題と同じ） */
+.title::after {
+  content: "";
+  display: block;
+  width: 24px;
+  margin-top: 0.9em;
+  border-top: 1px solid var(--wall-line);
+}
+
+/* 紹介の文。広い画面では1〜2行に収め、幅の狭い画面では画面の幅で折り返す */
+.description {
+  max-width: 50em;
+  margin: 1.1em 0 0;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  word-break: auto-phrase;
+}
+
+/* 記事へのリンク。文字のまま、細い下線と小さな矢印だけで示す */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 2em;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--wall-line);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.3s var(--ease-calm);
+}
+
+.arrow {
+  flex: none;
+  width: 0.6em;
+  height: 0.6em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  transition: translate 0.4s var(--ease-calm);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .link:hover .arrow {
+    translate: 2px -2px;
+  }
+}
+
+.link:focus-visible {
+  outline: 1px solid var(--wall-ink-muted);
+  outline-offset: 4px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow,
+  .link:hover .arrow {
+    translate: none;
+    transition: none;
+  }
+}

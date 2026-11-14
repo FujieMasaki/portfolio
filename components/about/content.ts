@@ -112,6 +112,14 @@ export const CAREER: CareerExhibit[] = [
   },
 ];
 
+/** Career の後に添える、外部の媒体に載ったインタビュー。記事は転載せず、紹介の文とリンクだけを置く */
+export const INTERVIEW = {
+  title: "これまでの歩みと、働き方について。",
+  description:
+    "これまでの仕事やエンジニアになったきっかけ、当時の暮らしと働き方について、転職支援サービス「Remogu」のインタビューでお話ししています。",
+  link: { text: "インタビュー記事を読む", href: "https://remogu.jp/c/go_fujie/" },
+};
+
 /** 画像の中で展示物が写っている範囲（px）。透明な余白を除いて展示台に載せるために使う */
 type Box = { x: number; y: number; width: number; height: number };
 
